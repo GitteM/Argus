@@ -6,6 +6,13 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		ECDA1D142E4F831A00D59653 /* Domain in Frameworks */ = {isa = PBXBuildFile; productRef = ECDA1D132E4F831A00D59653 /* Domain */; };
+		ECDA1D172E4F838700D59653 /* Data in Frameworks */ = {isa = PBXBuildFile; productRef = ECDA1D162E4F838700D59653 /* Data */; };
+		ECDA1D1A2E4F83E100D59653 /* Presentation in Frameworks */ = {isa = PBXBuildFile; productRef = ECDA1D192E4F83E100D59653 /* Presentation */; };
+		ECDA1D1D2E4F842300D59653 /* Infrastructure in Frameworks */ = {isa = PBXBuildFile; productRef = ECDA1D1C2E4F842300D59653 /* Infrastructure */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		EC78E3A82E4F694900262F13 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -19,6 +26,10 @@
 /* Begin PBXFileReference section */
 		EC78E3992E4F694800262F13 /* Argus.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Argus.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EC78E3A72E4F694900262F13 /* ArgusTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ArgusTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		ECDA1D112E4F82E700D59653 /* Domain */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Domain; path = AppPackages/Domain; sourceTree = "<group>"; };
+		ECDA1D152E4F836700D59653 /* Data */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Data; path = AppPackages/Data; sourceTree = "<group>"; };
+		ECDA1D182E4F83D500D59653 /* Presentation */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Presentation; path = AppPackages/Presentation; sourceTree = "<group>"; };
+		ECDA1D1B2E4F840F00D59653 /* Infrastructure */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Infrastructure; path = AppPackages/Infrastructure; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -39,6 +50,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ECDA1D172E4F838700D59653 /* Data in Frameworks */,
+				ECDA1D1A2E4F83E100D59653 /* Presentation in Frameworks */,
+				ECDA1D142E4F831A00D59653 /* Domain in Frameworks */,
+				ECDA1D1D2E4F842300D59653 /* Infrastructure in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -55,8 +70,13 @@
 		EC78E3902E4F694800262F13 = {
 			isa = PBXGroup;
 			children = (
+				ECDA1D1B2E4F840F00D59653 /* Infrastructure */,
+				ECDA1D182E4F83D500D59653 /* Presentation */,
+				ECDA1D152E4F836700D59653 /* Data */,
+				ECDA1D112E4F82E700D59653 /* Domain */,
 				EC78E39B2E4F694800262F13 /* Argus */,
 				EC78E3AA2E4F694900262F13 /* ArgusTests */,
+				ECDA1D122E4F831A00D59653 /* Frameworks */,
 				EC78E39A2E4F694800262F13 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -68,6 +88,13 @@
 				EC78E3A72E4F694900262F13 /* ArgusTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		ECDA1D122E4F831A00D59653 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -84,12 +111,17 @@
 			buildRules = (
 			);
 			dependencies = (
+				EC854F6C2E4FBA5400468161 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				EC78E39B2E4F694800262F13 /* Argus */,
 			);
 			name = Argus;
 			packageProductDependencies = (
+				ECDA1D132E4F831A00D59653 /* Domain */,
+				ECDA1D162E4F838700D59653 /* Data */,
+				ECDA1D192E4F83E100D59653 /* Presentation */,
+				ECDA1D1C2E4F842300D59653 /* Infrastructure */,
 			);
 			productName = Argus;
 			productReference = EC78E3992E4F694800262F13 /* Argus.app */;
@@ -146,6 +178,9 @@
 			);
 			mainGroup = EC78E3902E4F694800262F13;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				EC854F6A2E4FBA2D00468161 /* XCRemoteSwiftPackageReference "SwiftLint" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = EC78E39A2E4F694800262F13 /* Products */;
 			projectDirPath = "";
@@ -196,6 +231,10 @@
 			isa = PBXTargetDependency;
 			target = EC78E3982E4F694800262F13 /* Argus */;
 			targetProxy = EC78E3A82E4F694900262F13 /* PBXContainerItemProxy */;
+		};
+		EC854F6C2E4FBA5400468161 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = EC854F6B2E4FBA5400468161 /* SwiftLintBuildToolPlugin */;
 		};
 /* End PBXTargetDependency section */
 
@@ -467,6 +506,41 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		EC854F6A2E4FBA2D00468161 /* XCRemoteSwiftPackageReference "SwiftLint" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/realm/SwiftLint.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.59.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		EC854F6B2E4FBA5400468161 /* SwiftLintBuildToolPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = EC854F6A2E4FBA2D00468161 /* XCRemoteSwiftPackageReference "SwiftLint" */;
+			productName = "plugin:SwiftLintBuildToolPlugin";
+		};
+		ECDA1D132E4F831A00D59653 /* Domain */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Domain;
+		};
+		ECDA1D162E4F838700D59653 /* Data */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Data;
+		};
+		ECDA1D192E4F83E100D59653 /* Presentation */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Presentation;
+		};
+		ECDA1D1C2E4F842300D59653 /* Infrastructure */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Infrastructure;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = EC78E3912E4F694800262F13 /* Project object */;
 }

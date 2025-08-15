@@ -1,0 +1,45 @@
+# SwiftLint Configuration
+
+included:
+  - Argus
+  - AppPackages/Data/Sources
+  - AppPackages/Domain/Sources
+  - AppPackages/Infrastructure/Sources
+  - AppPackages/Presentation/Sources
+
+excluded:
+  - Carthage
+  - Pods
+  - .build
+  - DerivedData
+
+disabled_rules:
+  - trailing_whitespace
+
+opt_in_rules:
+  - empty_count
+  - empty_string
+  - explicit_init
+  - first_where
+  - force_unwrapping
+  - sorted_imports
+
+line_length: 120
+
+function_body_length: 150
+
+type_body_length: 300
+
+file_length: 500
+
+identifier_name:
+  min_length: 2
+  max_length: 40
+  excluded:
+    - id
+    - i
+    - j
+    - k
+    - x
+    - y
+    - z
