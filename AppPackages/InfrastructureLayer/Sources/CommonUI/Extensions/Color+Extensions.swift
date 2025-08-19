@@ -1,0 +1,3 @@
+import SwiftUICore
+
+extension Color {}
