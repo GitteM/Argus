@@ -1,0 +1,106 @@
+// swift-tools-version: 6.1
+
+import PackageDescription
+
+let package = Package(
+    name: "Data",
+    platforms: [
+        .iOS(.v17),
+    ],
+    products: [
+        .library(
+            name: "Data",
+            targets: ["Core"]
+        ),
+        .library(
+            name: "DataSource",
+            targets: ["DataSource"]
+        ),
+        .library(
+            name: "Network",
+            targets: ["Network"]
+        ),
+        .library(
+            name: "Persistence",
+            targets: ["Persistence"]
+        ),
+        .library(
+            name: "Repositories",
+            targets: ["Repositories"]
+        ),
+    ],
+    dependencies: [
+        .package(path: "../Domain"),
+
+        // MARK: - MQTT (For IoT real-time communication)
+
+        .package(url: "https://github.com/emqx/CocoaMQTT.git", from: "2.1.0"),
+    ],
+    targets: [
+        .target(
+            name: "Core",
+            dependencies: [
+                "Repositories",
+                "Network",
+                "Persistence",
+                "DataSource",
+            ],
+            path: "Sources/Core"
+        ),
+        .target(
+            name: "DataSource",
+            dependencies: [
+                .product(name: "Domain", package: "Domain"),
+                "CocoaMQTT",
+            ],
+            path: "Sources/DataSource"
+        ),
+        .target(
+            name: "Network",
+            dependencies: [
+                .product(name: "Domain", package: "Domain"),
+            ],
+            path: "Sources/Network"
+        ),
+        .target(
+            name: "Persistence",
+            dependencies: [
+                .product(name: "Domain", package: "Domain"),
+            ],
+            path: "Sources/Persistence"
+        ),
+        .target(
+            name: "Repositories",
+            dependencies: [
+                .product(name: "Domain", package: "Domain"),
+                "Network",
+                "Persistence",
+                "DataSource",
+            ],
+            path: "Sources/Repositories"
+        ),
+        .testTarget(
+            name: "DataSourceTests",
+            dependencies: [
+                "DataSource",
+                .product(name: "Domain", package: "Domain"),
+            ],
+            path: "Tests/DataSourceTests"
+        ),
+        .testTarget(
+            name: "NetworkTests",
+            dependencies: ["Network"],
+            path: "Tests/NetworkTests"
+        ),
+        .testTarget(
+            name: "PersistenceTests",
+            dependencies: ["Persistence"],
+            path: "Tests/PersistenceTests"
+        ),
+        .testTarget(
+            name: "RepositoriesTests",
+            dependencies: ["Repositories"],
+            path: "Tests/RepositoriesTests"
+        ),
+    ]
+)

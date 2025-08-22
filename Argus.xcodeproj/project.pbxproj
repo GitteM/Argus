@@ -7,15 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		EC854F6E2E508E2600468161 /* DataLayer in Frameworks */ = {isa = PBXBuildFile; productRef = EC854F6D2E508E2600468161 /* DataLayer */; };
-		EC854F702E508E2600468161 /* DomainLayer in Frameworks */ = {isa = PBXBuildFile; productRef = EC854F6F2E508E2600468161 /* DomainLayer */; };
-		EC854F722E508E2600468161 /* InfrastructureLayer in Frameworks */ = {isa = PBXBuildFile; productRef = EC854F712E508E2600468161 /* InfrastructureLayer */; };
-		EC854F742E508E2600468161 /* AlertsModule in Frameworks */ = {isa = PBXBuildFile; productRef = EC854F732E508E2600468161 /* AlertsModule */; };
-		EC854F762E508E2600468161 /* CommonModule in Frameworks */ = {isa = PBXBuildFile; productRef = EC854F752E508E2600468161 /* CommonModule */; };
-		EC854F782E508E2600468161 /* DashboardModule in Frameworks */ = {isa = PBXBuildFile; productRef = EC854F772E508E2600468161 /* DashboardModule */; };
-		EC854F7A2E508E2600468161 /* DeviceDetailModule in Frameworks */ = {isa = PBXBuildFile; productRef = EC854F792E508E2600468161 /* DeviceDetailModule */; };
-		EC854F7C2E508E2600468161 /* PresentationLayer in Frameworks */ = {isa = PBXBuildFile; productRef = EC854F7B2E508E2600468161 /* PresentationLayer */; };
-		EC854F7E2E508E2600468161 /* SettingsModule in Frameworks */ = {isa = PBXBuildFile; productRef = EC854F7D2E508E2600468161 /* SettingsModule */; };
+		EC2977A32E58A1F300734BEA /* Alerts in Frameworks */ = {isa = PBXBuildFile; productRef = EC2977A22E58A1F300734BEA /* Alerts */; };
+		EC2977A52E58A1FD00734BEA /* Dashboard in Frameworks */ = {isa = PBXBuildFile; productRef = EC2977A42E58A1FD00734BEA /* Dashboard */; };
+		EC2977A72E58A20200734BEA /* DeviceDetail in Frameworks */ = {isa = PBXBuildFile; productRef = EC2977A62E58A20200734BEA /* DeviceDetail */; };
+		EC2977A92E58A20A00734BEA /* Settings in Frameworks */ = {isa = PBXBuildFile; productRef = EC2977A82E58A20A00734BEA /* Settings */; };
+		EC63945A2E58B8C400FE0A82 /* Infrastructure in Frameworks */ = {isa = PBXBuildFile; productRef = EC6394592E58B8C400FE0A82 /* Infrastructure */; };
+		EC63945C2E58B8CC00FE0A82 /* Presentation in Frameworks */ = {isa = PBXBuildFile; productRef = EC63945B2E58B8CC00FE0A82 /* Presentation */; };
+		ECAA1F072E58BA3C006AA681 /* Domain in Frameworks */ = {isa = PBXBuildFile; productRef = ECAA1F062E58BA3C006AA681 /* Domain */; };
+		ECAA1F092E58BAFF006AA681 /* Data in Frameworks */ = {isa = PBXBuildFile; productRef = ECAA1F082E58BAFF006AA681 /* Data */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -31,10 +30,10 @@
 /* Begin PBXFileReference section */
 		EC78E3992E4F694800262F13 /* Argus.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Argus.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EC78E3A72E4F694900262F13 /* ArgusTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ArgusTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		ECDA1D112E4F82E700D59653 /* DomainLayer */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = DomainLayer; path = AppPackages/DomainLayer; sourceTree = "<group>"; };
-		ECDA1D152E4F836700D59653 /* DataLayer */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = DataLayer; path = AppPackages/DataLayer; sourceTree = "<group>"; };
-		ECDA1D182E4F83D500D59653 /* PresentationLayer */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = PresentationLayer; path = AppPackages/PresentationLayer; sourceTree = "<group>"; };
-		ECDA1D1B2E4F840F00D59653 /* InfrastructureLayer */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = InfrastructureLayer; path = AppPackages/InfrastructureLayer; sourceTree = "<group>"; };
+		ECDA1D112E4F82E700D59653 /* Domain */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Domain; path = AppPackages/Domain; sourceTree = "<group>"; };
+		ECDA1D152E4F836700D59653 /* Data */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Data; path = AppPackages/Data; sourceTree = "<group>"; };
+		ECDA1D182E4F83D500D59653 /* Presentation */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Presentation; path = AppPackages/Presentation; sourceTree = "<group>"; };
+		ECDA1D1B2E4F840F00D59653 /* Infrastructure */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Infrastructure; path = AppPackages/Infrastructure; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -55,15 +54,14 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EC854F702E508E2600468161 /* DomainLayer in Frameworks */,
-				EC854F782E508E2600468161 /* DashboardModule in Frameworks */,
-				EC854F7C2E508E2600468161 /* PresentationLayer in Frameworks */,
-				EC854F742E508E2600468161 /* AlertsModule in Frameworks */,
-				EC854F7A2E508E2600468161 /* DeviceDetailModule in Frameworks */,
-				EC854F722E508E2600468161 /* InfrastructureLayer in Frameworks */,
-				EC854F6E2E508E2600468161 /* DataLayer in Frameworks */,
-				EC854F7E2E508E2600468161 /* SettingsModule in Frameworks */,
-				EC854F762E508E2600468161 /* CommonModule in Frameworks */,
+				EC63945C2E58B8CC00FE0A82 /* Presentation in Frameworks */,
+				EC2977A32E58A1F300734BEA /* Alerts in Frameworks */,
+				EC2977A92E58A20A00734BEA /* Settings in Frameworks */,
+				EC2977A72E58A20200734BEA /* DeviceDetail in Frameworks */,
+				EC2977A52E58A1FD00734BEA /* Dashboard in Frameworks */,
+				ECAA1F072E58BA3C006AA681 /* Domain in Frameworks */,
+				ECAA1F092E58BAFF006AA681 /* Data in Frameworks */,
+				EC63945A2E58B8C400FE0A82 /* Infrastructure in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -80,10 +78,10 @@
 		EC78E3902E4F694800262F13 = {
 			isa = PBXGroup;
 			children = (
-				ECDA1D1B2E4F840F00D59653 /* InfrastructureLayer */,
-				ECDA1D182E4F83D500D59653 /* PresentationLayer */,
-				ECDA1D152E4F836700D59653 /* DataLayer */,
-				ECDA1D112E4F82E700D59653 /* DomainLayer */,
+				ECDA1D1B2E4F840F00D59653 /* Infrastructure */,
+				ECDA1D182E4F83D500D59653 /* Presentation */,
+				ECDA1D152E4F836700D59653 /* Data */,
+				ECDA1D112E4F82E700D59653 /* Domain */,
 				EC78E39B2E4F694800262F13 /* Argus */,
 				EC78E3AA2E4F694900262F13 /* ArgusTests */,
 				EC78E39A2E4F694800262F13 /* Products */,
@@ -120,15 +118,14 @@
 			);
 			name = Argus;
 			packageProductDependencies = (
-				EC854F6D2E508E2600468161 /* DataLayer */,
-				EC854F6F2E508E2600468161 /* DomainLayer */,
-				EC854F712E508E2600468161 /* InfrastructureLayer */,
-				EC854F732E508E2600468161 /* AlertsModule */,
-				EC854F752E508E2600468161 /* CommonModule */,
-				EC854F772E508E2600468161 /* DashboardModule */,
-				EC854F792E508E2600468161 /* DeviceDetailModule */,
-				EC854F7B2E508E2600468161 /* PresentationLayer */,
-				EC854F7D2E508E2600468161 /* SettingsModule */,
+				EC2977A22E58A1F300734BEA /* Alerts */,
+				EC2977A42E58A1FD00734BEA /* Dashboard */,
+				EC2977A62E58A20200734BEA /* DeviceDetail */,
+				EC2977A82E58A20A00734BEA /* Settings */,
+				EC6394592E58B8C400FE0A82 /* Infrastructure */,
+				EC63945B2E58B8CC00FE0A82 /* Presentation */,
+				ECAA1F062E58BA3C006AA681 /* Domain */,
+				ECAA1F082E58BAFF006AA681 /* Data */,
 			);
 			productName = Argus;
 			productReference = EC78E3992E4F694800262F13 /* Argus.app */;
@@ -534,41 +531,37 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		EC854F6D2E508E2600468161 /* DataLayer */ = {
+		EC2977A22E58A1F300734BEA /* Alerts */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = DataLayer;
+			productName = Alerts;
 		};
-		EC854F6F2E508E2600468161 /* DomainLayer */ = {
+		EC2977A42E58A1FD00734BEA /* Dashboard */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = DomainLayer;
+			productName = Dashboard;
 		};
-		EC854F712E508E2600468161 /* InfrastructureLayer */ = {
+		EC2977A62E58A20200734BEA /* DeviceDetail */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = InfrastructureLayer;
+			productName = DeviceDetail;
 		};
-		EC854F732E508E2600468161 /* AlertsModule */ = {
+		EC2977A82E58A20A00734BEA /* Settings */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = AlertsModule;
+			productName = Settings;
 		};
-		EC854F752E508E2600468161 /* CommonModule */ = {
+		EC6394592E58B8C400FE0A82 /* Infrastructure */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = CommonModule;
+			productName = Infrastructure;
 		};
-		EC854F772E508E2600468161 /* DashboardModule */ = {
+		EC63945B2E58B8CC00FE0A82 /* Presentation */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = DashboardModule;
+			productName = Presentation;
 		};
-		EC854F792E508E2600468161 /* DeviceDetailModule */ = {
+		ECAA1F062E58BA3C006AA681 /* Domain */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = DeviceDetailModule;
+			productName = Domain;
 		};
-		EC854F7B2E508E2600468161 /* PresentationLayer */ = {
+		ECAA1F082E58BAFF006AA681 /* Data */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = PresentationLayer;
-		};
-		EC854F7D2E508E2600468161 /* SettingsModule */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = SettingsModule;
+			productName = Data;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
