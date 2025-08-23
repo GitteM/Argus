@@ -30,6 +30,7 @@
 /* Begin PBXFileReference section */
 		EC78E3992E4F694800262F13 /* Argus.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Argus.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EC78E3A72E4F694900262F13 /* ArgusTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ArgusTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		ECAA1F0A2E59DE42006AA681 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		ECDA1D112E4F82E700D59653 /* Domain */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Domain; path = AppPackages/Domain; sourceTree = "<group>"; };
 		ECDA1D152E4F836700D59653 /* Data */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Data; path = AppPackages/Data; sourceTree = "<group>"; };
 		ECDA1D182E4F83D500D59653 /* Presentation */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Presentation; path = AppPackages/Presentation; sourceTree = "<group>"; };
@@ -78,6 +79,7 @@
 		EC78E3902E4F694800262F13 = {
 			isa = PBXGroup;
 			children = (
+				ECAA1F0A2E59DE42006AA681 /* README.md */,
 				ECDA1D1B2E4F840F00D59653 /* Infrastructure */,
 				ECDA1D182E4F83D500D59653 /* Presentation */,
 				ECDA1D152E4F836700D59653 /* Data */,

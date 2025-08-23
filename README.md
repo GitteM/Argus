@@ -2,8 +2,8 @@
 
 A modern, iOS application demonstrating real-time IoT device monitoring and control using Clean Architecture, MVVM pattern, and modular design with Swift Package Manager.
 
-![Swift](https://img.shields.io/badge/Swift-5.9-orange.svg)
-![iOS](https://img.shields.io/badge/iOS-16.0%2B-blue.svg)
+![Swift](https://img.shields.io/badge/Swift-6.1-orange.svg)
+![iOS](https://img.shields.io/badge/iOS-17.0%2B-blue.svg)
 ![Architecture](https://img.shields.io/badge/Architecture-Clean%20+%20MVVM-green.svg)
 ![SPM](https://img.shields.io/badge/SPM-Modular-red.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
@@ -55,14 +55,13 @@ The application follows Clean Architecture principles with four distinct layers:
 ### Package Structure
 
 ```
-IoTDeviceManagement/
-├── IoTApp/                    # Main iOS application
+Argus/
+├── Argus/                   # Main iOS application
 ├── Packages/
 │   ├── Domain/               # Business logic (no dependencies)
 │   ├── Data/                 # Repository implementations
 │   ├── Presentation/         # UI modules (Dashboard, Settings, etc.)
-│   ├── Infrastructure/       # Core services and utilities
-│   └── DemoMode/            # Mock implementations
+│   └── Infrastructure/       # Core services and utilities
 └── README.md
 ```
 
@@ -135,6 +134,37 @@ Open Argus/Argus.xcworkspace
 
 - **Debug**: Development environment with verbose logging
 - **Release**: Production build with optimizations
+
+### Testing
+
+#### MQTT Test Environment
+
+This iOS app can be tested against a local MQTT broker using our containerized test environment:
+
+**Repository**: [mqtt-test-environment](https://github.com/GitteM/mqtt-test-environment)
+
+**Quick Setup:**
+```bash
+# Clone the test environment
+git clone git@github.com:GitteM/mqtt-test-environment.git
+cd mqtt-test-environment
+chmod +x setup.sh
+
+# Start MQTT broker and simulators
+./setup.sh start
+
+# View live MQTT messages
+./setup.sh logs
+
+iOS App Configuration:
+- MQTT Broker: localhost:1883 (or your Mac's IP for device testing)
+- Discovery Topic: homeassistant/+/+/config
+- Test Devices: Living Room Light, Kitchen Temperature Sensor
+
+For Device Testing:
+Replace localhost with your Mac's IP address (found in System Preferences > Network) when testing on physical iOS devices.
+
+See the https://github.com/GitteM/mqtt-test-environment/blob/main/README.md for complete documentation and troubleshooting.
 
 ## Performance
 
