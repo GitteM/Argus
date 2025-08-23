@@ -130,14 +130,14 @@ Open Argus/Argus.xcworkspace
 - **Animations**: Smooth transitions and micro-interactions
 - **Responsive**: Adaptive layouts for all iOS devices
 
-### Build Configurations
+## Build Configurations
 
 - **Debug**: Development environment with verbose logging
 - **Release**: Production build with optimizations
 
-### Testing
+## Testing
 
-#### MQTT Test Environment
+### MQTT Test Environment
 
 This iOS app can be tested against a local MQTT broker using our containerized test environment:
 
