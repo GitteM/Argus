@@ -155,6 +155,7 @@ chmod +x setup.sh
 
 # View live MQTT messages
 ./setup.sh logs
+```
 
 iOS App Configuration:
 - MQTT Broker: localhost:1883 (or your Mac's IP for device testing)
