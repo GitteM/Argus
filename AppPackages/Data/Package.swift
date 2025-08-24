@@ -84,8 +84,7 @@ let package = Package(
             dependencies: [
                 "DataSource",
                 .product(name: "Domain", package: "Domain"),
-            ],
-            path: "Tests/DataSourceTests"
+            ]
         ),
         .testTarget(
             name: "NetworkTests",

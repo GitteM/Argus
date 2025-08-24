@@ -98,7 +98,16 @@ let package = Package(
         ),
         .target(
             name: "SharedUI",
-            dependencies: [],
+            dependencies: [
+                .product(
+                    name: "Domain",
+                    package: "Domain"
+                ),
+                .product(
+                    name: "Infrastructure",
+                    package: "Infrastructure"
+                ),
+            ],
             path: "Sources/SharedUI",
             resources: [
                 .process("Resources"),

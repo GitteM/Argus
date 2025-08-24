@@ -1,5 +1,12 @@
+import Entities
+import Foundation
+
+/**
+ Manages the MQTT communication layer between the app and individual devices.
+ */
+
 public protocol DeviceConnectionRepositoryProtocol {
-    func subscribe() async throws
-    func publish() async throws
-    func disconnect() async throws
+    func addDevice(_ discoveredDevice: DiscoveredDevice) async throws -> Device
+    func removeDevice(deviceId: String) async throws
+    func getManagedDevices() async throws -> [Device]
 }

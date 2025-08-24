@@ -25,6 +25,9 @@ let package = Package(
             targets: ["UseCases"]
         ),
     ],
+    dependencies: [
+        .package(url: "https://github.com/emqx/CocoaMQTT.git", from: "2.1.0"),
+    ],
     targets: [
         .target(
             name: "Entities",
@@ -34,10 +37,12 @@ let package = Package(
 
         .target(
             name: "RepositoryProtocols",
-            dependencies: ["Entities"],
+            dependencies: [
+                "Entities",
+                "CocoaMQTT",
+            ],
             path: "Sources/RepositoryProtocols"
         ),
-
         .target(
             name: "UseCases",
             dependencies: [

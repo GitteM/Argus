@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "C35D307F-E7BF-41D3-8A27-C34C28A6521A",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "testTimeoutsEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "DataSourceTests",
+        "name" : "DataSourceTests"
+      }
+    }
+  ],
+  "version" : 1
+}

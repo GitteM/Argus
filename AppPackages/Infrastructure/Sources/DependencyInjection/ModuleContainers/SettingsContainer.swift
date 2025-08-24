@@ -1,1 +1,3 @@
-struct SettingsContainer {}
+public final class SettingsContainer {
+    public init() {}
+}
