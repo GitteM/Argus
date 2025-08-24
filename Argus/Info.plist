@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>MQTT_DOMAIN</key>
+	<string>$(MQTT_DOMAIN)</string>
+	<key>MQTT_HOST</key>
+	<string>$(MQTT_HOST)</string>
+	<key>MQTT_PORT</key>
+	<string>$(MQTT_PORT)</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>$(MQTT_DOMAIN)</key>
+			<dict>
+				<key>NSExceptionMinimumTLSVersion</key>
+				<string>TLS 1.2</string>
+			</dict>
+		</dict>
+	</dict>
+</dict>
+</plist>

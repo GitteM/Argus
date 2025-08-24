@@ -41,6 +41,7 @@ let package = Package(
             name: "DependencyInjection",
             dependencies: [
                 "Services",
+                "Configuration",
                 .product(
                     name: "Domain",
                     package: "Domain"

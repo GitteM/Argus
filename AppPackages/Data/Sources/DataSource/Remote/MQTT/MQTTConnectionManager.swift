@@ -22,11 +22,10 @@ public final class MQTTConnectionManager: MQTTConnectionManagerProtocol, @unchec
     private var connectionContinuation: CheckedContinuation<Void, Error>?
     private let logger: LoggerProtocol
 
-    // TODO: Configure .xcconfig files for development and local schemes
     public init(
         clientId: String,
-        broker: String = "localhost",
-        port: UInt16 = 1883,
+        broker: String,
+        port: UInt16,
         logger: LoggerProtocol
     ) {
         self.clientId = clientId

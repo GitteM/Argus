@@ -1,0 +1,6 @@
+// Update host and port with remote config
+MQTT_HOST = localhost
+MQTT_PORT = 1883
+MQTT_DOMAIN = localhost
+
+

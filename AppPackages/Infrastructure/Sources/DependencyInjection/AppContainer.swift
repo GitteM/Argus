@@ -1,3 +1,4 @@
+import Configuration
 import DataSource
 import Foundation
 import Persistence
@@ -18,6 +19,8 @@ public struct AppContainer {
 
         let connectionManager = MQTTConnectionManager(
             clientId: clientId,
+            broker: Bundle.mqttHost,
+            port: Bundle.mqttPort,
             logger: logger
         )
         self.connectionManager = connectionManager
