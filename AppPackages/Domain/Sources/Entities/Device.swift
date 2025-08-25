@@ -39,7 +39,7 @@ public enum DeviceType: String, CaseIterable, Codable, Sendable {
     case smartSpeaker = "smart_speaker"
     case unknown
 
-    var displayName: String {
+    public var displayName: String {
         switch self {
         case .smartLight: "Smart Light"
         case .smartPlug: "Smart Plug"
@@ -53,7 +53,7 @@ public enum DeviceType: String, CaseIterable, Codable, Sendable {
         }
     }
 
-    var icon: String {
+    public var icon: String {
         switch self {
         case .smartLight: "lightbulb.fill"
         case .smartPlug: "powerplug.fill"
@@ -65,5 +65,31 @@ public enum DeviceType: String, CaseIterable, Codable, Sendable {
         case .smartSpeaker: "speaker.wave.2.fill"
         case .unknown: "questionmark.diamond.fill"
         }
+    }
+}
+
+public extension Device {
+    static let mockConnected = Device(
+        id: "mock-device-001",
+        name: "Mock Device Connected",
+        type: .temperatureSensor,
+        isManaged: false,
+        addedDate: Date(),
+        lastSeen: nil,
+        status: .connected
+    )
+
+    static let mockDisconnected = Device(
+        id: "mock-device-002",
+        name: "Mock Device Disconnected",
+        type: .temperatureSensor,
+        isManaged: false,
+        addedDate: Date(),
+        lastSeen: nil,
+        status: .disconnected
+    )
+
+    static var mockDefaults: [Device] {
+        [.mockConnected, mockDisconnected]
     }
 }
