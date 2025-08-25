@@ -26,7 +26,10 @@ public struct MQTTConnectionHandler: ViewModifier {
                 }
                 Button(Strings.cancel, role: .cancel) {}
             } message: {
-                Text(mqttConnectionError?.localizedDescription ?? Strings.unableToConnectToMQTTbroker)
+                Text(
+                    mqttConnectionError?.localizedDescription
+                        ?? Strings.unableToConnectToMQTTbroker
+                )
             }
     }
 

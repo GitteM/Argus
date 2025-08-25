@@ -138,7 +138,11 @@ public final class MQTTConnectionManager: MQTTConnectionManagerProtocol, @unchec
 extension MQTTConnectionManager: CocoaMQTT5Delegate {
     // MARK: - Connection Methods
 
-    public func mqtt5(_: CocoaMQTT5, didConnectAck ack: CocoaMQTTCONNACKReasonCode, connAckData _: MqttDecodeConnAck?) {
+    public func mqtt5(
+        _: CocoaMQTT5,
+        didConnectAck ack: CocoaMQTTCONNACKReasonCode,
+        connAckData _: MqttDecodeConnAck?
+    ) {
         let isSuccess = ack == .success
         let ackDescription = String(describing: ack)
         Task {
@@ -148,7 +152,8 @@ extension MQTTConnectionManager: CocoaMQTT5Delegate {
                     self.logger.log("MQTT connection established", level: .info)
                 } else {
                     self.connectionStatus = .disconnected
-                    self.logger.log("MQTT connection failed with ack: \(ackDescription)", level: .error)
+                    let message = "MQTT connection failed with ack: \(ackDescription)"
+                    self.logger.log(message, level: .error)
                 }
             }
 
@@ -176,8 +181,12 @@ extension MQTTConnectionManager: CocoaMQTT5Delegate {
 
     // MARK: - Disconnect and Auth Reason Code Methods
 
-    public func mqtt5(_: CocoaMQTT5, didReceiveDisconnectReasonCode reasonCode: CocoaMQTTDISCONNECTReasonCode) {
-        logger.log("MQTT Disconnect received with reason code: \(reasonCode.rawValue)", level: .info)
+    public func mqtt5(
+        _: CocoaMQTT5,
+        didReceiveDisconnectReasonCode reasonCode: CocoaMQTTDISCONNECTReasonCode
+    ) {
+        let logMessage = "MQTT Disconnect received with reason code: \(reasonCode.rawValue)"
+        logger.log(logMessage, level: .info)
     }
 
     public func mqtt5(_: CocoaMQTT5, didReceiveAuthReasonCode reasonCode: CocoaMQTTAUTHReasonCode) {
@@ -186,7 +195,12 @@ extension MQTTConnectionManager: CocoaMQTT5Delegate {
 
     // MARK: - Message Methods
 
-    public func mqtt5(_: CocoaMQTT5, didReceiveMessage message: CocoaMQTT5Message, id _: UInt16, publishData _: MqttDecodePublish?) {
+    public func mqtt5(
+        _: CocoaMQTT5,
+        didReceiveMessage message: CocoaMQTT5Message,
+        id _: UInt16,
+        publishData _: MqttDecodePublish?
+    ) {
         let mqttMessage = MQTTMessage(
             topic: message.topic,
             payload: message.string ?? ""
@@ -199,10 +213,10 @@ extension MQTTConnectionManager: CocoaMQTT5Delegate {
         }
 
         // Check for wildcard matches
-        for (subscribedTopic, handler) in messageHandlers {
-            if topicMatches(subscribedTopic, actualTopic: message.topic) {
-                handler(mqttMessage)
-            }
+        for (subscribedTopic, handler) in messageHandlers where topicMatches(
+            subscribedTopic, actualTopic: message.topic
+        ) {
+            handler(mqttMessage)
         }
     }
 
@@ -218,17 +232,31 @@ extension MQTTConnectionManager: CocoaMQTT5Delegate {
         logger.log("MQTT Publish received for message id: \(id)", level: .debug)
     }
 
-    public func mqtt5(_: CocoaMQTT5, didPublishComplete id: UInt16, pubCompData _: MqttDecodePubComp?) {
+    public func mqtt5(
+        _: CocoaMQTT5,
+        didPublishComplete id: UInt16,
+        pubCompData _: MqttDecodePubComp?
+    ) {
         logger.log("MQTT Publish completed for message id: \(id)", level: .debug)
     }
 
     // MARK: - Subscription Methods (Using Xcode's exact signatures)
 
-    public func mqtt5(_: CocoaMQTT5, didSubscribeTopics success: NSDictionary, failed: [String], subAckData _: MqttDecodeSubAck?) {
-        logger.log("MQTT Subscribed to topics - Success: \(success), Failed: \(failed)", level: .info)
+    public func mqtt5(
+        _: CocoaMQTT5,
+        didSubscribeTopics success: NSDictionary,
+        failed: [String],
+        subAckData _: MqttDecodeSubAck?
+    ) {
+        let logMessage = "MQTT Subscribed to topics - Success: \(success), Failed: \(failed)"
+        logger.log(logMessage, level: .info)
     }
 
-    public func mqtt5(_: CocoaMQTT5, didUnsubscribeTopics topics: [String], unsubAckData _: MqttDecodeUnsubAck?) {
+    public func mqtt5(
+        _: CocoaMQTT5,
+        didUnsubscribeTopics topics: [String],
+        unsubAckData _: MqttDecodeUnsubAck?
+    ) {
         logger.log("MQTT Unsubscribed from topics: \(topics)", level: .info)
     }
 

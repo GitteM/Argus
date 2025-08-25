@@ -1,7 +1,6 @@
 import Entities
 import SwiftUI
 
-// TODO: Remove magic numbers and localize
 public struct ConnectionStatusIndicator: View {
     let status: MQTTConnectionStatus
 

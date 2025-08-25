@@ -123,7 +123,10 @@ public actor MQTTDataSource: MQTTDataSourceProtocol {
     public func sendDeviceCommand(deviceId: String, command: Command) async throws {
         let topic = "devices/\(deviceId)/commands"
         let payload = try JSONEncoder().encode(command)
-        try await connectionManager.publish(topic: topic, payload: String(data: payload, encoding: .utf8) ?? "")
+        try await connectionManager.publish(
+            topic: topic,
+            payload: String(data: payload, encoding: .utf8) ?? ""
+        )
     }
 
     // MARK: - Actor-Isolated Cache Management
@@ -150,7 +153,9 @@ public actor MQTTDataSource: MQTTDataSourceProtocol {
 
     // MARK: - Message Parsing
 
-    private nonisolated func parseDiscoveredDeviceMessage(_ message: MQTTMessage) -> DiscoveredDevice? {
+    private nonisolated func parseDiscoveredDeviceMessage(
+        _ message: MQTTMessage
+    ) -> DiscoveredDevice? {
         guard let data = message.payload.data(using: .utf8),
               let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
         else {

@@ -16,6 +16,7 @@ public final class CacheManager: CacheManagerProtocol, Sendable {
     private let cacheQueue = DispatchQueue(label: "advanced.cache.queue", attributes: .concurrent)
 
     public init() {
+        // swiftlint:disable:next force_unwrapping
         let cachesDirectory = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first!
         cacheDirectory = cachesDirectory.appendingPathComponent("AppCache")
 
