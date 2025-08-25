@@ -20,9 +20,7 @@ public extension DashboardView {
     @MainActor
     static func create(from container: DashboardContainer) -> some View {
         DashboardView()
-            .environmentObject(DashboardStore(
-                getDashboardDataUseCase: container.getDashboardDataUseCase
-            ))
+            .environmentObject(DashboardStore(getDashboardDataUseCase: container.getDashboardDataUseCase))
             .environmentObject(AppState())
     }
 }

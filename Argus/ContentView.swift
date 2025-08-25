@@ -22,6 +22,7 @@ struct ContentView: View {
             NavigationStack {
                 DashboardView.create(from: dashboardContainer)
                     .navigationTitle("Devices")
+                    .mqttConnectionHandler()
                     .navigationBarTitleDisplayMode(.large)
                     .toolbar {
                         ConnectionStatusIndicator(status: connectionStatus)

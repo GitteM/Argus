@@ -170,6 +170,7 @@ extension MQTTConnectionManager: CocoaMQTT5Delegate {
             self.logger.log("MQTT Disconnected: \(errorMessage)", level: .error)
             connectionContinuation?.resume(throwing: err ?? MQTTError.connectionFailed)
             connectionContinuation = nil
+            mqtt = nil
         }
     }
 

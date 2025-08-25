@@ -44,10 +44,5 @@ public struct AppContainer {
             getDashboardDataUseCase: getDashboardDataUseCase
         )
         settingsContainer = SettingsContainer()
-
-        // Start MQTT connection
-        Task {
-            try? await connectionManager.connect()
-        }
     }
 }
