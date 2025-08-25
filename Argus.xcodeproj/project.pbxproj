@@ -247,7 +247,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Run SwiftFormat first\ncd BuildTools\nSDKROOT=$(xcrun --sdk macosx --show-sdk-path)\necho \"Running SwiftFormat...\"\nswift run -c release swiftformat \"$SRCROOT\"\n\n# Run SwiftLint separately\ncd \"$SRCROOT\"\necho \"Running SwiftLint...\"\nswift run -c release --package-path BuildTools swiftlint lint \\\n  Argus \\\n  AppPackages/DataLayer/Sources \\\n  AppPackages/DomainLayer/Sources \\\n  AppPackages/InfrastructureLayer/Sources \\\n  AppPackages/PresentationLayer/Sources \\\n  --reporter xcode\n";
+			shellScript = "# Run SwiftFormat first\n cd BuildTools\n SDKROOT=$(xcrun --sdk macosx --show-sdk-path)\n echo \"Running SwiftFormat...\"\n swift run -c release swiftformat \"$SRCROOT\"\n\n# Run SwiftLint separately\n cd \"$SRCROOT\"\n echo \"Running SwiftLint...\"\n swift run -c release --package-path BuildTools swiftlint lint \\\n  Argus \\\n  AppPackages/Data/Sources \\\n  AppPackages/Domain/Sources \\\n  AppPackages/Infrastructure/Sources \\\n  AppPackages/Presentation/Sources \\\n  --reporter xcode\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
