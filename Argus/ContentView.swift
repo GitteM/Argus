@@ -21,26 +21,29 @@ struct ContentView: View {
         TabView {
             NavigationStack {
                 DashboardView.create(from: dashboardContainer)
-                    .navigationTitle("Devices")
                     .mqttConnectionHandler()
+                    .navigationTitle(Strings.devices)
                     .navigationBarTitleDisplayMode(.large)
                     .toolbar {
                         ConnectionStatusIndicator(status: connectionStatus)
                     }
             }
             .tabItem {
-                Image(systemName: "house.fill")
-                Text("Home")
+                Image(systemName: Icons.home)
+                Text(Strings.home)
             }
 
             NavigationStack {
                 SettingsView.create(from: settingsContainer)
-                    .navigationTitle("Settings")
+                    .navigationTitle(Strings.settings)
                     .navigationBarTitleDisplayMode(.large)
+                    .toolbar {
+                        ConnectionStatusIndicator(status: connectionStatus)
+                    }
             }
             .tabItem {
-                Image(systemName: "gear")
-                Text("Settings")
+                Image(systemName: Icons.settings)
+                Text(Strings.settings)
             }
         }
     }

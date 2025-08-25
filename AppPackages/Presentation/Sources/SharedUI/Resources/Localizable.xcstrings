@@ -1,0 +1,33 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Cancel" : {
+
+    },
+    "Devices" : {
+      "extractionState" : "manual"
+    },
+    "Home" : {
+      "extractionState" : "manual"
+    },
+    "MQTT" : {
+
+    },
+    "MQTT Connection Failed" : {
+
+    },
+    "Retry" : {
+
+    },
+    "Settings" : {
+      "extractionState" : "manual"
+    },
+    "Something went wrong" : {
+
+    },
+    "Unable to connect to MQTT broker" : {
+      "extractionState" : "manual"
+    }
+  },
+  "version" : "1.0"
+}

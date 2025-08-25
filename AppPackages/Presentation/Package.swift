@@ -4,6 +4,7 @@ import PackageDescription
 
 let package = Package(
     name: "Presentation",
+    defaultLocalization: "en",
     platforms: [.iOS(.v17)],
     products: [
         .library(name: "Alerts", targets: ["Alerts"]),
@@ -17,6 +18,7 @@ let package = Package(
     dependencies: [
         .package(path: "../Domain"),
         .package(path: "../Infrastructure"),
+        .package(path: "../Data"),
     ],
     targets: [
         .target(
@@ -106,6 +108,10 @@ let package = Package(
                 .product(
                     name: "Infrastructure",
                     package: "Infrastructure"
+                ),
+                .product(
+                    name: "Data",
+                    package: "Data"
                 ),
             ],
             path: "Sources/SharedUI",

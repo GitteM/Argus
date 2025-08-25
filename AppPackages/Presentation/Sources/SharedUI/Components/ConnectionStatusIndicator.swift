@@ -10,8 +10,8 @@ public struct ConnectionStatusIndicator: View {
     }
 
     public var body: some View {
-        HStack(spacing: 4) {
-            Text("MQTT")
+        HStack(spacing: Spacing.s.value) {
+            Text(Strings.mqtt)
                 .font(.caption2)
                 .foregroundColor(.secondary)
             Group {
@@ -23,11 +23,11 @@ public struct ConnectionStatusIndicator: View {
                 case .connected:
                     Circle()
                         .fill(Color.green)
-                        .frame(width: 12, height: 12)
+                        .frame(width: Spacing.s4.value, height: Spacing.s4.value)
                 case .disconnected:
                     Circle()
                         .fill(Color.red)
-                        .frame(width: 12, height: 12)
+                        .frame(width: Spacing.s4.value, height: Spacing.s4.value)
                 }
             }
             .animation(.easeInOut(duration: 0.3), value: status)
@@ -37,7 +37,7 @@ public struct ConnectionStatusIndicator: View {
 
 struct ConnectionStatusIndicator_Previews: PreviewProvider {
     static var previews: some View {
-        VStack(spacing: 48) {
+        VStack(spacing: Spacing.xl2.value) {
             VStack {
                 Text("Connected")
                     .font(.caption2)

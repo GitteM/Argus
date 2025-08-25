@@ -1,6 +1,6 @@
 import SwiftUI
 
-// FIXME: Example replace localization, images etc
+// FIXME: Example replace localization, images, spacing etc
 public struct ErrorView: View {
     let message: String
     let retryAction: (() -> Void)?
@@ -16,7 +16,7 @@ public struct ErrorView: View {
                 .font(.system(size: 50))
                 .foregroundColor(.orange)
 
-            Text("Something went wrong")
+            Text(Strings.somethingWentWrong)
                 .font(.headline)
 
             Text(message)
@@ -25,7 +25,7 @@ public struct ErrorView: View {
                 .foregroundColor(.secondary)
 
             if let retryAction {
-                Button("Retry", action: retryAction)
+                Button(Strings.retry, action: retryAction)
                     .buttonStyle(.borderedProminent)
             }
         }
@@ -36,8 +36,7 @@ public struct ErrorView: View {
 }
 
 #Preview("Error with Retry") {
-    // swiftlint:disable:next line_length
-    let message = "Failed to load data. Please check your internet connection and try again."
+    let message = "Failed to load data. Check connection and try again."
     ErrorView(
         message: message,
         retryAction: { print("Retry tapped") }
