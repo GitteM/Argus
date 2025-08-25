@@ -24,14 +24,28 @@ public struct DeviceDiscoveryRepository: DeviceDiscoveryRepositoryProtocol {
         try await mqttDataSource.stopDeviceDiscovery()
     }
 
+    // FIXME: This looks shakey - fixit
     public func getDiscoveredDevices() async throws -> [DiscoveredDevice] {
+        // First check cache
         if let cached: [DiscoveredDevice] = cacheManager.get(key: "discovered_devices") {
-            return cached.filter {
+            let recent = cached.filter {
                 // Only return devices discovered in last 5 minutes
                 Date().timeIntervalSince($0.discoveredAt) < 300
             }
+            if !recent.isEmpty {
+                return recent
+            }
         }
-        return []
+
+        // If no cached devices or they're expired, get from MQTT data source
+        let discoveredDevices = await mqttDataSource.getDiscoveredDevices()
+
+        // Cache the fresh results
+        if !discoveredDevices.isEmpty {
+            cacheManager.set(discoveredDevices, key: "discovered_devices", ttl: 300) // 5 minutes
+        }
+
+        return discoveredDevices
     }
 
     public func subscribeToDiscoveredDevices() async -> AsyncStream<[Entities.DiscoveredDevice]> {

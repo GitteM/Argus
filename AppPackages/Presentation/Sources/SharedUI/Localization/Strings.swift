@@ -1,13 +1,21 @@
 import Foundation
 
+// swiftlint:disable line_length
 public enum Strings {
-    public static let cancel = "Cancel"
-    public static let devices = "Devices"
-    public static let home = "Home"
-    public static let mqtt = "MQTT"
-    public static let mqttConnectionFailed = "MQTT Connection Failed"
-    public static let retry = "Retry"
-    public static let settings = "Settings"
-    public static let somethingWentWrong = "Something went wrong"
-    public static let unableToConnectToMQTTbroker = "Unable to connect to MQTT broker"
+    public static let availableNotSubscribed = String(localized: "Available / Not Subscribed")
+    public static let cancel = String(localized: "Cancel")
+    public static let devices = String(localized: "Devices")
+    public static let home = String(localized: "Home")
+    public static let loading = String(localized: "Loading...")
+    public static let mqtt = String(localized: "MQTT")
+    public static let mqttConnectionFailed = String(localized: "MQTT Connection Failed")
+    public static let noDevicesAvailable = String(localized: "No devices currently avalailable")
+    public static let retry = String(localized: "Retry")
+    public static let settings = String(localized: "Settings")
+    public static let somethingWentWrong = String(localized: "Something went wrong")
+    public static let subscribeToDeviceWarning = String(localized: "Subscribe to a device from the list below to start receiving data")
+    public static let subscribed = String(localized: "Subscribed")
+    public static let unableToConnectToMQTTbroker = String(localized: "Unable to connect to MQTT broker")
 }
+
+// swiftlint:enable line_length

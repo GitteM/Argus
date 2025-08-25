@@ -7,28 +7,28 @@ protocol RepositoryFactory {
     func makeDeviceStateRepository() -> DeviceStateRepositoryProtocol
 }
 
-class DefaultRepositoryFactory: RepositoryFactory {
+public class DefaultRepositoryFactory: RepositoryFactory {
     private let serviceFactory: ServiceFactory
 
-    init(serviceFactory: ServiceFactory) {
+    public init(serviceFactory: ServiceFactory) {
         self.serviceFactory = serviceFactory
     }
 
-    func makeDeviceConnectionRepository() -> DeviceConnectionRepositoryProtocol {
+    public func makeDeviceConnectionRepository() -> DeviceConnectionRepositoryProtocol {
         DeviceConnectionRepository(
             mqttDataSource: serviceFactory.makeMQTTDataSource(),
             cacheManager: serviceFactory.makeCacheManager()
         )
     }
 
-    func makeDeviceDiscoveryRepository() -> DeviceDiscoveryRepositoryProtocol {
+    public func makeDeviceDiscoveryRepository() -> DeviceDiscoveryRepositoryProtocol {
         DeviceDiscoveryRepository(
             mqttDataSource: serviceFactory.makeMQTTDataSource(),
             cacheManager: serviceFactory.makeCacheManager()
         )
     }
 
-    func makeDeviceStateRepository() -> DeviceStateRepositoryProtocol {
+    public func makeDeviceStateRepository() -> DeviceStateRepositoryProtocol {
         DeviceStateRepository(
             mqttDataSource: serviceFactory.makeMQTTDataSource(),
             restDataSource: serviceFactory.makeRESTDataSource()

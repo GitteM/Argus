@@ -1,26 +1,39 @@
+import Entities
 import Infrastructure
-import Navigation
 import SharedUI
 import SwiftUI
+import UseCases
 
 public struct DashboardView: View {
     @EnvironmentObject private var dashboardStore: DashboardStore
-    @EnvironmentObject private var appState: AppState
 
     public init() {}
 
     public var body: some View {
-        Text("🚧 Dashboard 🚧")
-    }
-}
+        switch dashboardStore.viewState {
+        case .loading:
+            LoadingView()
+                .onAppear {
+                    dashboardStore.loadDashboardData()
+                }
 
-// MARK: - Factory Extension
+        case let .data(data):
+            DashboardContentView(
+                subscribedDevices: data.managedDevices,
+                availableDevices: data.discoveredDevices
+            )
 
-public extension DashboardView {
-    @MainActor
-    static func create(from container: DashboardContainer) -> some View {
-        DashboardView()
-            .environmentObject(DashboardStore(getDashboardDataUseCase: container.getDashboardDataUseCase))
-            .environmentObject(AppState())
+        case .empty:
+            EmptyStateView(
+                message: "No data available",
+                icon: "questionmark.circle"
+            )
+
+        case let .error(error):
+            ErrorView(
+                message: error,
+                retryAction: { dashboardStore.loadDashboardData() }
+            )
+        }
     }
 }

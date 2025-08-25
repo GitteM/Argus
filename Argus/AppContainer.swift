@@ -1,6 +1,8 @@
 import Configuration
+import Dashboard
 import DataSource
 import Foundation
+import Infrastructure
 import Persistence
 import Repositories
 import RepositoryProtocols
@@ -9,10 +11,11 @@ import UseCases
 
 public struct AppContainer {
     public let dashboardContainer: DashboardContainer
+    public let dashboardStore: DashboardStore
     public let settingsContainer: SettingsContainer
     public let connectionManager: MQTTConnectionManager
 
-    public init() {
+    @MainActor public init() {
         // Create service dependencies
         let logger = LoggingService.shared
         let clientId = "argus-app-\(UUID().uuidString)"
@@ -43,6 +46,13 @@ public struct AppContainer {
         dashboardContainer = DashboardContainer(
             getDashboardDataUseCase: getDashboardDataUseCase
         )
+
+        // Create stores
+        dashboardStore = DashboardStore(
+            getDashboardDataUseCase: getDashboardDataUseCase,
+            logger: logger
+        )
+
         settingsContainer = SettingsContainer()
     }
 }

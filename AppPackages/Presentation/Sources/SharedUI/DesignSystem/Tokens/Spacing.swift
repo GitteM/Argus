@@ -1,72 +1,46 @@
 import CoreFoundation
 
-enum Spacing {
+public enum Spacing {
     /// 1pt
-    case xs
+    public static let xs: CGFloat = 1
     /// 2pt
-    case xs2
+    public static let xs2: CGFloat = 2
     /// 3pt
-    case xs3
+    public static let xs3: CGFloat = 3
     /// 4pt
-    case s
+    public static let s: CGFloat = 4
     /// 6pt
-    case s2
+    public static let s2: CGFloat = 6
     /// 8pt
-    case s3
+    public static let s3: CGFloat = 8
     /// 12pt
-    case s4
+    public static let s4: CGFloat = 12
     /// 16pt
-    case m
+    public static let m: CGFloat = 16
     /// 20pt
-    case m2
+    public static let m2: CGFloat = 20
     /// 24pt
-    case m3
+    public static let m3: CGFloat = 24
     /// 28pt
-    case l
+    public static let l: CGFloat = 28
     /// 32pt
-    case l2
+    public static let l2: CGFloat = 32
     /// 36pt
-    case l3
+    public static let l3: CGFloat = 36
     /// 40pt
-    case l4
+    public static let l4: CGFloat = 40
     /// 44pt
-    case xl
+    public static let xl: CGFloat = 44
     /// 48pt
-    case xl2
+    public static let xl2: CGFloat = 48
     /// 56pt
-    case xl3
+    public static let xl3: CGFloat = 56
     /// 64pt
-    case xl4
+    public static let xl4: CGFloat = 64
     /// 72pt
-    case section
+    public static let section: CGFloat = 72
     /// 80pt
-    case section2
+    public static let section2: CGFloat = 80
     /// 96pt
-    case section3
-
-    var value: CGFloat {
-        switch self {
-        case .xs: 1
-        case .xs2: 2
-        case .xs3: 3
-        case .s: 4
-        case .s2: 6
-        case .s3: 8
-        case .s4: 12
-        case .m: 16
-        case .m2: 20
-        case .m3: 24
-        case .l: 28
-        case .l2: 32
-        case .l3: 36
-        case .l4: 40
-        case .xl: 44
-        case .xl2: 48
-        case .xl3: 56
-        case .xl4: 64
-        case .section: 72
-        case .section2: 80
-        case .section3: 96
-        }
-    }
+    public static let section3: CGFloat = 96
 }

@@ -9,6 +9,7 @@ public protocol MQTTDataSourceProtocol: Sendable {
     func startDeviceDiscovery() async throws
     func stopDeviceDiscovery() async throws
     func subscribeToDeviceDiscovery() async -> AsyncStream<[DiscoveredDevice]>
+    func getDiscoveredDevices() async -> [DiscoveredDevice]
 
     // Device States
     func subscribeToDeviceStates() async -> AsyncStream<[DeviceState]>
@@ -147,8 +148,39 @@ public actor MQTTDataSource: MQTTDataSourceProtocol {
         discoveredDevicesCache.removeAll { $0.id == deviceId }
     }
 
-    private func getDiscoveredDevices() -> [DiscoveredDevice] {
-        discoveredDevicesCache
+    // FIXME: We need real data
+    public func getDiscoveredDevices() -> [DiscoveredDevice] {
+        // For testing purposes, add some mock devices if cache is empty
+        if discoveredDevicesCache.isEmpty {
+            return [
+                DiscoveredDevice(
+                    id: "mock-device-001",
+                    name: "Living Room Light",
+                    type: .smartLight,
+                    signalStrength: -45,
+                    discoveredAt: Date(),
+                    isAlreadyAdded: false
+                ),
+                DiscoveredDevice(
+                    id: "mock-device-002",
+                    name: "Kitchen Temperature Sensor",
+                    type: .temperatureSensor,
+                    signalStrength: -38,
+                    discoveredAt: Date().addingTimeInterval(-120),
+                    isAlreadyAdded: false
+                ),
+                DiscoveredDevice(
+                    id: "mock-device-003",
+                    name: "Smart Thermostat",
+                    type: .smartThermostat,
+                    signalStrength: -52,
+                    discoveredAt: Date().addingTimeInterval(-60),
+                    isAlreadyAdded: true
+                ),
+            ]
+        }
+
+        return discoveredDevicesCache
     }
 
     // MARK: - Message Parsing

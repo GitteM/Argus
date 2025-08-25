@@ -1,4 +1,3 @@
-import Infrastructure
 import SwiftUI
 
 @main
@@ -9,6 +8,7 @@ struct ArgusApp: App {
         WindowGroup {
             ContentView(
                 dashboardContainer: appContainer.dashboardContainer,
+                dashboardStore: appContainer.dashboardStore,
                 settingsContainer: appContainer.settingsContainer
             )
             .environmentObject(appContainer.connectionManager)

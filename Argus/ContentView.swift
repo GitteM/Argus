@@ -2,6 +2,7 @@ import Dashboard
 import DataSource
 import Entities
 import Infrastructure
+import Presentation
 import Settings
 import SharedUI
 import SwiftUI
@@ -10,6 +11,7 @@ struct ContentView: View {
     @EnvironmentObject private var connectionManager: MQTTConnectionManager
 
     let dashboardContainer: DashboardContainer
+    let dashboardStore: DashboardStore
     let settingsContainer: SettingsContainer
 
     private var connectionStatus: MQTTConnectionStatus {
@@ -19,7 +21,8 @@ struct ContentView: View {
     var body: some View {
         TabView {
             NavigationStack {
-                DashboardView.create(from: dashboardContainer)
+                DashboardView()
+                    .environmentObject(dashboardStore)
                     .mqttConnectionHandler()
                     .navigationTitle(Strings.devices)
                     .navigationBarTitleDisplayMode(.large)
@@ -48,20 +51,24 @@ struct ContentView: View {
     }
 }
 
-#Preview("Light Mode") {
+#Preview("Light Mode") { @MainActor in
     let appContainer = AppContainer()
     ContentView(
         dashboardContainer: appContainer.dashboardContainer,
+        dashboardStore: appContainer.dashboardStore,
         settingsContainer: appContainer.settingsContainer
     )
+    .environmentObject(appContainer.connectionManager)
     .preferredColorScheme(.light)
 }
 
-#Preview("Dark Mode") {
+#Preview("Dark Mode") { @MainActor in
     let appContainer = AppContainer()
     ContentView(
         dashboardContainer: appContainer.dashboardContainer,
+        dashboardStore: appContainer.dashboardStore,
         settingsContainer: appContainer.settingsContainer
     )
+    .environmentObject(appContainer.connectionManager)
     .preferredColorScheme(.dark)
 }

@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Available / Not Subscribed" : {
+      "extractionState" : "manual"
+    },
     "Cancel" : {
 
     },
@@ -10,11 +13,17 @@
     "Home" : {
       "extractionState" : "manual"
     },
+    "Loading..." : {
+
+    },
     "MQTT" : {
 
     },
     "MQTT Connection Failed" : {
 
+    },
+    "No devices currently avalailable" : {
+      "extractionState" : "manual"
     },
     "Retry" : {
 
@@ -24,6 +33,20 @@
     },
     "Something went wrong" : {
 
+    },
+    "Subscribe to a device from the list below to start receiving data" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subscribe to a device from the list below to start receiving data"
+          }
+        }
+      }
+    },
+    "Subscribed" : {
+      "extractionState" : "manual"
     },
     "Unable to connect to MQTT broker" : {
       "extractionState" : "manual"
