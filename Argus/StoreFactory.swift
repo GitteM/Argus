@@ -9,32 +9,29 @@ protocol StoreFactory {
 final class DefaultStoreFactory: StoreFactory {
     private let getManagedDevicesUseCase: GetManagedDevicesUseCase
     private let getDiscoveredDevicesUseCase: GetDiscoveredDevicesUseCase
-    private let startDiscoveryUseCase: StartDeviceDiscoveryUseCase
-    private let stopDiscoveryUseCase: StopDeviceDiscoveryUseCase
     private let subscribeToStatesUseCase: SubscribeToDeviceStatesUseCase
     private let subscribeToDiscoveredDevicesUseCase: SubscribeToDiscoveredDevicesUseCase
     private let addDeviceUseCase: AddDeviceUseCase
+    private let removeDeviceUseCase: RemoveDeviceUseCase
     private let sendDeviceCommandUseCase: SendDeviceCommandUseCase
     private let logger: LoggerProtocol
 
     init(
         getManagedDevicesUseCase: GetManagedDevicesUseCase,
         getDiscoveredDevicesUseCase: GetDiscoveredDevicesUseCase,
-        startDiscoveryUseCase: StartDeviceDiscoveryUseCase,
-        stopDiscoveryUseCase: StopDeviceDiscoveryUseCase,
         subscribeToStatesUseCase: SubscribeToDeviceStatesUseCase,
         subscribeToDiscoveredDevicesUseCase: SubscribeToDiscoveredDevicesUseCase,
         addDeviceUseCase: AddDeviceUseCase,
+        removeDeviceUseCase: RemoveDeviceUseCase,
         sendDeviceCommandUseCase: SendDeviceCommandUseCase,
         logger: LoggerProtocol
     ) {
         self.getManagedDevicesUseCase = getManagedDevicesUseCase
         self.getDiscoveredDevicesUseCase = getDiscoveredDevicesUseCase
-        self.startDiscoveryUseCase = startDiscoveryUseCase
-        self.stopDiscoveryUseCase = stopDiscoveryUseCase
         self.subscribeToStatesUseCase = subscribeToStatesUseCase
         self.subscribeToDiscoveredDevicesUseCase = subscribeToDiscoveredDevicesUseCase
         self.addDeviceUseCase = addDeviceUseCase
+        self.removeDeviceUseCase = removeDeviceUseCase
         self.sendDeviceCommandUseCase = sendDeviceCommandUseCase
         self.logger = logger
     }
@@ -43,11 +40,10 @@ final class DefaultStoreFactory: StoreFactory {
         DeviceStore(
             getManagedDevicesUseCase: getManagedDevicesUseCase,
             getDiscoveredDevicesUseCase: getDiscoveredDevicesUseCase,
-            startDiscoveryUseCase: startDiscoveryUseCase,
-            stopDiscoveryUseCase: stopDiscoveryUseCase,
             subscribeToStatesUseCase: subscribeToStatesUseCase,
             subscribeToDiscoveredDevicesUseCase: subscribeToDiscoveredDevicesUseCase,
             addDeviceUseCase: addDeviceUseCase,
+            removeDeviceUseCase: removeDeviceUseCase,
             sendDeviceCommandUseCase: sendDeviceCommandUseCase,
             logger: logger
         )

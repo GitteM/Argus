@@ -1,10 +1,12 @@
 import Entities
 import SharedUI
+import Stores
 import SwiftUI
 
 struct DeviceAvailableRow: View {
     let device: DiscoveredDevice
     @State private var isLoading = false
+    @EnvironmentObject private var deviceStore: DeviceStore
 
     var body: some View {
         HStack(spacing: Spacing.s4) {
@@ -31,8 +33,9 @@ struct DeviceAvailableRow: View {
         }
         .onTapGesture {
             withAnimation {
-                isLoading.toggle()
+                isLoading = true
             }
+            deviceStore.subscribeToDevice(device)
         }
     }
 }

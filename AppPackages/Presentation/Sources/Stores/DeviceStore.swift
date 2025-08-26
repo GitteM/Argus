@@ -14,11 +14,10 @@ public final class DeviceStore: ObservableObject {
 
     private let getManagedDevicesUseCase: GetManagedDevicesUseCase
     private let getDiscoveredDevicesUseCase: GetDiscoveredDevicesUseCase
-    private let startDiscoveryUseCase: StartDeviceDiscoveryUseCase
-    private let stopDiscoveryUseCase: StopDeviceDiscoveryUseCase
     private let subscribeToStatesUseCase: SubscribeToDeviceStatesUseCase
     private let subscribeToDiscoveredDevicesUseCase: SubscribeToDiscoveredDevicesUseCase
     private let addDeviceUseCase: AddDeviceUseCase
+    private let removeDeviceUseCase: RemoveDeviceUseCase
     private let sendDeviceCommandUseCase: SendDeviceCommandUseCase
     private let logger: LoggerProtocol
 
@@ -29,21 +28,19 @@ public final class DeviceStore: ObservableObject {
     public init(
         getManagedDevicesUseCase: GetManagedDevicesUseCase,
         getDiscoveredDevicesUseCase: GetDiscoveredDevicesUseCase,
-        startDiscoveryUseCase: StartDeviceDiscoveryUseCase,
-        stopDiscoveryUseCase: StopDeviceDiscoveryUseCase,
         subscribeToStatesUseCase: SubscribeToDeviceStatesUseCase,
         subscribeToDiscoveredDevicesUseCase: SubscribeToDiscoveredDevicesUseCase,
         addDeviceUseCase: AddDeviceUseCase,
+        removeDeviceUseCase: RemoveDeviceUseCase,
         sendDeviceCommandUseCase: SendDeviceCommandUseCase,
         logger: LoggerProtocol
     ) {
         self.getManagedDevicesUseCase = getManagedDevicesUseCase
         self.getDiscoveredDevicesUseCase = getDiscoveredDevicesUseCase
-        self.startDiscoveryUseCase = startDiscoveryUseCase
-        self.stopDiscoveryUseCase = stopDiscoveryUseCase
         self.subscribeToStatesUseCase = subscribeToStatesUseCase
         self.subscribeToDiscoveredDevicesUseCase = subscribeToDiscoveredDevicesUseCase
         self.addDeviceUseCase = addDeviceUseCase
+        self.removeDeviceUseCase = removeDeviceUseCase
         self.sendDeviceCommandUseCase = sendDeviceCommandUseCase
         self.logger = logger
         viewState = .loading
@@ -65,14 +62,13 @@ public final class DeviceStore: ObservableObject {
                     return
                 }
 
-                guard !(discovered.isEmpty && managed.isEmpty) else {
-                    viewState = .empty
-                    return
-                }
-
                 self.devices = managed
                 self.discoveredDevices = discovered
 
+                // Start real-time subscriptions to get live updates
+                self.startRealtimeUpdates()
+
+                // Always set to loaded - empty discovered devices is valid state
                 viewState = .loaded
                 logger.log("Dashboard data loaded", level: .info)
 
@@ -97,39 +93,43 @@ public final class DeviceStore: ObservableObject {
         discoverySubscriptionTask = nil
     }
 
-    public func startDeviceDiscovery() {
-        Task { @MainActor in
-            do {
-                try await startDiscoveryUseCase.execute()
-                logger.log("Device discovery started", level: .info)
-            } catch {
-                let message = "Failed to start device discovery: \(error.localizedDescription)"
-                logger.log(message, level: .error)
-            }
-        }
-    }
-
-    public func stopDeviceDiscovery() {
-        Task { @MainActor in
-            do {
-                try await stopDiscoveryUseCase.execute()
-                logger.log("Device discovery stopped", level: .info)
-            } catch {
-                let message = "Failed to stop device discovery: \(error.localizedDescription)"
-                logger.log(message, level: .error)
-            }
-        }
-    }
-
-    public func addDevice(_ discoveredDevice: DiscoveredDevice) {
+    public func subscribeToDevice(_ discoveredDevice: DiscoveredDevice) {
         Task { @MainActor in
             do {
                 let device = try await addDeviceUseCase.execute(discoveredDevice: discoveredDevice)
                 devices.append(device)
                 discoveredDevices.removeAll { $0.id == discoveredDevice.id }
-                logger.log("Device added: \(device.name)", level: .info)
+                logger.log("Subscribed to device: \(device.name)", level: .info)
             } catch {
-                logger.log("Failed to add device: \(error.localizedDescription)", level: .error)
+                viewState = .error("Failed to subscribe to device")
+                let message = "Failed to subscribe to device: \(error.localizedDescription)"
+                logger.log(message, level: .error)
+            }
+        }
+    }
+
+    public func unsubscribeFromDevice(_ device: Device) {
+        Task { @MainActor in
+            do {
+                try await removeDeviceUseCase.execute(deviceId: device.id)
+                devices.removeAll { $0.id == device.id }
+
+                // Convert back to discovered device so it appears in available list
+                let discoveredDevice = DiscoveredDevice(
+                    id: device.id,
+                    name: device.name,
+                    type: device.type,
+                    manufacturer: device.manufacturer,
+                    model: device.model,
+                    discoveredAt: Date(),
+                    isAlreadyAdded: false
+                )
+                discoveredDevices.append(discoveredDevice)
+
+                logger.log("Unsubscribed from device: \(device.name)", level: .info)
+            } catch {
+                let message = "Failed to unsubscribe from device: \(error.localizedDescription)"
+                logger.log(message, level: .error)
             }
         }
     }
@@ -175,9 +175,11 @@ public final class DeviceStore: ObservableObject {
     }
 
     private func startDiscoverySubscription() {
+        logger.log("Starting discovery subscription", level: .debug)
         discoverySubscriptionTask = Task { @MainActor in
             do {
                 let discoveryStream = try await subscribeToDiscoveredDevicesUseCase.execute()
+
                 for await newDiscoveredDevices in discoveryStream {
                     guard !Task.isCancelled else { break }
 
@@ -185,6 +187,9 @@ public final class DeviceStore: ObservableObject {
                         !devices.contains { $0.id == discoveredDevice.id }
                     }
 
+                    if filteredDevices.count != discoveredDevices.count {
+                        logger.log("Discovered \(filteredDevices.count) new devices", level: .info)
+                    }
                     discoveredDevices = filteredDevices
                 }
             } catch {

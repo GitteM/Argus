@@ -7,9 +7,7 @@ import RepositoryProtocols
 public struct DeviceConnectionRepository: DeviceConnectionRepositoryProtocol {
     private let cacheManager: CacheManagerProtocol
 
-    public init(
-        cacheManager: CacheManagerProtocol
-    ) {
+    public init(cacheManager: CacheManagerProtocol) {
         self.cacheManager = cacheManager
     }
 
@@ -18,6 +16,8 @@ public struct DeviceConnectionRepository: DeviceConnectionRepositoryProtocol {
             id: discoveredDevice.id,
             name: discoveredDevice.name,
             type: discoveredDevice.type,
+            manufacturer: discoveredDevice.manufacturer,
+            model: discoveredDevice.model,
             isManaged: true,
             addedDate: Date(),
             lastSeen: Date(),

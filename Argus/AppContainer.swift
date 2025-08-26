@@ -34,9 +34,7 @@ public struct AppContainer {
         )
 
         let dataSourceFactory = DefaultDataSourceFactory(
-            logger: logger,
-            mqttBroker: Bundle.mqttHost,
-            mqttPort: Bundle.mqttPort,
+            connectionManager: connectionManager,
             clientId: clientId
         )
 
@@ -59,14 +57,6 @@ public struct AppContainer {
             deviceDiscoveryRepository: deviceDiscoveryRepository
         )
 
-        let startDiscoveryUseCase = StartDeviceDiscoveryUseCase(
-            deviceDiscoveryRepository: deviceDiscoveryRepository
-        )
-
-        let stopDiscoveryUseCase = StopDeviceDiscoveryUseCase(
-            deviceDiscoveryRepository: deviceDiscoveryRepository
-        )
-
         let subscribeToStatesUseCase = SubscribeToDeviceStatesUseCase(
             deviceStateRepository: deviceStateRepository
         )
@@ -79,6 +69,10 @@ public struct AppContainer {
             deviceConnectionRepository: deviceConnectionRepository
         )
 
+        let removeDeviceUseCase = RemoveDeviceUseCase(
+            deviceConnectionRepository: deviceConnectionRepository
+        )
+
         let sendDeviceCommandUseCase = SendDeviceCommandUseCase(
             deviceCommandRepository: deviceCommandRepository
         )
@@ -87,11 +81,10 @@ public struct AppContainer {
         let storeFactory = DefaultStoreFactory(
             getManagedDevicesUseCase: getManagedDevicesUseCase,
             getDiscoveredDevicesUseCase: getDiscoveredDevicesUseCase,
-            startDiscoveryUseCase: startDiscoveryUseCase,
-            stopDiscoveryUseCase: stopDiscoveryUseCase,
             subscribeToStatesUseCase: subscribeToStatesUseCase,
             subscribeToDiscoveredDevicesUseCase: subscribeToDiscoveredDevicesUseCase,
             addDeviceUseCase: addDeviceUseCase,
+            removeDeviceUseCase: removeDeviceUseCase,
             sendDeviceCommandUseCase: sendDeviceCommandUseCase,
             logger: logger
         )

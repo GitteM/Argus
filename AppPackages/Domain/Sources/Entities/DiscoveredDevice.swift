@@ -4,7 +4,8 @@ public struct DiscoveredDevice: Codable, Sendable {
     public let id: String
     public let name: String
     public let type: DeviceType
-    public let signalStrength: Int
+    public let manufacturer: String
+    public let model: String
     public let discoveredAt: Date
     public let isAlreadyAdded: Bool
 
@@ -12,14 +13,16 @@ public struct DiscoveredDevice: Codable, Sendable {
         id: String,
         name: String,
         type: DeviceType,
-        signalStrength: Int,
+        manufacturer: String,
+        model: String,
         discoveredAt: Date,
         isAlreadyAdded: Bool
     ) {
         self.id = id
         self.name = name
         self.type = type
-        self.signalStrength = signalStrength
+        self.manufacturer = manufacturer
+        self.model = model
         self.discoveredAt = discoveredAt
         self.isAlreadyAdded = isAlreadyAdded
     }
@@ -30,7 +33,8 @@ public extension DiscoveredDevice {
         id: "mock-device-001",
         name: "Living Room Light",
         type: .smartLight,
-        signalStrength: -45,
+        manufacturer: "Smart lights",
+        model: "XYZ123",
         discoveredAt: Date(),
         isAlreadyAdded: false
     )
@@ -39,7 +43,8 @@ public extension DiscoveredDevice {
         id: "mock-device-002",
         name: "Kitchen Temperature Sensor",
         type: .temperatureSensor,
-        signalStrength: -38,
+        manufacturer: "Smart sensors",
+        model: "YZA456",
         discoveredAt: Date().addingTimeInterval(-120),
         isAlreadyAdded: false
     )
@@ -48,7 +53,8 @@ public extension DiscoveredDevice {
         id: "mock-device-003",
         name: "Smart Thermostat",
         type: .smartThermostat,
-        signalStrength: -52,
+        manufacturer: "Smart home",
+        model: "ZYX789",
         discoveredAt: Date().addingTimeInterval(-60),
         isAlreadyAdded: true
     )

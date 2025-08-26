@@ -4,6 +4,8 @@ public struct Device: Codable, Sendable {
     public let id: String
     public let name: String
     public let type: DeviceType
+    public let manufacturer: String
+    public let model: String
     public let isManaged: Bool
     public let addedDate: Date
     public var lastSeen: Date?
@@ -13,6 +15,8 @@ public struct Device: Codable, Sendable {
         id: String,
         name: String,
         type: DeviceType,
+        manufacturer: String,
+        model: String,
         isManaged: Bool,
         addedDate: Date,
         lastSeen: Date?,
@@ -21,6 +25,8 @@ public struct Device: Codable, Sendable {
         self.id = id
         self.name = name
         self.type = type
+        self.manufacturer = manufacturer
+        self.model = model
         self.isManaged = isManaged
         self.addedDate = addedDate
         self.lastSeen = lastSeen
@@ -73,6 +79,8 @@ public extension Device {
         id: "mock-device-001",
         name: "Mock Device Connected",
         type: .temperatureSensor,
+        manufacturer: "Smart lights",
+        model: "XYZ123",
         isManaged: false,
         addedDate: Date(),
         lastSeen: nil,
@@ -83,6 +91,8 @@ public extension Device {
         id: "mock-device-002",
         name: "Mock Device Disconnected",
         type: .temperatureSensor,
+        manufacturer: "Smart sensors",
+        model: "YZA456",
         isManaged: false,
         addedDate: Date(),
         lastSeen: nil,

@@ -13,7 +13,7 @@ struct DeviceSubscribedRow: View {
 
             VStack(alignment: .leading, spacing: Spacing.s) {
                 Text(device.name)
-                Text(device.type.displayName)
+                Text("\(device.manufacturer) | \(device.type.displayName)")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }

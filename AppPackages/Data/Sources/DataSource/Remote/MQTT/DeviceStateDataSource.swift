@@ -16,24 +16,28 @@ public actor DeviceStateDataSource: DeviceStateDataSourceProtocol {
 
     public func subscribeToDeviceStates() -> AsyncStream<[DeviceState]> {
         AsyncStream { continuation in
-            subscriptionManager.subscribe(to: "devices/+/status") { [weak self] message in
+            // Subscribe to Home Assistant state topics
+            // Pattern: home/{component}/{device_id}/state
+            subscriptionManager.subscribe(to: "home/+/+/state") { [weak self] message in
                 guard let self else { return }
 
                 let messageCopy = MQTTMessage(topic: message.topic, payload: message.payload)
                 Task {
-                    if let deviceState = self.parseDeviceStatusMessage(messageCopy) {
+                    if let deviceState = self.parseHomeAssistantStateMessage(messageCopy) {
                         await self.updateDeviceState(deviceState)
                         continuation.yield([deviceState])
                     }
                 }
             }
 
-            subscriptionManager.subscribe(to: "devices/+/telemetry") { [weak self] message in
+            // Also subscribe to sensor data topics which might be different
+            // Pattern: home/sensor/{device_id}/temperature, etc.
+            subscriptionManager.subscribe(to: "home/sensor/+/+") { [weak self] message in
                 guard let self else { return }
 
                 let messageCopy = MQTTMessage(topic: message.topic, payload: message.payload)
                 Task {
-                    if let deviceState = self.parseDeviceTelemetryMessage(messageCopy) {
+                    if let deviceState = self.parseHomeAssistantSensorMessage(messageCopy) {
                         await self.updateDeviceState(deviceState)
                         continuation.yield([deviceState])
                     }
@@ -50,50 +54,52 @@ public actor DeviceStateDataSource: DeviceStateDataSourceProtocol {
         deviceStatesCache[deviceState.deviceId] = deviceState
     }
 
-    private nonisolated func parseDeviceStatusMessage(_ message: MQTTMessage) -> DeviceState? {
-        guard let data = message.payload.data(using: .utf8),
-              let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-              let deviceId = extractDeviceIdFromTopic(message.topic),
-              let isOnline = json["online"] as? Bool
+    private nonisolated func parseHomeAssistantStateMessage(
+        _ message: MQTTMessage
+    ) -> DeviceState? {
+        // Parse Home Assistant state message
+        // Topic format: home/{component}/{device_id}/state
+        let topicComponents = message.topic.components(separatedBy: "/")
+        guard topicComponents.count >= 4,
+              topicComponents[0] == "home",
+              topicComponents[3] == "state"
         else {
             return nil
         }
+
+        let deviceId = topicComponents[2]
+        let payload = message.payload
+
+        // For most Home Assistant devices, the state is just a string value (ON/OFF, etc.)
+        let isOnline = !payload.isEmpty && payload.lowercased() != "unavailable"
 
         return DeviceState(
             deviceId: deviceId,
             isOnline: isOnline,
-            battery: json["battery"] as? Int,
-            temperature: json["temperature"] as? Double,
             lastUpdate: Date()
         )
     }
 
-    private nonisolated func parseDeviceTelemetryMessage(_ message: MQTTMessage) -> DeviceState? {
-        guard let data = message.payload.data(using: .utf8),
-              let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+    private nonisolated func parseHomeAssistantSensorMessage(
+        _ message: MQTTMessage
+    ) -> DeviceState? {
+        // Parse Home Assistant sensor message
+        // Topic format: home/sensor/{device_id}/{measurement_type}
+        let topicComponents = message.topic.components(separatedBy: "/")
+        guard topicComponents.count >= 4,
+              topicComponents[0] == "home",
+              topicComponents[1] == "sensor"
         else {
             return nil
         }
 
-        let deviceId = message.topic.components(separatedBy: "/")[1]
+        let deviceId = topicComponents[2]
+        let payload = message.payload
 
         return DeviceState(
             deviceId: deviceId,
-            isOnline: true,
-            battery: json["battery"] as? Int,
-            temperature: json["temperature"] as? Double,
+            isOnline: !payload.isEmpty && payload.lowercased() != "unavailable",
             lastUpdate: Date()
         )
-    }
-
-    private nonisolated func extractDeviceIdFromTopic(_ topic: String) -> String? {
-        let components = topic.components(separatedBy: "/")
-        guard components.count >= 3,
-              components[0] == "devices",
-              !components[1].isEmpty
-        else {
-            return nil
-        }
-        return components[1]
     }
 }

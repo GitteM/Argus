@@ -3,7 +3,7 @@ import Foundation
 import ServiceProtocols
 
 public protocol MQTTSubscriptionManagerProtocol: Sendable {
-    func subscribe(to topic: String, handler: @escaping (MQTTMessage) -> Void)
+    func subscribe(to topic: String, handler: @escaping @Sendable (MQTTMessage) -> Void)
     func publish(topic: String, payload: String) async throws
     func connect() async throws
     func disconnect()
@@ -16,7 +16,7 @@ public final class MQTTSubscriptionManager: MQTTSubscriptionManagerProtocol, @un
         self.connectionManager = connectionManager
     }
 
-    public func subscribe(to topic: String, handler: @escaping (MQTTMessage) -> Void) {
+    public func subscribe(to topic: String, handler: @escaping @Sendable (MQTTMessage) -> Void) {
         connectionManager.subscribe(to: topic, handler: handler)
     }
 

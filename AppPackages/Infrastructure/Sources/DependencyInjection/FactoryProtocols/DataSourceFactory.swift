@@ -6,39 +6,23 @@ public protocol DataSourceFactory {
     func makeDeviceStateDataSource() -> DeviceStateDataSourceProtocol
     func makeDeviceCommandDataSource() -> DeviceCommandDataSourceProtocol
     func makeMQTTSubscriptionManager() -> MQTTSubscriptionManagerProtocol
-    func makeMQTTConnectionManager() -> any MQTTConnectionManagerProtocol
 }
 
 public final class DefaultDataSourceFactory: DataSourceFactory {
-    private let logger: LoggerProtocol
-    private let mqttBroker: String
-    private let mqttPort: UInt16
+    private let connectionManager: any MQTTConnectionManagerProtocol
     private let clientId: String
 
     public init(
-        logger: LoggerProtocol,
-        mqttBroker: String,
-        mqttPort: UInt16,
+        connectionManager: any MQTTConnectionManagerProtocol,
         clientId: String
     ) {
-        self.logger = logger
-        self.mqttBroker = mqttBroker
-        self.mqttPort = mqttPort
+        self.connectionManager = connectionManager
         self.clientId = clientId
-    }
-
-    public func makeMQTTConnectionManager() -> any MQTTConnectionManagerProtocol {
-        MQTTConnectionManager(
-            clientId: clientId,
-            broker: mqttBroker,
-            port: mqttPort,
-            logger: logger
-        )
     }
 
     public func makeMQTTSubscriptionManager() -> MQTTSubscriptionManagerProtocol {
         MQTTSubscriptionManager(
-            connectionManager: makeMQTTConnectionManager()
+            connectionManager: connectionManager
         )
     }
 

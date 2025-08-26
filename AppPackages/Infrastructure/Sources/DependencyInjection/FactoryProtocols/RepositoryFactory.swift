@@ -28,8 +28,7 @@ public class DefaultRepositoryFactory: RepositoryFactory {
 
     public func makeDeviceDiscoveryRepository() -> DeviceDiscoveryRepositoryProtocol {
         DeviceDiscoveryRepository(
-            deviceDiscoveryDataSource: dataSourceFactory.makeDeviceDiscoveryDataSource(),
-            cacheManager: serviceFactory.makeCacheManager()
+            deviceDiscoveryDataSource: dataSourceFactory.makeDeviceDiscoveryDataSource()
         )
     }
 

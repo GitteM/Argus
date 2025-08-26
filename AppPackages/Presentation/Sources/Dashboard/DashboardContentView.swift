@@ -28,16 +28,14 @@ public struct DashboardContentView: View {
                 Text(Strings.subscribed)
             }
 
-            Section {
-                if availableDevices.isEmpty {
-                    WarningRow(message: Strings.noDevicesAvailable)
-                } else {
+            if !availableDevices.isEmpty {
+                Section {
                     ForEach(availableDevices, id: \.id) { device in
                         DeviceAvailableRow(device: device)
                     }
+                } header: {
+                    Text(Strings.availableNotSubscribed)
                 }
-            } header: {
-                Text(Strings.availableNotSubscribed)
             }
         }
     }

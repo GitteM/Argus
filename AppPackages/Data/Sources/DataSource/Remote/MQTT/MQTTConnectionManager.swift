@@ -7,7 +7,16 @@ import ServiceProtocols
 public final class MQTTConnectionManager: MQTTConnectionManagerProtocol, @unchecked Sendable {
     @Published public private(set) var connectionStatus: MQTTConnectionStatus = .disconnected
     private var mqtt: CocoaMQTT5?
-    private var messageHandlers: [String: (MQTTMessage) -> Void] = [:]
+    private var messageHandlers: [String: @Sendable (MQTTMessage) -> Void] = [:]
+    private var _pendingSubscriptions: [String: @Sendable (MQTTMessage) -> Void] = [:]
+    private var pendingSubscriptions: [String: @Sendable (MQTTMessage) -> Void] {
+        get { _pendingSubscriptions }
+        set { _pendingSubscriptions = newValue }
+    }
+
+    private let subscriptionQueue = DispatchQueue(
+        label: "mqtt.subscriptions", attributes: .concurrent
+    )
     private let clientId: String
     private let broker: String
     private let port: UInt16
@@ -55,9 +64,21 @@ public final class MQTTConnectionManager: MQTTConnectionManagerProtocol, @unchec
         }
     }
 
-    public func subscribe(to topic: String, handler: @escaping (MQTTMessage) -> Void) {
-        messageHandlers[topic] = handler
-        mqtt?.subscribe(topic, qos: .qos1)
+    public func subscribe(to topic: String, handler: @escaping @Sendable (MQTTMessage) -> Void) {
+        subscriptionQueue.async(flags: .barrier) {
+            self.logger.log("MQTT subscribing to topic: \(topic)", level: .debug)
+            self.messageHandlers[topic] = handler
+
+            if let mqtt = self.mqtt, mqtt.connState == .connected {
+                // Connection is ready, subscribe immediately
+                mqtt.subscribe(topic, qos: .qos1)
+                self.logger.log("MQTT subscribed immediately to: \(topic)", level: .debug)
+            } else {
+                // Connection not ready, queue for later
+                self.logger.log("MQTT queueing subscription for: \(topic)", level: .debug)
+                self._pendingSubscriptions[topic] = handler // Direct access to avoid setter
+            }
+        }
     }
 
     public func publish(topic: String, payload: String) async throws {
@@ -80,9 +101,14 @@ public final class MQTTConnectionManager: MQTTConnectionManagerProtocol, @unchec
     }
 
     public func disconnect() {
-        mqtt?.disconnect()
-        mqtt = nil
-        messageHandlers.removeAll()
+        subscriptionQueue.async(flags: .barrier) {
+            let message = "MQTT disconnecting - clearing handlers and pending subscriptions"
+            self.logger.log(message, level: .info)
+            self.mqtt?.disconnect()
+            self.mqtt = nil
+            self.messageHandlers.removeAll()
+            self.pendingSubscriptions.removeAll()
+        }
     }
 
     /**
@@ -94,15 +120,41 @@ public final class MQTTConnectionManager: MQTTConnectionManagerProtocol, @unchec
         let patternComponents = pattern.components(separatedBy: "/")
         let topicComponents = actualTopic.components(separatedBy: "/")
 
-        guard patternComponents.count == topicComponents.count else { return false }
+        guard patternComponents.count == topicComponents.count else {
+            return false
+        }
 
-        for (pattern, topic) in zip(patternComponents, topicComponents) {
-            if pattern != "+", pattern != topic {
+        for (patternPart, topicPart) in zip(patternComponents, topicComponents) {
+            if patternPart != "+", patternPart != topicPart {
                 return false
             }
         }
 
         return true
+    }
+
+    private func processPendingSubscriptions() {
+        subscriptionQueue.sync {
+            let pendingCount = self._pendingSubscriptions.count
+            guard pendingCount > 0 else { return }
+
+            self.logger.log("MQTT processing \(pendingCount) pending subscriptions", level: .debug)
+
+            // Make a copy to avoid modification during iteration
+            let subscriptionsToProcess = self._pendingSubscriptions
+
+            for (topic, _) in subscriptionsToProcess {
+                if let mqtt = self.mqtt {
+                    mqtt.subscribe(topic, qos: .qos1)
+                } else {
+                    let message = "MQTT failed to process pending subscription - no client"
+                    self.logger.log(message, level: .error)
+                }
+            }
+
+            self._pendingSubscriptions.removeAll()
+            self.logger.log("MQTT pending subscriptions processed and cleared", level: .debug)
+        }
     }
 }
 
@@ -132,6 +184,8 @@ extension MQTTConnectionManager: CocoaMQTT5Delegate {
 
             if isSuccess {
                 connectionContinuation?.resume()
+                // Process pending subscriptions now that we're connected
+                self.processPendingSubscriptions()
             } else {
                 connectionContinuation?.resume(throwing: MQTTError.connectionFailed)
             }
@@ -174,6 +228,8 @@ extension MQTTConnectionManager: CocoaMQTT5Delegate {
         id _: UInt16,
         publishData _: MqttDecodePublish?
     ) {
+        logger.log("MQTT message received on topic: \(message.topic)", level: .debug)
+
         let mqttMessage = MQTTMessage(
             topic: message.topic,
             payload: message.string ?? ""
@@ -186,10 +242,16 @@ extension MQTTConnectionManager: CocoaMQTT5Delegate {
         }
 
         // Check for wildcard matches
+        var foundHandler = false
         for (subscribedTopic, handler) in messageHandlers where topicMatches(
             subscribedTopic, actualTopic: message.topic
         ) {
             handler(mqttMessage)
+            foundHandler = true
+        }
+
+        if !foundHandler {
+            logger.log("MQTT no handler found for topic: \(message.topic)", level: .debug)
         }
     }
 
