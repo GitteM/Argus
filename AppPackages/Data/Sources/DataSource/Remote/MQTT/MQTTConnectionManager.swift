@@ -2,15 +2,7 @@ import CocoaMQTT
 import Entities
 import Foundation
 import OSLog
-import RepositoryProtocols
-
-public protocol MQTTConnectionManagerProtocol: ObservableObject {
-    var connectionStatus: MQTTConnectionStatus { get }
-    func connect() async throws
-    func subscribe(to topic: String, handler: @escaping (MQTTMessage) -> Void)
-    func publish(topic: String, payload: String) async throws
-    func disconnect()
-}
+import ServiceProtocols
 
 public final class MQTTConnectionManager: MQTTConnectionManagerProtocol, @unchecked Sendable {
     @Published public private(set) var connectionStatus: MQTTConnectionStatus = .disconnected
@@ -31,25 +23,6 @@ public final class MQTTConnectionManager: MQTTConnectionManagerProtocol, @unchec
         self.clientId = clientId
         self.broker = broker
         self.port = port
-        self.logger = logger
-    }
-
-    /// init for testing
-    init(
-        mqtt: CocoaMQTT5? = nil,
-        messageHandlers: [String: (MQTTMessage) -> Void],
-        clientId: String,
-        broker: String,
-        port: UInt16,
-        connectionContinuation: CheckedContinuation<Void, Error>? = nil,
-        logger: LoggerProtocol
-    ) {
-        self.mqtt = mqtt
-        self.messageHandlers = messageHandlers
-        self.clientId = clientId
-        self.broker = broker
-        self.port = port
-        self.connectionContinuation = connectionContinuation
         self.logger = logger
     }
 

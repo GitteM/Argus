@@ -1,5 +1,6 @@
 import OSLog
 import RepositoryProtocols
+import ServiceProtocols
 import Utilities
 
 public final class LoggingService: LoggerProtocol, Sendable {

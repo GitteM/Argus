@@ -3,24 +3,20 @@ import Entities
 import RepositoryProtocols
 
 public class DeviceStateRepository: DeviceStateRepositoryProtocol {
-    private let mqttDataSource: MQTTDataSourceProtocol
-    private let restDataSource: RESTDataSourceProtocol
+    private let deviceStateDataSource: DeviceStateDataSourceProtocol
 
     public init(
-        mqttDataSource: MQTTDataSourceProtocol,
-        restDataSource: RESTDataSourceProtocol
+        deviceStateDataSource: DeviceStateDataSourceProtocol
     ) {
-        self.mqttDataSource = mqttDataSource
-        self.restDataSource = restDataSource
+        self.deviceStateDataSource = deviceStateDataSource
     }
 
-    /// First try to get current state via REST API
-    public func getDeviceState(deviceId: String) async throws -> DeviceState {
-        try await restDataSource.getDeviceState(deviceId: deviceId)
+    public func getDeviceState(deviceId: String) async throws -> DeviceState? {
+        try await deviceStateDataSource.getDeviceState(deviceId: deviceId)
     }
 
     /// Subscribe to real-time device state updates via MQTT
     public func subscribeToDeviceStates() async throws -> AsyncStream<[DeviceState]> {
-        await mqttDataSource.subscribeToDeviceStates()
+        await deviceStateDataSource.subscribeToDeviceStates()
     }
 }

@@ -27,28 +27,28 @@ public struct DiscoveredDevice: Codable, Sendable {
 
 public extension DiscoveredDevice {
     static let mockNew1 = DiscoveredDevice(
-        id: "discovered-001",
-        name: "Mock Device 1",
-        type: .smartPlug,
-        signalStrength: 0,
+        id: "mock-device-001",
+        name: "Living Room Light",
+        type: .smartLight,
+        signalStrength: -45,
         discoveredAt: Date(),
         isAlreadyAdded: false
     )
 
     static let mockNew2 = DiscoveredDevice(
-        id: "discovered-002",
-        name: "Mock Device 2",
+        id: "mock-device-002",
+        name: "Kitchen Temperature Sensor",
         type: .temperatureSensor,
-        signalStrength: 0,
+        signalStrength: -38,
         discoveredAt: Date().addingTimeInterval(-120),
         isAlreadyAdded: false
     )
 
     static let mockAdded1 = DiscoveredDevice(
-        id: "discovered-003",
-        name: "Mock Device 3",
-        type: .temperatureSensor,
-        signalStrength: 0,
+        id: "mock-device-003",
+        name: "Smart Thermostat",
+        type: .smartThermostat,
+        signalStrength: -52,
         discoveredAt: Date().addingTimeInterval(-60),
         isAlreadyAdded: true
     )

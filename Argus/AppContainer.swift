@@ -1,19 +1,17 @@
 import Configuration
-import Dashboard
 import DataSource
 import Foundation
 import Infrastructure
 import Persistence
 import Repositories
 import RepositoryProtocols
+import ServiceProtocols
 import Services
 import Stores
 import UseCases
 
 public struct AppContainer {
-    public let dashboardContainer: DashboardContainer
     public let deviceStore: DeviceStore
-    public let settingsContainer: SettingsContainer
     public let connectionManager: MQTTConnectionManager
 
     @MainActor public init() {
@@ -28,32 +26,77 @@ public struct AppContainer {
             logger: logger
         )
         self.connectionManager = connectionManager
+
         let cacheManager = CacheManager()
+
         let serviceFactory = DefaultServiceFactory(
-            cacheManager: cacheManager,
-            connectionManager: connectionManager,
+            cacheManager: cacheManager
+        )
+
+        let dataSourceFactory = DefaultDataSourceFactory(
+            logger: logger,
+            mqttBroker: Bundle.mqttHost,
+            mqttPort: Bundle.mqttPort,
             clientId: clientId
         )
-        let repositoryFactory = DefaultRepositoryFactory(serviceFactory: serviceFactory)
+
+        // Create repositories
+        let repositoryFactory = DefaultRepositoryFactory(
+            serviceFactory: serviceFactory,
+            dataSourceFactory: dataSourceFactory
+        )
+        let deviceConnectionRepository = repositoryFactory.makeDeviceConnectionRepository()
+        let deviceDiscoveryRepository = repositoryFactory.makeDeviceDiscoveryRepository()
+        let deviceStateRepository = repositoryFactory.makeDeviceStateRepository()
+        let deviceCommandRepository = repositoryFactory.makeDeviceCommandRepository()
 
         // Create use cases
-        let getDashboardDataUseCase = GetDashboardDataUseCase(
-            deviceConnectionRepository: repositoryFactory.makeDeviceConnectionRepository(),
-            deviceDiscoveryRepository: repositoryFactory.makeDeviceDiscoveryRepository(),
-            deviceStateRepository: repositoryFactory.makeDeviceStateRepository()
+        let getManagedDevicesUseCase = GetManagedDevicesUseCase(
+            deviceConnectionRepository: deviceConnectionRepository
         )
 
-        // Create module containers
-        dashboardContainer = DashboardContainer(
-            getDashboardDataUseCase: getDashboardDataUseCase
+        let getDiscoveredDevicesUseCase = GetDiscoveredDevicesUseCase(
+            deviceDiscoveryRepository: deviceDiscoveryRepository
         )
 
-        // Create stores
-        deviceStore = DeviceStore(
-            getDashboardDataUseCase: getDashboardDataUseCase,
+        let startDiscoveryUseCase = StartDeviceDiscoveryUseCase(
+            deviceDiscoveryRepository: deviceDiscoveryRepository
+        )
+
+        let stopDiscoveryUseCase = StopDeviceDiscoveryUseCase(
+            deviceDiscoveryRepository: deviceDiscoveryRepository
+        )
+
+        let subscribeToStatesUseCase = SubscribeToDeviceStatesUseCase(
+            deviceStateRepository: deviceStateRepository
+        )
+
+        let subscribeToDiscoveredDevicesUseCase = SubscribeToDiscoveredDevicesUseCase(
+            deviceDiscoveryRepository: deviceDiscoveryRepository
+        )
+
+        let addDeviceUseCase = AddDeviceUseCase(
+            deviceConnectionRepository: deviceConnectionRepository
+        )
+
+        let sendDeviceCommandUseCase = SendDeviceCommandUseCase(
+            deviceCommandRepository: deviceCommandRepository
+        )
+
+        // Create factories
+        let storeFactory = DefaultStoreFactory(
+            getManagedDevicesUseCase: getManagedDevicesUseCase,
+            getDiscoveredDevicesUseCase: getDiscoveredDevicesUseCase,
+            startDiscoveryUseCase: startDiscoveryUseCase,
+            stopDiscoveryUseCase: stopDiscoveryUseCase,
+            subscribeToStatesUseCase: subscribeToStatesUseCase,
+            subscribeToDiscoveredDevicesUseCase: subscribeToDiscoveredDevicesUseCase,
+            addDeviceUseCase: addDeviceUseCase,
+            sendDeviceCommandUseCase: sendDeviceCommandUseCase,
             logger: logger
         )
 
-        settingsContainer = SettingsContainer()
+        // Create stores
+        deviceStore = storeFactory.makeDeviceStore()
     }
 }

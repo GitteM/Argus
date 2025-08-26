@@ -6,8 +6,8 @@ public struct Device: Codable, Sendable {
     public let type: DeviceType
     public let isManaged: Bool
     public let addedDate: Date
-    public let lastSeen: Date?
-    public let status: DeviceConnectionStatus
+    public var lastSeen: Date?
+    public var status: DeviceConnectionStatus
 
     public init(
         id: String,

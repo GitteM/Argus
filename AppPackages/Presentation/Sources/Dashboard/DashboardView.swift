@@ -18,10 +18,10 @@ public struct DashboardView: View {
                     deviceStore.loadDashboardData()
                 }
 
-        case let .data(data):
+        case .loaded:
             DashboardContentView(
-                subscribedDevices: data.managedDevices,
-                availableDevices: data.discoveredDevices
+                subscribedDevices: deviceStore.devices,
+                availableDevices: deviceStore.discoveredDevices
             )
 
         case .empty:

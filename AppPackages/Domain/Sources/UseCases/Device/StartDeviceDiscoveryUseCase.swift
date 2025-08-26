@@ -1,16 +1,16 @@
 import Entities
 import RepositoryProtocols
 
-class StartDeviceDiscoveryUseCase {
+public final class StartDeviceDiscoveryUseCase: @unchecked Sendable {
     private let deviceDiscoveryRepository: DeviceDiscoveryRepositoryProtocol
 
-    init(
+    public init(
         deviceDiscoveryRepository: DeviceDiscoveryRepositoryProtocol
     ) {
         self.deviceDiscoveryRepository = deviceDiscoveryRepository
     }
 
-    func execute() async throws {
+    public func execute() async throws {
         try await deviceDiscoveryRepository.startDiscovery()
     }
 }

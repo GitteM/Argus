@@ -5,26 +5,25 @@ import Persistence
 import RepositoryProtocols
 
 public struct DeviceDiscoveryRepository: DeviceDiscoveryRepositoryProtocol {
-    private let mqttDataSource: MQTTDataSourceProtocol
+    private let deviceDiscoveryDataSource: DeviceDiscoveryDataSourceProtocol
     private let cacheManager: CacheManagerProtocol
 
     public init(
-        mqttDataSource: MQTTDataSourceProtocol,
+        deviceDiscoveryDataSource: DeviceDiscoveryDataSourceProtocol,
         cacheManager: CacheManagerProtocol
     ) {
-        self.mqttDataSource = mqttDataSource
+        self.deviceDiscoveryDataSource = deviceDiscoveryDataSource
         self.cacheManager = cacheManager
     }
 
     public func startDiscovery() async throws {
-        try await mqttDataSource.startDeviceDiscovery()
+        try await deviceDiscoveryDataSource.startDeviceDiscovery()
     }
 
     public func stopDiscovery() async throws {
-        try await mqttDataSource.stopDeviceDiscovery()
+        try await deviceDiscoveryDataSource.stopDeviceDiscovery()
     }
 
-    // FIXME: This looks shakey - fixit
     public func getDiscoveredDevices() async throws -> [DiscoveredDevice] {
         // First check cache
         if let cached: [DiscoveredDevice] = cacheManager.get(key: "discovered_devices") {
@@ -37,8 +36,8 @@ public struct DeviceDiscoveryRepository: DeviceDiscoveryRepositoryProtocol {
             }
         }
 
-        // If no cached devices or they're expired, get from MQTT data source
-        let discoveredDevices = await mqttDataSource.getDiscoveredDevices()
+        // If no cached devices or they're expired, get from discovery data source
+        let discoveredDevices = await deviceDiscoveryDataSource.getDiscoveredDevices()
 
         // Cache the fresh results
         if !discoveredDevices.isEmpty {
@@ -48,7 +47,7 @@ public struct DeviceDiscoveryRepository: DeviceDiscoveryRepositoryProtocol {
         return discoveredDevices
     }
 
-    public func subscribeToDiscoveredDevices() async -> AsyncStream<[Entities.DiscoveredDevice]> {
-        await mqttDataSource.subscribeToDeviceDiscovery()
+    public func subscribeToDiscoveredDevices() async throws -> AsyncStream<[DiscoveredDevice]> {
+        await deviceDiscoveryDataSource.subscribeToDeviceDiscovery()
     }
 }

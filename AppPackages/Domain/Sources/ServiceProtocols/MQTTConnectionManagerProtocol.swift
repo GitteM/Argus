@@ -3,9 +3,8 @@ import Combine
 import Entities
 import Foundation
 
-public protocol MQTTConnectionManagerProtocol: AnyObject, Sendable {
+public protocol MQTTConnectionManagerProtocol: ObservableObject {
     var connectionStatus: MQTTConnectionStatus { get }
-    var connectionStatusPublisher: Published<MQTTConnectionStatus>.Publisher { get }
 
     func connect() async throws
     func disconnect()

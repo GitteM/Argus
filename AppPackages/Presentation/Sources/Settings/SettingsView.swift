@@ -11,13 +11,3 @@ public struct SettingsView: View {
         Text("🚧 SettingsView 🚧")
     }
 }
-
-// MARK: - Factory Extension
-
-public extension SettingsView {
-    @MainActor
-    static func create(from _: SettingsContainer) -> some View {
-        SettingsView()
-            .environmentObject(SettingsState())
-    }
-}

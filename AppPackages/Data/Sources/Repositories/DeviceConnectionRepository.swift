@@ -5,14 +5,11 @@ import Persistence
 import RepositoryProtocols
 
 public struct DeviceConnectionRepository: DeviceConnectionRepositoryProtocol {
-    private let mqttDataSource: MQTTDataSourceProtocol
     private let cacheManager: CacheManagerProtocol
 
     public init(
-        mqttDataSource: MQTTDataSourceProtocol,
         cacheManager: CacheManagerProtocol
     ) {
-        self.mqttDataSource = mqttDataSource
         self.cacheManager = cacheManager
     }
 

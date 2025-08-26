@@ -1,11 +1,11 @@
 import Foundation
 
 public struct DeviceState: Sendable {
-    let deviceId: String
-    let isOnline: Bool
-    let battery: Int?
-    let temperature: Double?
-    let lastUpdate: Date
+    public let deviceId: String
+    public let isOnline: Bool
+    public let battery: Int?
+    public let temperature: Double?
+    public let lastUpdate: Date
 
     public init(
         deviceId: String,

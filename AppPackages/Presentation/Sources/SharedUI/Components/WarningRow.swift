@@ -19,11 +19,15 @@ public struct WarningRow: View {
 }
 
 #Preview("Light Mode") {
-    WarningRow(message: "Description of warning goes here...")
-        .preferredColorScheme(.light)
+    List {
+        WarningRow(message: "Description of warning goes here...")
+            .preferredColorScheme(.light)
+    }
 }
 
 #Preview("Dark Mode") {
-    WarningRow(message: "Description of warning goes here...")
-        .preferredColorScheme(.dark)
+    List {
+        WarningRow(message: "Description of warning goes here...")
+            .preferredColorScheme(.dark)
+    }
 }

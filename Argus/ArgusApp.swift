@@ -7,9 +7,7 @@ struct ArgusApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView(
-                dashboardContainer: appContainer.dashboardContainer,
-                deviceStore: appContainer.deviceStore,
-                settingsContainer: appContainer.settingsContainer
+                deviceStore: appContainer.deviceStore
             )
             .environmentObject(appContainer.connectionManager)
         }

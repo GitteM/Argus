@@ -9,7 +9,7 @@ let package = Package(
         .library(
             name: "Domain",
             targets: [
-                "Entities", "RepositoryProtocols", "UseCases",
+                "Entities", "RepositoryProtocols", "ServiceProtocols", "UseCases",
             ]
         ),
         .library(
@@ -19,6 +19,10 @@ let package = Package(
         .library(
             name: "RepositoryProtocols",
             targets: ["RepositoryProtocols"]
+        ),
+        .library(
+            name: "ServiceProtocols",
+            targets: ["ServiceProtocols"]
         ),
         .library(
             name: "UseCases",
@@ -39,15 +43,24 @@ let package = Package(
             name: "RepositoryProtocols",
             dependencies: [
                 "Entities",
-                "CocoaMQTT",
+                "ServiceProtocols",
             ],
             path: "Sources/RepositoryProtocols"
+        ),
+        .target(
+            name: "ServiceProtocols",
+            dependencies: [
+                "Entities",
+                "CocoaMQTT",
+            ],
+            path: "Sources/ServiceProtocols"
         ),
         .target(
             name: "UseCases",
             dependencies: [
                 "Entities",
                 "RepositoryProtocols",
+                "ServiceProtocols",
             ],
             path: "Sources/UseCases"
         ),
@@ -56,6 +69,7 @@ let package = Package(
             dependencies: [
                 "Entities",
                 "RepositoryProtocols",
+                "ServiceProtocols",
                 "UseCases",
             ],
             path: "Tests/Unit"
