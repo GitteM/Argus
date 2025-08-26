@@ -1,7 +1,7 @@
 import Entities
 import RepositoryProtocols
 
-public struct DashboardData: Sendable {
+public struct DeviceData: Sendable {
     public let managedDevices: [Device]
     public let discoveredDevices: [DiscoveredDevice]
 }
@@ -21,13 +21,13 @@ public class GetDashboardDataUseCase: @unchecked Sendable {
         self.deviceStateRepository = deviceStateRepository
     }
 
-    public func execute() async throws -> DashboardData {
+    public func execute() async throws -> DeviceData {
         async let managedDevices = deviceConnectionRepository.getManagedDevices()
         async let discoveredDevices = deviceDiscoveryRepository.getDiscoveredDevices()
 
         let (managed, discovered) = try await (managedDevices, discoveredDevices)
 
-        return DashboardData(
+        return DeviceData(
             managedDevices: managed,
             discoveredDevices: discovered.filter { !$0.isAlreadyAdded }
         )

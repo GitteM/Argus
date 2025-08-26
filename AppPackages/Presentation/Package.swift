@@ -14,6 +14,7 @@ let package = Package(
         .library(name: "Presentation", targets: ["Presentation"]),
         .library(name: "Settings", targets: ["Settings"]),
         .library(name: "SharedUI", targets: ["SharedUI"]),
+        .library(name: "Stores", targets: ["Stores"]),
     ],
     dependencies: [
         .package(path: "../Domain"),
@@ -52,6 +53,7 @@ let package = Package(
             name: "Dashboard",
             dependencies: [
                 "SharedUI",
+                "Stores",
                 .product(
                     name: "Domain",
                     package: "Domain"
@@ -118,6 +120,21 @@ let package = Package(
             resources: [
                 .process("Resources"),
             ]
+        ),
+        .target(
+            name: "Stores",
+            dependencies: [
+                "SharedUI",
+                .product(
+                    name: "Domain",
+                    package: "Domain"
+                ),
+                .product(
+                    name: "Infrastructure",
+                    package: "Infrastructure"
+                ),
+            ],
+            path: "Sources/Stores"
         ),
         .testTarget(
             name: "AlertsTests",

@@ -8,7 +8,7 @@ struct ArgusApp: App {
         WindowGroup {
             ContentView(
                 dashboardContainer: appContainer.dashboardContainer,
-                dashboardStore: appContainer.dashboardStore,
+                deviceStore: appContainer.deviceStore,
                 settingsContainer: appContainer.settingsContainer
             )
             .environmentObject(appContainer.connectionManager)

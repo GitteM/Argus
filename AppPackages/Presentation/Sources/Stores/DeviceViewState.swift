@@ -1,8 +1,8 @@
 import UseCases
 
-enum DashboardViewState {
+public enum DeviceViewState {
     case loading
-    case data(DashboardData)
+    case data(DeviceData)
     case error(String)
     case empty
 }

@@ -7,11 +7,12 @@ import Persistence
 import Repositories
 import RepositoryProtocols
 import Services
+import Stores
 import UseCases
 
 public struct AppContainer {
     public let dashboardContainer: DashboardContainer
-    public let dashboardStore: DashboardStore
+    public let deviceStore: DeviceStore
     public let settingsContainer: SettingsContainer
     public let connectionManager: MQTTConnectionManager
 
@@ -48,7 +49,7 @@ public struct AppContainer {
         )
 
         // Create stores
-        dashboardStore = DashboardStore(
+        deviceStore = DeviceStore(
             getDashboardDataUseCase: getDashboardDataUseCase,
             logger: logger
         )

@@ -5,13 +5,14 @@ import Infrastructure
 import Presentation
 import Settings
 import SharedUI
+import Stores
 import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject private var connectionManager: MQTTConnectionManager
 
     let dashboardContainer: DashboardContainer
-    let dashboardStore: DashboardStore
+    let deviceStore: DeviceStore
     let settingsContainer: SettingsContainer
 
     private var connectionStatus: MQTTConnectionStatus {
@@ -22,7 +23,7 @@ struct ContentView: View {
         TabView {
             NavigationStack {
                 DashboardView()
-                    .environmentObject(dashboardStore)
+                    .environmentObject(deviceStore)
                     .mqttConnectionHandler()
                     .navigationTitle(Strings.devices)
                     .navigationBarTitleDisplayMode(.large)
@@ -55,7 +56,7 @@ struct ContentView: View {
     let appContainer = AppContainer()
     ContentView(
         dashboardContainer: appContainer.dashboardContainer,
-        dashboardStore: appContainer.dashboardStore,
+        deviceStore: appContainer.deviceStore,
         settingsContainer: appContainer.settingsContainer
     )
     .environmentObject(appContainer.connectionManager)
@@ -66,7 +67,7 @@ struct ContentView: View {
     let appContainer = AppContainer()
     ContentView(
         dashboardContainer: appContainer.dashboardContainer,
-        dashboardStore: appContainer.dashboardStore,
+        deviceStore: appContainer.deviceStore,
         settingsContainer: appContainer.settingsContainer
     )
     .environmentObject(appContainer.connectionManager)

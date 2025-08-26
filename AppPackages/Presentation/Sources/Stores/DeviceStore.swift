@@ -5,8 +5,8 @@ import Services
 import UseCases
 
 @MainActor
-public final class DashboardStore: ObservableObject {
-    @Published var viewState: DashboardViewState
+public final class DeviceStore: ObservableObject {
+    @Published public var viewState: DeviceViewState
 
     private let getDashboardDataUseCase: GetDashboardDataUseCase
     private let logger: LoggerProtocol
