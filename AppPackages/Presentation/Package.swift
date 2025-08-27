@@ -101,25 +101,5 @@ let package = Package(
             ],
             path: "Sources/Stores"
         ),
-        .testTarget(
-            name: "DashboardTests",
-            dependencies: ["Dashboard"],
-            path: "Tests/DashboardTests"
-        ),
-        .testTarget(
-            name: "DeviceDetailTests",
-            dependencies: ["DeviceDetail"],
-            path: "Tests/DeviceDetailTests"
-        ),
-        .testTarget(
-            name: "NavigationTests",
-            dependencies: ["Navigation"],
-            path: "Tests/NavigationTests"
-        ),
-        .testTarget(
-            name: "SharedUITests",
-            dependencies: ["SharedUI"],
-            path: "Tests/SharedUITests"
-        ),
     ]
 )

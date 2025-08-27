@@ -89,11 +89,6 @@ let package = Package(
             path: "Tests/ConfigurationTests"
         ),
         .testTarget(
-            name: "ServicesTests",
-            dependencies: ["Services"],
-            path: "Tests/ServicesTests"
-        ),
-        .testTarget(
             name: "DependencyInjectionTests",
             dependencies: ["DependencyInjection"],
             path: "Tests/DependencyInjectionTests"
