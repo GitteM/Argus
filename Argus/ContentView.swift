@@ -38,6 +38,7 @@ struct ContentView: View {
     ContentView()
         .environment(appContainer.connectionManager)
         .environment(appContainer.deviceStore)
+        .environment(appContainer.router)
         .preferredColorScheme(.light)
 }
 
@@ -46,5 +47,6 @@ struct ContentView: View {
     ContentView()
         .environment(appContainer.connectionManager)
         .environment(appContainer.deviceStore)
+        .environment(appContainer.router)
         .preferredColorScheme(.dark)
 }
