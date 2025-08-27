@@ -1,5 +1,7 @@
 import Foundation
+import Observation
 import SwiftUICore
 
 @MainActor
-public final class SettingsState: ObservableObject {}
+@Observable
+public final class SettingsState {}

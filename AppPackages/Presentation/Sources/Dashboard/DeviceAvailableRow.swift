@@ -6,7 +6,7 @@ import SwiftUI
 struct DeviceAvailableRow: View {
     let device: DiscoveredDevice
     @State private var isLoading = false
-    @EnvironmentObject private var deviceStore: DeviceStore
+    @Environment(DeviceStore.self) private var deviceStore
 
     var body: some View {
         HStack(spacing: Spacing.s4) {
@@ -31,7 +31,7 @@ struct DeviceAvailableRow: View {
                     .foregroundColor(.green)
             }
         }
-        .onTapGesture {
+        .onRowTap {
             withAnimation {
                 isLoading = true
             }

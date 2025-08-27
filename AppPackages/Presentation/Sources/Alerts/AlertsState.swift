@@ -1,4 +1,6 @@
 import Foundation
+import Observation
 
 @MainActor
-public final class AlertsState: ObservableObject {}
+@Observable
+public final class AlertsState {}

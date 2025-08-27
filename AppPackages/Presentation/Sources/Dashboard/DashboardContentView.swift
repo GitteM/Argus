@@ -1,8 +1,12 @@
 import Entities
+import Navigation
+import Observation
 import SharedUI
 import SwiftUI
 
 public struct DashboardContentView: View {
+    @Environment(Router.self) private var router
+
     let subscribedDevices: [Device]
     let availableDevices: [DiscoveredDevice]
 
@@ -22,6 +26,9 @@ public struct DashboardContentView: View {
                 } else {
                     ForEach(subscribedDevices, id: \.id) { device in
                         DeviceSubscribedRow(device: device)
+                            .onRowTap {
+                                router.navigateTo(.deviceDetail)
+                            }
                     }
                 }
             } header: {

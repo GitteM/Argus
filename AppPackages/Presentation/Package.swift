@@ -10,7 +10,6 @@ let package = Package(
         .library(name: "Alerts", targets: ["Alerts"]),
         .library(name: "Dashboard", targets: ["Dashboard"]),
         .library(name: "DeviceDetail", targets: ["DeviceDetail"]),
-        .library(name: "Navigation", targets: ["Navigation"]),
         .library(name: "Presentation", targets: ["Presentation"]),
         .library(name: "Settings", targets: ["Settings"]),
         .library(name: "SharedUI", targets: ["SharedUI"]),
@@ -20,6 +19,7 @@ let package = Package(
         .package(path: "../Domain"),
         .package(path: "../Infrastructure"),
         .package(path: "../Data"),
+        .package(path: "../Navigation"),
     ],
     targets: [
         .target(
@@ -28,7 +28,6 @@ let package = Package(
                 "Alerts",
                 "Dashboard",
                 "DeviceDetail",
-                "Navigation",
                 "Settings",
                 "SharedUI",
             ],
@@ -55,6 +54,10 @@ let package = Package(
                 "SharedUI",
                 "Stores",
                 .product(
+                    name: "Navigation",
+                    package: "Navigation"
+                ),
+                .product(
                     name: "Domain",
                     package: "Domain"
                 ),
@@ -69,6 +72,7 @@ let package = Package(
             name: "DeviceDetail",
             dependencies: [
                 "SharedUI",
+                "Stores",
                 .product(
                     name: "Domain",
                     package: "Domain"
@@ -79,11 +83,6 @@ let package = Package(
                 ),
             ],
             path: "Sources/DeviceDetail"
-        ),
-        .target(
-            name: "Navigation",
-            dependencies: [],
-            path: "Sources/Navigation"
         ),
         .target(
             name: "Settings",

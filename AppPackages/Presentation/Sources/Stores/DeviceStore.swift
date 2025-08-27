@@ -1,16 +1,18 @@
 import Entities
 import Foundation
+import Observation
 import OSLog
 import RepositoryProtocols
 import ServiceProtocols
 import UseCases
 
 @MainActor
-public final class DeviceStore: ObservableObject {
-    @Published public var viewState: DeviceViewState
-    @Published public var devices: [Device] = []
-    @Published public var discoveredDevices: [DiscoveredDevice] = []
-    @Published public var deviceStates: [String: DeviceState] = [:]
+@Observable
+public final class DeviceStore {
+    public var viewState: DeviceViewState
+    public var devices: [Device] = []
+    public var discoveredDevices: [DiscoveredDevice] = []
+    public var deviceStates: [String: DeviceState] = [:]
 
     private let getManagedDevicesUseCase: GetManagedDevicesUseCase
     private let getDiscoveredDevicesUseCase: GetDiscoveredDevicesUseCase
@@ -198,11 +200,5 @@ public final class DeviceStore: ObservableObject {
                 logger.log(message, level: .error)
             }
         }
-    }
-
-    deinit {
-        dashboardTask?.cancel()
-        stateSubscriptionTask?.cancel()
-        discoverySubscriptionTask?.cancel()
     }
 }

@@ -3,7 +3,7 @@ import Combine
 import Entities
 import Foundation
 
-public protocol MQTTConnectionManagerProtocol: ObservableObject {
+public protocol MQTTConnectionManagerProtocol {
     var connectionStatus: MQTTConnectionStatus { get }
 
     func connect() async throws

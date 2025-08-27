@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		EC0E44C92E5EF3B100E52C2D /* Navigation in Frameworks */ = {isa = PBXBuildFile; productRef = EC0E44C82E5EF3B100E52C2D /* Navigation */; };
 		EC2977A32E58A1F300734BEA /* Alerts in Frameworks */ = {isa = PBXBuildFile; productRef = EC2977A22E58A1F300734BEA /* Alerts */; };
 		EC2977A52E58A1FD00734BEA /* Dashboard in Frameworks */ = {isa = PBXBuildFile; productRef = EC2977A42E58A1FD00734BEA /* Dashboard */; };
 		EC2977A72E58A20200734BEA /* DeviceDetail in Frameworks */ = {isa = PBXBuildFile; productRef = EC2977A62E58A20200734BEA /* DeviceDetail */; };
@@ -29,6 +30,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		EC2DDBC82E5EF4F900791902 /* Navigation */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Navigation; path = AppPackages/Navigation; sourceTree = "<group>"; };
 		EC78E3992E4F694800262F13 /* Argus.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Argus.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EC78E3A72E4F694900262F13 /* ArgusTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ArgusTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		ECAA1F0A2E59DE42006AA681 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -74,6 +76,7 @@
 				EC2977A32E58A1F300734BEA /* Alerts in Frameworks */,
 				EC2977A92E58A20A00734BEA /* Settings in Frameworks */,
 				EC2977A72E58A20200734BEA /* DeviceDetail in Frameworks */,
+				EC0E44C92E5EF3B100E52C2D /* Navigation in Frameworks */,
 				ECD6A2712E5D8ED7003C1149 /* Stores in Frameworks */,
 				EC2977A52E58A1FD00734BEA /* Dashboard in Frameworks */,
 				ECAA1F072E58BA3C006AA681 /* Domain in Frameworks */,
@@ -97,6 +100,7 @@
 			children = (
 				ECCA86352E5B68E100490B13 /* TestPlan.xctestplan */,
 				ECAA1F0A2E59DE42006AA681 /* README.md */,
+				EC2DDBC82E5EF4F900791902 /* Navigation */,
 				ECDA1D1B2E4F840F00D59653 /* Infrastructure */,
 				ECDA1D182E4F83D500D59653 /* Presentation */,
 				ECDA1D152E4F836700D59653 /* Data */,
@@ -154,6 +158,7 @@
 				ECAA1F062E58BA3C006AA681 /* Domain */,
 				ECAA1F082E58BAFF006AA681 /* Data */,
 				ECD6A2702E5D8ED7003C1149 /* Stores */,
+				EC0E44C82E5EF3B100E52C2D /* Navigation */,
 			);
 			productName = Argus;
 			productReference = EC78E3992E4F694800262F13 /* Argus.app */;
@@ -573,6 +578,10 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		EC0E44C82E5EF3B100E52C2D /* Navigation */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Navigation;
+		};
 		EC2977A22E58A1F300734BEA /* Alerts */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Alerts;

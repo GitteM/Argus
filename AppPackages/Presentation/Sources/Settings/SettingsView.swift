@@ -3,7 +3,7 @@ import SharedUI
 import SwiftUI
 
 public struct SettingsView: View {
-    @EnvironmentObject private var settingState: SettingsState
+    @Environment(SettingsState.self) private var settingState
 
     public init() {}
 

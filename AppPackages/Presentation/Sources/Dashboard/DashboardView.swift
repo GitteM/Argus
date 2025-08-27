@@ -6,7 +6,7 @@ import SwiftUI
 import UseCases
 
 public struct DashboardView: View {
-    @EnvironmentObject private var deviceStore: DeviceStore
+    @Environment(DeviceStore.self) private var deviceStore
 
     public init() {}
 

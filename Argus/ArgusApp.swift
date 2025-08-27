@@ -1,3 +1,4 @@
+import Navigation
 import SwiftUI
 
 @main
@@ -6,10 +7,10 @@ struct ArgusApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView(
-                deviceStore: appContainer.deviceStore
-            )
-            .environmentObject(appContainer.connectionManager)
+            ContentView()
+                .environment(appContainer.connectionManager)
+                .environment(appContainer.router)
+                .environment(appContainer.deviceStore)
         }
     }
 }

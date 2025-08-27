@@ -2,6 +2,7 @@ import Configuration
 import DataSource
 import Foundation
 import Infrastructure
+import Navigation
 import Persistence
 import Repositories
 import RepositoryProtocols
@@ -13,6 +14,7 @@ import UseCases
 public struct AppContainer {
     public let deviceStore: DeviceStore
     public let connectionManager: MQTTConnectionManager
+    public let router: Router
 
     @MainActor public init() {
         // Create service dependencies
@@ -91,5 +93,8 @@ public struct AppContainer {
 
         // Create stores
         deviceStore = storeFactory.makeDeviceStore()
+
+        // Create navigation
+        router = Router()
     }
 }

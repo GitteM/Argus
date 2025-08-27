@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct AlertsView: View {
-    @EnvironmentObject var alertState: AlertsState
+    @Environment(AlertsState.self) var alertState
 
     var body: some View {
         Text("AlertsView")

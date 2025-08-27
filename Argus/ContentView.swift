@@ -1,6 +1,7 @@
 import DataSource
 import Entities
 import Infrastructure
+import Navigation
 import Presentation
 import Settings
 import SharedUI
@@ -8,19 +9,23 @@ import Stores
 import SwiftUI
 
 struct ContentView: View {
-    @EnvironmentObject private var connectionManager: MQTTConnectionManager
-
-    let deviceStore: DeviceStore
+    @Environment(MQTTConnectionManager.self) private var connectionManager
+    @Environment(Router.self) private var router
+    @Environment(DeviceStore.self) private var deviceStore
 
     private var connectionStatus: MQTTConnectionStatus {
         connectionManager.connectionStatus
     }
 
     var body: some View {
+        @Bindable var router = router
+
         TabView {
-            NavigationStack {
+            NavigationStack(path: $router.routes) {
                 DashboardView()
-                    .environmentObject(deviceStore)
+                    .navigationDestination(for: Route.self) { route in
+                        route.destination(router: router)
+                    }
                     .mqttConnectionHandler()
                     .navigationTitle(Strings.devices)
                     .navigationBarTitleDisplayMode(.large)
@@ -51,18 +56,16 @@ struct ContentView: View {
 
 #Preview("Light Mode") { @MainActor in
     let appContainer = AppContainer()
-    ContentView(
-        deviceStore: appContainer.deviceStore
-    )
-    .environmentObject(appContainer.connectionManager)
-    .preferredColorScheme(.light)
+    ContentView()
+        .environment(appContainer.connectionManager)
+        .environment(appContainer.deviceStore)
+        .preferredColorScheme(.light)
 }
 
 #Preview("Dark Mode") { @MainActor in
     let appContainer = AppContainer()
-    ContentView(
-        deviceStore: appContainer.deviceStore
-    )
-    .environmentObject(appContainer.connectionManager)
-    .preferredColorScheme(.dark)
+    ContentView()
+        .environment(appContainer.connectionManager)
+        .environment(appContainer.deviceStore)
+        .preferredColorScheme(.dark)
 }

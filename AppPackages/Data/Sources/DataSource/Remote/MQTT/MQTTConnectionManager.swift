@@ -1,11 +1,13 @@
 import CocoaMQTT
 import Entities
 import Foundation
+import Observation
 import OSLog
 import ServiceProtocols
 
+@Observable
 public final class MQTTConnectionManager: MQTTConnectionManagerProtocol, @unchecked Sendable {
-    @Published public private(set) var connectionStatus: MQTTConnectionStatus = .disconnected
+    public private(set) var connectionStatus: MQTTConnectionStatus = .disconnected
     private var mqtt: CocoaMQTT5?
     private var messageHandlers: [String: @Sendable (MQTTMessage) -> Void] = [:]
     private var _pendingSubscriptions: [String: @Sendable (MQTTMessage) -> Void] = [:]

@@ -3,6 +3,7 @@ import Foundation
 // swiftlint:disable line_length
 public enum Strings {
     public static let availableNotSubscribed = String(localized: "Available / Not Subscribed")
+    public static let back = String(localized: "Back")
     public static let cancel = String(localized: "Cancel")
     public static let devices = String(localized: "Devices")
     public static let home = String(localized: "Home")

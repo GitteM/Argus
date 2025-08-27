@@ -1,1 +1,0 @@
-public enum DeviceDestination: Hashable {}

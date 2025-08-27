@@ -3,7 +3,7 @@ import Entities
 import SwiftUI
 
 public struct MQTTConnectionHandler: ViewModifier {
-    @EnvironmentObject private var connectionManager: MQTTConnectionManager
+    @Environment(MQTTConnectionManager.self) private var connectionManager
     @State private var showConnectionError = false
     @State private var mqttConnectionError: Error?
 
