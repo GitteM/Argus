@@ -3,7 +3,6 @@ import Entities
 import Infrastructure
 import Navigation
 import Presentation
-import Settings
 import SharedUI
 import Stores
 import SwiftUI
@@ -19,37 +18,17 @@ struct ContentView: View {
 
     var body: some View {
         @Bindable var router = router
-
-        TabView {
-            NavigationStack(path: $router.routes) {
-                DashboardView()
-                    .navigationDestination(for: Route.self) { route in
-                        route.destination(router: router)
-                    }
-                    .mqttConnectionHandler()
-                    .navigationTitle(Strings.devices)
-                    .navigationBarTitleDisplayMode(.large)
-                    .toolbar {
-                        ConnectionStatusIndicator(status: connectionStatus)
-                    }
-            }
-            .tabItem {
-                Image(systemName: Icons.home)
-                Text(Strings.home)
-            }
-
-            NavigationStack {
-                SettingsView()
-                    .navigationTitle(Strings.settings)
-                    .navigationBarTitleDisplayMode(.large)
-                    .toolbar {
-                        ConnectionStatusIndicator(status: connectionStatus)
-                    }
-            }
-            .tabItem {
-                Image(systemName: Icons.settings)
-                Text(Strings.settings)
-            }
+        NavigationStack(path: $router.routes) {
+            DashboardView()
+                .navigationDestination(for: Route.self) { route in
+                    route.destination(router: router)
+                }
+                .mqttConnectionHandler()
+                .navigationTitle(Strings.devices)
+                .navigationBarTitleDisplayMode(.large)
+                .toolbar {
+                    ConnectionStatusIndicator(status: connectionStatus)
+                }
         }
     }
 }

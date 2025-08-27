@@ -1,1 +1,0 @@
-public enum SettingsDestination: Hashable {}

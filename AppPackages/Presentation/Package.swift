@@ -7,11 +7,9 @@ let package = Package(
     defaultLocalization: "en",
     platforms: [.iOS(.v17)],
     products: [
-        .library(name: "Alerts", targets: ["Alerts"]),
         .library(name: "Dashboard", targets: ["Dashboard"]),
         .library(name: "DeviceDetail", targets: ["DeviceDetail"]),
         .library(name: "Presentation", targets: ["Presentation"]),
-        .library(name: "Settings", targets: ["Settings"]),
         .library(name: "SharedUI", targets: ["SharedUI"]),
         .library(name: "Stores", targets: ["Stores"]),
     ],
@@ -25,28 +23,11 @@ let package = Package(
         .target(
             name: "Presentation",
             dependencies: [
-                "Alerts",
                 "Dashboard",
                 "DeviceDetail",
-                "Settings",
                 "SharedUI",
             ],
             path: "Sources/Presentation"
-        ),
-        .target(
-            name: "Alerts",
-            dependencies: [
-                "SharedUI",
-                .product(
-                    name: "Domain",
-                    package: "Domain"
-                ),
-                .product(
-                    name: "Infrastructure",
-                    package: "Infrastructure"
-                ),
-            ],
-            path: "Sources/Alerts"
         ),
         .target(
             name: "Dashboard",
@@ -85,21 +66,6 @@ let package = Package(
             path: "Sources/DeviceDetail"
         ),
         .target(
-            name: "Settings",
-            dependencies: [
-                "SharedUI",
-                .product(
-                    name: "Domain",
-                    package: "Domain"
-                ),
-                .product(
-                    name: "Infrastructure",
-                    package: "Infrastructure"
-                ),
-            ],
-            path: "Sources/Settings"
-        ),
-        .target(
             name: "SharedUI",
             dependencies: [
                 .product(
@@ -136,11 +102,6 @@ let package = Package(
             path: "Sources/Stores"
         ),
         .testTarget(
-            name: "AlertsTests",
-            dependencies: ["Alerts"],
-            path: "Tests/AlertsTests"
-        ),
-        .testTarget(
             name: "DashboardTests",
             dependencies: ["Dashboard"],
             path: "Tests/DashboardTests"
@@ -154,11 +115,6 @@ let package = Package(
             name: "NavigationTests",
             dependencies: ["Navigation"],
             path: "Tests/NavigationTests"
-        ),
-        .testTarget(
-            name: "SettingsTests",
-            dependencies: ["Settings"],
-            path: "Tests/SettingsTests"
         ),
         .testTarget(
             name: "SharedUITests",

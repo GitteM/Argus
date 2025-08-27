@@ -8,10 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		EC0E44C92E5EF3B100E52C2D /* Navigation in Frameworks */ = {isa = PBXBuildFile; productRef = EC0E44C82E5EF3B100E52C2D /* Navigation */; };
-		EC2977A32E58A1F300734BEA /* Alerts in Frameworks */ = {isa = PBXBuildFile; productRef = EC2977A22E58A1F300734BEA /* Alerts */; };
 		EC2977A52E58A1FD00734BEA /* Dashboard in Frameworks */ = {isa = PBXBuildFile; productRef = EC2977A42E58A1FD00734BEA /* Dashboard */; };
 		EC2977A72E58A20200734BEA /* DeviceDetail in Frameworks */ = {isa = PBXBuildFile; productRef = EC2977A62E58A20200734BEA /* DeviceDetail */; };
-		EC2977A92E58A20A00734BEA /* Settings in Frameworks */ = {isa = PBXBuildFile; productRef = EC2977A82E58A20A00734BEA /* Settings */; };
 		EC63945A2E58B8C400FE0A82 /* Infrastructure in Frameworks */ = {isa = PBXBuildFile; productRef = EC6394592E58B8C400FE0A82 /* Infrastructure */; };
 		EC63945C2E58B8CC00FE0A82 /* Presentation in Frameworks */ = {isa = PBXBuildFile; productRef = EC63945B2E58B8CC00FE0A82 /* Presentation */; };
 		ECAA1F072E58BA3C006AA681 /* Domain in Frameworks */ = {isa = PBXBuildFile; productRef = ECAA1F062E58BA3C006AA681 /* Domain */; };
@@ -73,8 +71,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				EC63945C2E58B8CC00FE0A82 /* Presentation in Frameworks */,
-				EC2977A32E58A1F300734BEA /* Alerts in Frameworks */,
-				EC2977A92E58A20A00734BEA /* Settings in Frameworks */,
 				EC2977A72E58A20200734BEA /* DeviceDetail in Frameworks */,
 				EC0E44C92E5EF3B100E52C2D /* Navigation in Frameworks */,
 				ECD6A2712E5D8ED7003C1149 /* Stores in Frameworks */,
@@ -149,10 +145,8 @@
 			);
 			name = Argus;
 			packageProductDependencies = (
-				EC2977A22E58A1F300734BEA /* Alerts */,
 				EC2977A42E58A1FD00734BEA /* Dashboard */,
 				EC2977A62E58A20200734BEA /* DeviceDetail */,
-				EC2977A82E58A20A00734BEA /* Settings */,
 				EC6394592E58B8C400FE0A82 /* Infrastructure */,
 				EC63945B2E58B8CC00FE0A82 /* Presentation */,
 				ECAA1F062E58BA3C006AA681 /* Domain */,
@@ -582,10 +576,6 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = Navigation;
 		};
-		EC2977A22E58A1F300734BEA /* Alerts */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Alerts;
-		};
 		EC2977A42E58A1FD00734BEA /* Dashboard */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Dashboard;
@@ -593,10 +583,6 @@
 		EC2977A62E58A20200734BEA /* DeviceDetail */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = DeviceDetail;
-		};
-		EC2977A82E58A20A00734BEA /* Settings */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Settings;
 		};
 		EC6394592E58B8C400FE0A82 /* Infrastructure */ = {
 			isa = XCSwiftPackageProductDependency;

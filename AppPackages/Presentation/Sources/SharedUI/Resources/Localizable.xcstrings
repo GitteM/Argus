@@ -13,9 +13,6 @@
     "Devices" : {
       "extractionState" : "manual"
     },
-    "Home" : {
-      "extractionState" : "manual"
-    },
     "Loading..." : {
 
     },
@@ -30,9 +27,6 @@
     },
     "Retry" : {
 
-    },
-    "Settings" : {
-      "extractionState" : "manual"
     },
     "Something went wrong" : {
 
