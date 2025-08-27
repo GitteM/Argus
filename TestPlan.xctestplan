@@ -12,13 +12,7 @@
     "testTimeoutsEnabled" : true
   },
   "testTargets" : [
-    {
-      "target" : {
-        "containerPath" : "container:",
-        "identifier" : "DataSourceTests",
-        "name" : "DataSourceTests"
-      }
-    }
+
   ],
   "version" : 1
 }
