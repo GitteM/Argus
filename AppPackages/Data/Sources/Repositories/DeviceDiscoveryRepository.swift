@@ -4,6 +4,7 @@ import Foundation
 import Persistence
 import RepositoryProtocols
 
+@available(macOS 10.15, iOS 13, *)
 public struct DeviceDiscoveryRepository: DeviceDiscoveryRepositoryProtocol {
     private let deviceDiscoveryDataSource: DeviceDiscoveryDataSourceProtocol
 
@@ -18,6 +19,7 @@ public struct DeviceDiscoveryRepository: DeviceDiscoveryRepositoryProtocol {
         await deviceDiscoveryDataSource.getDiscoveredDevices()
     }
 
+    @available(macOS 10.15, iOS 13, *)
     public func subscribeToDiscoveredDevices() async throws
         -> AsyncStream<[DiscoveredDevice]> {
         await deviceDiscoveryDataSource.subscribeToDeviceDiscovery()

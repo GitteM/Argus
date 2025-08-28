@@ -5,7 +5,10 @@ import PackageDescription
 let package = Package(
     name: "Presentation",
     defaultLocalization: "en",
-    platforms: [.iOS(.v17)],
+    platforms: [
+        .iOS(.v17),
+        .macOS(.v10_15)
+    ],
     products: [
         .library(name: "Dashboard", targets: ["Dashboard"]),
         .library(name: "DeviceDetail", targets: ["DeviceDetail"]),
@@ -101,5 +104,21 @@ let package = Package(
             ],
             path: "Sources/Stores"
         ),
+        .testTarget(
+            name: "StoresTests",
+            dependencies: [
+                "Stores",
+                "SharedUI",
+                .product(
+                    name: "Domain",
+                    package: "Domain"
+                ),
+                .product(
+                    name: "Infrastructure",
+                    package: "Infrastructure"
+                ),
+            ],
+            path: "Tests/StoresTests"
+        )
     ]
 )

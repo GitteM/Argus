@@ -2,6 +2,7 @@ import Entities
 import Foundation
 import ServiceProtocols
 
+@available(macOS 10.15, iOS 13, *)
 public protocol DeviceDiscoveryDataSourceProtocol: Sendable {
     func subscribeToDeviceDiscovery() async -> AsyncStream<[DiscoveredDevice]>
     func getDiscoveredDevices() async -> [DiscoveredDevice]
@@ -20,6 +21,7 @@ public actor DeviceDiscoveryDataSource: DeviceDiscoveryDataSourceProtocol {
         self.clientId = clientId
     }
 
+    @available(macOS 10.15, iOS 13, *)
     public func subscribeToDeviceDiscovery()
         -> AsyncStream<[DiscoveredDevice]> {
         AsyncStream { continuation in

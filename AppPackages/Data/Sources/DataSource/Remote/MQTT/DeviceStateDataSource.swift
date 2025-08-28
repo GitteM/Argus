@@ -3,6 +3,7 @@ import Entities
 import Foundation
 import ServiceProtocols
 
+@available(macOS 10.15, iOS 13, *)
 public protocol DeviceStateDataSourceProtocol: Sendable {
     func subscribeToDeviceState(stateTopic: String) async
         -> AsyncStream<DeviceState>
@@ -22,6 +23,7 @@ public actor DeviceStateDataSource: DeviceStateDataSourceProtocol {
         self.logger = logger
     }
 
+    @available(macOS 10.15, iOS 13, *)
     public func subscribeToDeviceState(stateTopic: String) async
         -> AsyncStream<DeviceState> {
         AsyncStream { continuation in

@@ -2,6 +2,7 @@ import DataSource
 import Entities
 import RepositoryProtocols
 
+@available(macOS 10.15, iOS 13, *)
 public class DeviceStateRepository: DeviceStateRepositoryProtocol {
     private let deviceStateDataSource: DeviceStateDataSourceProtocol
 
@@ -15,7 +16,7 @@ public class DeviceStateRepository: DeviceStateRepositoryProtocol {
         try await deviceStateDataSource.getDeviceState(deviceId: deviceId)
     }
 
-    /// Subscribe to real-time device state updates for a specific state topic
+    @available(macOS 10.15, iOS 13, *)
     public func subscribeToDeviceState(stateTopic: String) async throws
         -> AsyncStream<DeviceState> {
         await deviceStateDataSource

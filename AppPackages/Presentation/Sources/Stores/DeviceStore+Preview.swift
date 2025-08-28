@@ -84,6 +84,7 @@ private final class MockDeviceDiscoveryRepository: DeviceDiscoveryRepositoryProt
         return devices
     }
 
+    @available(macOS 10.15, iOS 13, *)
     func subscribeToDiscoveredDevices() async throws
         -> AsyncStream<[DiscoveredDevice]> {
         AsyncStream { continuation in
@@ -104,6 +105,7 @@ private final class MockDeviceStateRepository: DeviceStateRepositoryProtocol {
         deviceState
     }
 
+    @available(macOS 10.15, iOS 13, *)
     func subscribeToDeviceState(stateTopic _: String) async throws
         -> AsyncStream<DeviceState> {
         AsyncStream { continuation in

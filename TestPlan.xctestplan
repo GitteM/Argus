@@ -15,8 +15,8 @@
     {
       "target" : {
         "containerPath" : "container:",
-        "identifier" : "DataSourceTests",
-        "name" : "DataSourceTests"
+        "identifier" : "StoresTests",
+        "name" : "StoresTests"
       }
     }
   ],
