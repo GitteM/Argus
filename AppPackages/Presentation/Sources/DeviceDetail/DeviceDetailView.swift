@@ -58,10 +58,10 @@ public struct DeviceDetailView: View {
                     )
 
                 case .unknown:
-                    VStack(alignment: .leading, spacing: 16) {
+                    VStack(alignment: .leading, spacing: Spacing.m) {
                         DeviceInfoSection(device: device)
                         ErrorView(
-                            message: "Unknown device type"
+                            message: Strings.unknownDeviceType
                         )
                     }
                     .padding()
@@ -71,7 +71,7 @@ public struct DeviceDetailView: View {
                     Divider()
 
                     DestructiveButton(
-                        title: "Unsubscribe from Device"
+                        title: Strings.unsubscribeFromDevice
                     ) {
                         deviceStore.unsubscribeFromDevice(withId: device.id)
                         deviceStore.clearSelection()
@@ -81,13 +81,13 @@ public struct DeviceDetailView: View {
             }
         } else {
             ErrorView(
-                message: "Please select a device to view its details."
+                message: Strings.selectDevicetoViewDetails
             )
         }
     }
 
     private var navigationTitle: String {
-        deviceStore.selectedDevice?.name ?? "Device Detail"
+        deviceStore.selectedDevice?.name ?? Strings.deviceDetail
     }
 }
 

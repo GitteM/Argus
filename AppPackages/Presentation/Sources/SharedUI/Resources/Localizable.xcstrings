@@ -10,6 +10,9 @@
     "Cancel" : {
 
     },
+    "Device Detail" : {
+      "extractionState" : "manual"
+    },
     "Devices" : {
       "extractionState" : "manual"
     },
@@ -27,6 +30,12 @@
     },
     "No devices currently avalailable" : {
       "extractionState" : "manual"
+    },
+    "Please select a device to view its details" : {
+      "extractionState" : "manual"
+    },
+    "Please select a device to view its details." : {
+
     },
     "Retry" : {
 
@@ -49,6 +58,12 @@
       "extractionState" : "manual"
     },
     "Unable to connect to MQTT broker" : {
+      "extractionState" : "manual"
+    },
+    "Unknown device type" : {
+      "extractionState" : "manual"
+    },
+    "Unsubscribe from Device" : {
       "extractionState" : "manual"
     }
   },

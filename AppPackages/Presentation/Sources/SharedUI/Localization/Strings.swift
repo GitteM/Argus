@@ -5,6 +5,7 @@ public enum Strings {
         String(localized: "Available / Not Subscribed")
     public static let back = String(localized: "Back")
     public static let cancel = String(localized: "Cancel")
+    public static let deviceDetail = String(localized: "Device Detail")
     public static let devices = String(localized: "Devices")
     public static let loading = String(localized: "Loading...")
     public static let mqtt = String(localized: "MQTT")
@@ -15,8 +16,11 @@ public enum Strings {
     public static let noDevicesAvailable =
         String(localized: "No devices currently avalailable")
     public static let retry = String(localized: "Retry")
+    public static let selectDevicetoViewDetails =
+        String(localized: "Please select a device to view its details.")
     public static let somethingWentWrong =
         String(localized: "Something went wrong")
+
     public static let subscribeToDeviceWarning =
         String(
             localized: "Subscribe to a device from the list below to start receiving data"
@@ -24,4 +28,8 @@ public enum Strings {
     public static let subscribed = String(localized: "Subscribed")
     public static let unableToConnectToMQTTbroker =
         String(localized: "Unable to connect to MQTT broker")
+    public static let unknownDeviceType =
+        String(localized: "Unknown device type")
+    public static let unsubscribeFromDevice =
+        String(localized: "Unsubscribe from Device")
 }
