@@ -5,6 +5,10 @@ import SwiftUI
 struct DeviceSubscribedRow: View {
     let device: Device
 
+    private var deviceDetails: String {
+        "\(device.manufacturer) | \(device.type.displayName)"
+    }
+
     var body: some View {
         HStack(spacing: Spacing.s4) {
             Image(systemName: device.type.icon)
@@ -13,7 +17,7 @@ struct DeviceSubscribedRow: View {
 
             VStack(alignment: .leading, spacing: Spacing.s) {
                 Text(device.name)
-                Text("\(device.manufacturer) | \(device.type.displayName)")
+                Text(deviceDetails)
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
