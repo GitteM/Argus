@@ -1,5 +1,6 @@
 import DataSource
 import Entities
+import ServiceProtocols
 import SharedUI
 import Stores
 import SwiftUI
@@ -86,4 +87,45 @@ public struct DeviceDetailView: View {
     private var navigationTitle: String {
         deviceStore.selectedDevice?.name ?? "Device Detail"
     }
+}
+
+#Preview("Smart Light") { @MainActor in
+    let store = DeviceStore.preview
+    let connectionManager = MQTTConnectionManager.preview
+
+    Task { @MainActor in
+        store.loadDashboardData()
+        store.selectDevice(.mockLight)
+    }
+
+    return DeviceDetailView { _ in }
+        .environment(store)
+        .environment(connectionManager)
+}
+
+#Preview("Temperature Sensor") { @MainActor in
+    let store = DeviceStore.preview
+    let connectionManager = MQTTConnectionManager.preview
+
+    Task { @MainActor in
+        store.loadDashboardData()
+        store
+            .selectDevice(.mockTemperatureSensor)
+    }
+
+    return DeviceDetailView { _ in }
+        .environment(store)
+        .environment(connectionManager)
+}
+
+#Preview("No Selection") { @MainActor in
+    let store = DeviceStore.emptyPreview
+    let connectionManager = MQTTConnectionManager.preview
+
+    DeviceDetailView { _ in }
+        .environment(store)
+        .environment(connectionManager)
+        .task {
+            store.loadDashboardData()
+        }
 }
