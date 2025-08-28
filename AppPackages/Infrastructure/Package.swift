@@ -5,7 +5,7 @@ let package = Package(
     name: "Infrastructure",
     platforms: [
         .iOS(.v17),
-        .macOS(.v10_15)
+        .macOS(.v14)
     ],
     products: [
         .library(

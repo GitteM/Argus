@@ -24,6 +24,7 @@ public struct DeviceDetailView: View {
     public var body: some View {
         contentView
             .navigationTitle(navigationTitle)
+        #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarBackButtonHidden()
             .toolbar {
@@ -35,6 +36,7 @@ public struct DeviceDetailView: View {
                     ConnectionStatusIndicator(status: connectionStatus)
                 }
             }
+        #endif
     }
 
     @ViewBuilder

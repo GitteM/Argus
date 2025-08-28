@@ -25,7 +25,9 @@ struct ContentView: View {
                 }
                 .mqttConnectionHandler()
                 .navigationTitle(Strings.devices)
-                .navigationBarTitleDisplayMode(.large)
+            #if os(iOS)
+                .navigationBarTitleDisplayMode(.inline)
+            #endif
                 .toolbar {
                     ConnectionStatusIndicator(status: connectionStatus)
                 }

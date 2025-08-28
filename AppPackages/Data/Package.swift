@@ -6,7 +6,7 @@ let package = Package(
     name: "Data",
     platforms: [
         .iOS(.v17),
-        .macOS(.v10_15)
+        .macOS(.v14)
     ],
     products: [
         .library(

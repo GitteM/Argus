@@ -8,7 +8,11 @@ public struct BackToolbarItem: ToolbarContent {
     public init(action: @escaping () -> Void) {
         self.action = action
         icon = Icons.chevronLeft
-        placement = .navigationBarLeading
+        #if os(iOS)
+            placement = .navigationBarLeading
+        #elseif os(macOS)
+            placement = .navigation
+        #endif
     }
 
     public var body: some ToolbarContent {
