@@ -31,10 +31,14 @@ public struct DestructiveButton: View {
     }
 }
 
-#Preview {
-    DestructiveButton(
-        title: "Unsubscribe from Device"
-    ) {
-        print("Unsubscribe from Device tapped")
+#if DEBUG
+
+    #Preview {
+        DestructiveButton(
+            title: "Unsubscribe from Device"
+        ) {
+            print("Unsubscribe from Device tapped")
+        }
     }
-}
+
+#endif

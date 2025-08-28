@@ -1,6 +1,5 @@
 import SwiftUI
 
-// FIXME: Incomplete
 public struct EmptyStateView: View {
     let message: String
     let icon: String
@@ -11,9 +10,9 @@ public struct EmptyStateView: View {
     }
 
     public var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: Spacing.m) {
             Image(systemName: icon)
-                .font(.system(size: 48))
+                .font(.system(size: Spacing.l))
                 .foregroundColor(.secondary)
 
             Text(message)
@@ -24,3 +23,14 @@ public struct EmptyStateView: View {
         .padding()
     }
 }
+
+#if DEBUG
+
+    #Preview {
+        EmptyStateView(
+            message: "Nothing to see here",
+            icon: Icons.noData
+        )
+    }
+
+#endif
