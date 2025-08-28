@@ -103,7 +103,6 @@
 				ECDA1D112E4F82E700D59653 /* Domain */,
 				EC78E39B2E4F694800262F13 /* Argus */,
 				EC78E3AA2E4F694900262F13 /* ArgusTests */,
-				ECD6A26F2E5D8ED7003C1149 /* Frameworks */,
 				EC78E39A2E4F694800262F13 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -115,13 +114,6 @@
 				EC78E3A72E4F694900262F13 /* ArgusTests.xctest */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		ECD6A26F2E5D8ED7003C1149 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

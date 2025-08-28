@@ -1,6 +1,6 @@
-# Argus: IoT Device Management iOS App
+# Argus: MQTT Integration Demo iOS App
 
-A modern, iOS application demonstrating real-time IoT device monitoring and control using Clean Architecture, MVVM pattern, and modular design with Swift Package Manager.
+A modern iOS application demonstrating MQTT integration with Clean Architecture and a modular design with Swift Package Manager.
 
 ![Swift](https://img.shields.io/badge/Swift-6.1-orange.svg)
 ![iOS](https://img.shields.io/badge/iOS-17.0%2B-blue.svg)
@@ -10,58 +10,80 @@ A modern, iOS application demonstrating real-time IoT device monitoring and cont
 
 ## Overview
 
-This project showcases a comprehensive IoT device management solution for iOS, featuring real-time device monitoring, control interfaces, and alert management. Built with enterprise-grade architecture patterns and best practices, it demonstrates proficiency in modern iOS development.
+A demonstration of basic MQTT integration for iOS featuring real-time device monitoring capabilities.
 
-### Key Features
+### Prerequisites
 
-- **Real-time Dashboard** - Live device grid with MQTT-powered status updates
-- **Device Control** - Custom SwiftUI components for intuitive device management
-- **Alert System** - Real-time notifications with severity-based prioritization
-- **Advanced Settings** - WebView integration for complex configuration
-- **Demo Mode** - Fully functional offline mode with simulated data
-- **Offline Support** - Seamless operation with data persistence and sync
+Before running the project on an iOS simulator, the MQTT test environment must be availble:
+
+Check out the companion test server repository
+Follow the setup instructions in that repository's README.md.
+Ensure the Docker container and test server is running locally to provide test data to the iOS simulator
+
+### Core Functionality
+
+- **MQTT Connection Management**: Connection and reconnection handling
+- **Connection Status Indicator**: Visual indicator that becomes tappable when disconnected to initiate reconnection
+- **Device Discovery**: Dashboard displaying list of available devices for subscription
+- **Device Monitoring**: Detail view showing basic device information and current state
+- **Subscription Controlv**: Ability to subscribe/unsubscribe from individual devices
+
 
 ### Technical Highlights
 
 - **Clean Architecture** with clear separation of concerns
-- **MVVM Pattern** for reactive UI with Combine
+- **MV State Pattern** for reactive UI with Combine
 - **Modular Design** using Swift Package Manager
-- **Real-time Communication** via MQTT and WebSocket
-- **Comprehensive Testing** with unit, integration, and UI tests
-- **Dependency Injection** using Factory pattern
-- **Coordinator Pattern** for navigation
+- **Real-time Communication** via MQTT 
+- **Dependency Injection** Composition Root with State/Store
+- **Router Pattern** for navigation
 - **Async/Await** for modern concurrency
+- **Testing Practices**: TestPlan includes DeviceStore
 
 ## Architecture
 
-The application follows Clean Architecture principles with four distinct layers:
+The application follows Clean Architecture principles:
 
 ```
 ┌───────────────────────────────────────────────┐
-│          Presentation Layer (MVVM)            │
-│    SwiftUI Views • ViewModels • Coordinators  │
+│           Presentation Layer                  │
+│    SwiftUI Views • Stores • SharedUI          │
 ├───────────────────────────────────────────────┤
 │           Domain Layer (Business Logic)       │
 │    Use Cases • Entities • Repository Protocols│
 ├───────────────────────────────────────────────┤
 │        Data Layer (Repository Impl)           │
-│    Repositories • Network • Persistence • MQTT│
+│    Repositories • DataSource • Persistence    │
 ├───────────────────────────────────────────────┤
 │     Infrastructure & Cross-Cutting            │
-│    DI • Navigation • Logging • Analytics      │
+│         DI • Services • Utilites              │
+├───────────────────────────────────────────────┤
+│                  Navigation                   │
+│         Router + Route+Extensions             │
 └───────────────────────────────────────────────┘
 ```
+
+
+**Notes**
+
+The project employs a structured architecture that may be more complex than necessary for its current scope. This was intentionally designed as an experimentation platform for:
+
+- Scalable application structure patterns
+- Foundation for larger MQTT-based applications
+- Testing architectural patterns in real-time data scenarios
+
 
 ### Package Structure
 
 ```
 Argus/
-├── Argus/                   # Main iOS application
+├── Argus/                    # Main iOS application
 ├── Packages/
 │   ├── Domain/               # Business logic (no dependencies)
 │   ├── Data/                 # Repository implementations
-│   ├── Presentation/         # UI modules (Dashboard, Settings, etc.)
-│   └── Infrastructure/       # Core services and utilities
+│   ├── Presentation/         # UI modules 
+│   ├── Infrastructure/       # Core services and utilities
+│   └── Navigation/           # Routers and Route extensions
 └── README.md
 ```
 
@@ -87,48 +109,17 @@ Open Argus/Argus.xcworkspace
 
 3. **Build and run**
 ```bash
-# Select your target device/simulator
+# Select Argus Scheme and target simulator
 # Press Cmd+R or click the Run button
 ```
 
-## Features in Detail
-
-### Dashboard Module
-- Grid layout with real-time device status
-- Live MQTT updates with visual indicators
-- Search and filter capabilities
-- Pull-to-refresh functionality
-- Device status badges (online/offline/warning)
-
-### Device Detail Module
-- Custom control components (sliders, toggles, gauges)
-- Real-time metrics visualization
-- Command sending with confirmation
-- Historical data charts
-- Device information panel
-
-### Settings Module
-- Native settings interface
-- WebView for advanced configuration
-- JavaScript bridge for web integration
-- Theme selection (light/dark/auto)
-- Notification preferences
-
-### Alerts Module
-- Real-time alert streaming
-- Severity-based categorization
-- Alert acknowledgment system
-- Push notification integration
-- Alert history with filtering
-
-
 ## UI/UX Design
 
-- **Design System**: Consistent color palette, typography, and spacing
-- **Dark Mode**: Full support with semantic colors
-- **Accessibility**: VoiceOver, Dynamic Type, and reduced motion support
-- **Animations**: Smooth transitions and micro-interactions
-- **Responsive**: Adaptive layouts for all iOS devices
+**Notes**
+
+The current interface prioritizes functionality over polish. Potential improvements for future iterations:
+- Enhanced visual design and user experience
+- Improved connection status 
 
 ## Build Configurations
 
@@ -137,9 +128,9 @@ Open Argus/Argus.xcworkspace
 
 ## Testing
 
-### MQTT Test Environment
+#### MQTT Test Environment
 
-This iOS app can be tested against a local MQTT broker using our containerized test environment:
+This iOS app can be tested against a local MQTT broker using a containerized test environment:
 
 **Repository**: [mqtt-test-environment](https://github.com/GitteM/mqtt-test-environment)
 
@@ -157,34 +148,27 @@ chmod +x setup.sh
 ./setup.sh logs
 ```
 
-iOS App Configuration:
-- MQTT Broker: localhost:1883 (or your Mac's IP for device testing)
-- Discovery Topic: homeassistant/+/+/config
-- Test Devices: Living Room Light, Kitchen Temperature Sensor
+#### iOS App Configuration:
+- **MQTT Broker**: localhost:1883 (or your Mac's IP for device testing)
+- **Discovery Topic**: homeassistant/+/+/config
+- **Test Devices**: Living Room Light, Kitchen Temperature Sensor
 
-For Device Testing:
-Replace localhost with your Mac's IP address (found in System Preferences > Network) when testing on physical iOS devices.
+See the [README.md](https://github.com/GitteM/mqtt-test-environment/blob/main/README.md) for complete documentation and troubleshooting.
 
-See the https://github.com/GitteM/mqtt-test-environment/blob/main/README.md for complete documentation and troubleshooting.
+### Limitations & Future Enhancements
+**Currently Not Implemented**:
+- Event history display
+- Publishing capabilities to MQTT topics
 
-## Performance
+### Known Issues
+Subscription update delivery may stop when MQTT connection goes offline and recovers
+Occasional missed updates during connection state transitions
 
-- **App Launch**: -
-- **Memory Usage**: -
-- **Frame Rate**: -
-- **Network Efficiency**: -
-- **Battery Impact**: -
-
-## Documentation
-
-- [Project Documentation](https://app.clickup.com/90151482241/v/dc/2kyq4ww1-695)
 
 ## License
-
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Author
-
 **Brigitte Michau**
 
 - Email: b.boardman@me.com
@@ -192,22 +176,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - GitHub: [@GitteM](https://github.com/GitteM)
 
 ## Acknowledgments
-
 This project uses the following open-source libraries:
 
 - [CocoaMQTT](https://github.com/emqx/CocoaMQTT) - MQTT client
-- [Factory](https://github.com/hmlongco/Factory) - Dependency injection
 - [SwiftLint](https://github.com/realm/SwiftLint) - Code linting
-
-## Purpose
-
-This demonstration project was created to showcase:
-
-- **Architecture Design**: Implementation of Clean Architecture with MVVM
-- **Modern iOS Development**: SwiftUI, Combine, async/await
-- **Real-time Systems**: MQTT and WebSocket integration
-- **Modular Design**: Swift Package Manager organization
-- **Testing Practices**: Comprehensive test coverage
-- **Production Readiness**: Error handling, logging, and monitoring
-
-**Note**: This is a demonstration project. Mock data and simulated services are used where actual IoT infrastructure would normally be required.
+- [SwiftFormat](https://github.com/nicklockwood/SwiftFormat) - Code formatting
