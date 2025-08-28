@@ -1,38 +1,46 @@
 import Entities
+import SharedUI
 import SwiftUI
 
 struct SmartLightView: View {
     let device: Device
     let lightState: LightState?
 
+    private var formattedLastUpdated: String {
+        guard let lightState else { return "" }
+        return lightState.date.formatted(date: .abbreviated, time: .shortened)
+    }
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 32) {
-            Text("Light Controls")
+        VStack(alignment: .leading, spacing: Spacing.l2) {
+            Text(Strings.lightControls)
                 .font(.headline)
 
             if let lightState {
-                VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: Spacing.s3) {
                     HStack {
-                        Text("Status:")
-                        Text(lightState.state ? "On" : "Off")
+                        Text("\(Strings.status):")
+                        Text(lightState.state ? Strings.on : Strings.off)
                             .foregroundColor(lightState.state ? .green : .red)
                             .fontWeight(.semibold)
                     }
 
                     if let brightness = lightState.brightness {
                         HStack {
-                            Text("Brightness:")
+                            Text("\(Strings.brightness):")
                             Text("\(brightness)%")
                                 .bold()
                         }
                     }
 
-                    Text("Last Updated: \(lightState.date.formatted())")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                    Text(
+                        "\(Strings.lastUpdated): \(formattedLastUpdated)"
+                    )
+                    .font(.caption)
+                    .foregroundColor(.secondary)
                 }
             } else {
-                Text("No light state data available")
+                Text(Strings.noLightStateAvailable)
                     .foregroundColor(.secondary)
             }
 

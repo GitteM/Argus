@@ -4,11 +4,14 @@ public enum Strings {
     public static let availableNotSubscribed =
         String(localized: "Available / Not Subscribed")
     public static let back = String(localized: "Back")
+    public static let brightness = String(localized: "Brightness")
     public static let cancel = String(localized: "Cancel")
     public static let deviceDetail = String(localized: "Device Detail")
     public static let deviceInformation =
         String(localized: "Device Information")
     public static let devices = String(localized: "Devices")
+    public static let lastUpdated = String(localized: "Last Updated")
+    public static let lightControls = String(localized: "Light Controls")
     public static let loading = String(localized: "Loading...")
     public static let manufacturer = String(localized: "Manufacturer")
     public static let model = String(localized: "Model")
@@ -19,6 +22,10 @@ public enum Strings {
         String(localized: "No data available")
     public static let noDevicesAvailable =
         String(localized: "No devices currently avalailable")
+    public static let noLightStateAvailable =
+        String(localized: "No light state data available")
+    public static let on = String(localized: "On")
+    public static let off = String(localized: "Off")
     public static let retry = String(localized: "Retry")
     public static let selectDevicetoViewDetails =
         String(localized: "Please select a device to view its details.")

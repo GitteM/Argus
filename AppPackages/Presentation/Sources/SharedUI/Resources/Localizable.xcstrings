@@ -7,6 +7,9 @@
     "Back" : {
 
     },
+    "Brightness" : {
+      "extractionState" : "manual"
+    },
     "Cancel" : {
 
     },
@@ -17,6 +20,12 @@
       "extractionState" : "manual"
     },
     "Devices" : {
+      "extractionState" : "manual"
+    },
+    "Last Updated" : {
+      "extractionState" : "manual"
+    },
+    "Light Controls" : {
       "extractionState" : "manual"
     },
     "Loading..." : {
@@ -38,6 +47,15 @@
       "extractionState" : "manual"
     },
     "No devices currently avalailable" : {
+      "extractionState" : "manual"
+    },
+    "No light state data available" : {
+      "extractionState" : "manual"
+    },
+    "Off" : {
+      "extractionState" : "manual"
+    },
+    "On" : {
       "extractionState" : "manual"
     },
     "Please select a device to view its details" : {
