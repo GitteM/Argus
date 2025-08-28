@@ -6,13 +6,27 @@ import Stores
 import SwiftUI
 
 public struct DashboardContentView: View {
-    @Environment(Router.self) private var router
     @Environment(DeviceStore.self) private var deviceStore
 
     public init() {}
 
     public var body: some View {
         List {
+            SubscribedDevicesSection()
+            DiscoveredDevicesSection()
+        }
+        .refreshable {
+            deviceStore.loadDashboardData()
+        }
+    }
+}
+
+private extension DashboardContentView {
+    struct SubscribedDevicesSection: View {
+        @Environment(DeviceStore.self) private var deviceStore
+        @Environment(Router.self) private var router
+
+        var body: some View {
             Section {
                 if deviceStore.devices.isEmpty {
                     WarningRow(message: Strings.subscribeToDeviceWarning)
@@ -28,7 +42,13 @@ public struct DashboardContentView: View {
             } header: {
                 Text(Strings.subscribed)
             }
+        }
+    }
 
+    struct DiscoveredDevicesSection: View {
+        @Environment(DeviceStore.self) private var deviceStore
+
+        var body: some View {
             if !deviceStore.discoveredDevices.isEmpty {
                 Section {
                     ForEach(deviceStore.discoveredDevices, id: \.id) { device in
