@@ -10,7 +10,8 @@ public final class AddDeviceUseCase: @unchecked Sendable {
         self.deviceConnectionRepository = deviceConnectionRepository
     }
 
-    public func execute(discoveredDevice: DiscoveredDevice) async throws -> Device {
+    public func execute(discoveredDevice: DiscoveredDevice) async throws
+        -> Device {
         try await deviceConnectionRepository.addDevice(discoveredDevice)
     }
 }

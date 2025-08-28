@@ -8,7 +8,9 @@ public final class SubscribeToDeviceStatesUseCase: @unchecked Sendable {
         self.deviceStateRepository = deviceStateRepository
     }
 
-    public func execute() async throws -> AsyncStream<[DeviceState]> {
-        try await deviceStateRepository.subscribeToDeviceStates()
+    public func execute(stateTopic: String) async throws
+        -> AsyncStream<DeviceState> {
+        try await deviceStateRepository
+            .subscribeToDeviceState(stateTopic: stateTopic)
     }
 }

@@ -9,7 +9,8 @@ public final class GetDiscoveredDevicesUseCase: @unchecked Sendable {
     }
 
     public func execute() async throws -> [DiscoveredDevice] {
-        let allDiscovered = try await deviceDiscoveryRepository.getDiscoveredDevices()
+        let allDiscovered = try await deviceDiscoveryRepository
+            .getDiscoveredDevices()
         return allDiscovered.filter { !$0.isAlreadyAdded }
     }
 }

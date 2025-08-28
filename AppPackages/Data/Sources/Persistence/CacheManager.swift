@@ -1,5 +1,6 @@
 import Entities
 import Foundation
+import ServiceProtocols
 
 public protocol CacheManagerProtocol: Sendable {
     func get<T: Codable>(key: String) -> T?
@@ -9,17 +10,32 @@ public protocol CacheManagerProtocol: Sendable {
     func exists(key: String) -> Bool
 }
 
+public enum CacheError: Error {
+    case cachesDirectoryNotFound
+    case cacheCreationFailed
+}
+
 public final class CacheManager: CacheManagerProtocol, Sendable {
     private nonisolated(unsafe) let memoryCache = NSCache<NSString, CacheItem>()
     private nonisolated(unsafe) let fileManager = FileManager.default
     private let cacheDirectory: URL
-    private let cacheQueue = DispatchQueue(label: "advanced.cache.queue", attributes: .concurrent)
+    private let cacheQueue = DispatchQueue(
+        label: "advanced.cache.queue",
+        attributes: .concurrent
+    )
+    private let logger: LoggerProtocol
 
-    public init() {
-        // swiftlint:disable:next force_unwrapping
-        let cachesDirectory = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first!
+    public init(
+        logger: LoggerProtocol
+    ) {
+        self.logger = logger
+        guard let cachesDirectory = fileManager.urls(
+            for: .cachesDirectory,
+            in: .userDomainMask
+        ).first else {
+            fatalError("Unable to locate caches directory")
+        }
         cacheDirectory = cachesDirectory.appendingPathComponent("AppCache")
-
         try? fileManager.createCacheDirectory(at: cacheDirectory)
         setupCache()
     }
@@ -34,9 +50,13 @@ public final class CacheManager: CacheManagerProtocol, Sendable {
     public func get<T: Codable>(key: String) -> T? {
         cacheQueue.sync {
             // Try memory cache first
-            if let memoryItem = memoryCache.object(forKey: NSString(string: key)) {
+            if let memoryItem = memoryCache
+                .object(forKey: NSString(string: key)) {
                 if !memoryItem.isExpired {
-                    return try? JSONDecoder().decode(T.self, from: memoryItem.data)
+                    return try? JSONDecoder().decode(
+                        T.self,
+                        from: memoryItem.data
+                    )
                 } else {
                     memoryCache.removeObject(forKey: NSString(string: key))
                 }
@@ -47,7 +67,11 @@ public final class CacheManager: CacheManagerProtocol, Sendable {
         }
     }
 
-    public func set(_ value: some Codable & Sendable, key: String, ttl: TimeInterval? = nil) {
+    public func set(
+        _ value: some Codable & Sendable,
+        key: String,
+        ttl: TimeInterval? = nil
+    ) {
         cacheQueue.async(flags: .barrier) { [weak self] in
             guard let self else { return }
 
@@ -103,7 +127,8 @@ public final class CacheManager: CacheManagerProtocol, Sendable {
     public func exists(key: String) -> Bool {
         cacheQueue.sync {
             // Check memory cache first
-            if let memoryItem = memoryCache.object(forKey: NSString(string: key)) {
+            if let memoryItem = memoryCache
+                .object(forKey: NSString(string: key)) {
                 if !memoryItem.isExpired {
                     return true
                 } else {
@@ -139,9 +164,13 @@ public final class CacheManager: CacheManagerProtocol, Sendable {
 
         do {
             let data = try Data(contentsOf: fileURL)
-            let diskItem = try JSONDecoder().decode(DiskCacheItem.self, from: data)
+            let diskItem = try JSONDecoder().decode(
+                DiskCacheItem.self,
+                from: data
+            )
 
-            if let expirationDate = diskItem.expirationDate, Date() > expirationDate {
+            if let expirationDate = diskItem.expirationDate,
+               Date() > expirationDate {
                 fileManager.removeItemSafely(at: fileURL)
                 return nil
             }
@@ -162,10 +191,14 @@ public final class CacheManager: CacheManagerProtocol, Sendable {
 
             do {
                 let data = try Data(contentsOf: fileURL)
-                let diskItem = try JSONDecoder().decode(DiskCacheItem.self, from: data)
+                let diskItem = try JSONDecoder().decode(
+                    DiskCacheItem.self,
+                    from: data
+                )
 
                 // Check if not expired
-                if let expirationDate = diskItem.expirationDate, Date() > expirationDate {
+                if let expirationDate = diskItem.expirationDate,
+                   Date() > expirationDate {
                     fileManager.removeItemSafely(at: fileURL)
                     continue
                 }

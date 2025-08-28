@@ -18,7 +18,8 @@ public struct DeviceDiscoveryRepository: DeviceDiscoveryRepositoryProtocol {
         await deviceDiscoveryDataSource.getDiscoveredDevices()
     }
 
-    public func subscribeToDiscoveredDevices() async throws -> AsyncStream<[DiscoveredDevice]> {
+    public func subscribeToDiscoveredDevices() async throws
+        -> AsyncStream<[DiscoveredDevice]> {
         await deviceDiscoveryDataSource.subscribeToDeviceDiscovery()
     }
 }

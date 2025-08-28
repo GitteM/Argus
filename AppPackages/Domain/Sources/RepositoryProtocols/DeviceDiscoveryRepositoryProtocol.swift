@@ -6,5 +6,6 @@ import Entities
  */
 public protocol DeviceDiscoveryRepositoryProtocol {
     func getDiscoveredDevices() async throws -> [DiscoveredDevice]
-    func subscribeToDiscoveredDevices() async throws -> AsyncStream<[DiscoveredDevice]>
+    func subscribeToDiscoveredDevices() async throws
+        -> AsyncStream<[DiscoveredDevice]>
 }

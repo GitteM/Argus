@@ -20,15 +20,18 @@ public class DefaultRepositoryFactory: RepositoryFactory {
         self.dataSourceFactory = dataSourceFactory
     }
 
-    public func makeDeviceConnectionRepository() -> DeviceConnectionRepositoryProtocol {
+    public func makeDeviceConnectionRepository()
+        -> DeviceConnectionRepositoryProtocol {
         DeviceConnectionRepository(
             cacheManager: serviceFactory.makeCacheManager()
         )
     }
 
-    public func makeDeviceDiscoveryRepository() -> DeviceDiscoveryRepositoryProtocol {
+    public func makeDeviceDiscoveryRepository()
+        -> DeviceDiscoveryRepositoryProtocol {
         DeviceDiscoveryRepository(
-            deviceDiscoveryDataSource: dataSourceFactory.makeDeviceDiscoveryDataSource()
+            deviceDiscoveryDataSource: dataSourceFactory
+                .makeDeviceDiscoveryDataSource()
         )
     }
 
@@ -38,9 +41,11 @@ public class DefaultRepositoryFactory: RepositoryFactory {
         )
     }
 
-    public func makeDeviceCommandRepository() -> DeviceCommandRepositoryProtocol {
+    public func makeDeviceCommandRepository()
+        -> DeviceCommandRepositoryProtocol {
         DeviceCommandRepository(
-            deviceCommandDataSource: dataSourceFactory.makeDeviceCommandDataSource()
+            deviceCommandDataSource: dataSourceFactory
+                .makeDeviceCommandDataSource()
         )
     }
 }

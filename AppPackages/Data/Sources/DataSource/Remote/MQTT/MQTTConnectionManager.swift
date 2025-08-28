@@ -6,12 +6,18 @@ import OSLog
 import ServiceProtocols
 
 @Observable
-public final class MQTTConnectionManager: MQTTConnectionManagerProtocol, @unchecked Sendable {
-    public private(set) var connectionStatus: MQTTConnectionStatus = .disconnected
+public final class MQTTConnectionManager: MQTTConnectionManagerProtocol,
+    @unchecked Sendable {
+    public private(set) var connectionStatus: MQTTConnectionStatus =
+        .disconnected
     private var mqtt: CocoaMQTT5?
     private var messageHandlers: [String: @Sendable (MQTTMessage) -> Void] = [:]
-    private var _pendingSubscriptions: [String: @Sendable (MQTTMessage) -> Void] = [:]
-    private var pendingSubscriptions: [String: @Sendable (MQTTMessage) -> Void] {
+    private var _pendingSubscriptions: [String: @Sendable (MQTTMessage)
+        -> Void
+    ] = [:]
+    private var pendingSubscriptions: [String: @Sendable (MQTTMessage)
+        -> Void
+    ] {
         get { _pendingSubscriptions }
         set { _pendingSubscriptions = newValue }
     }
@@ -40,7 +46,10 @@ public final class MQTTConnectionManager: MQTTConnectionManagerProtocol, @unchec
     public func connect() async throws {
         guard mqtt == nil else { return }
 
-        logger.log("Starting MQTT connection to \(broker):\(port)", level: .info)
+        logger.log(
+            "Starting MQTT connection to \(broker):\(port)",
+            level: .info
+        )
         await MainActor.run {
             connectionStatus = .connecting
         }
@@ -66,19 +75,33 @@ public final class MQTTConnectionManager: MQTTConnectionManagerProtocol, @unchec
         }
     }
 
-    public func subscribe(to topic: String, handler: @escaping @Sendable (MQTTMessage) -> Void) {
+    public func subscribe(
+        to topic: String,
+        handler: @escaping @Sendable (MQTTMessage) -> Void
+    ) {
         subscriptionQueue.async(flags: .barrier) {
-            self.logger.log("MQTT subscribing to topic: \(topic)", level: .debug)
+            self.logger.log(
+                "MQTT subscribing to topic: \(topic)",
+                level: .debug
+            )
             self.messageHandlers[topic] = handler
 
             if let mqtt = self.mqtt, mqtt.connState == .connected {
                 // Connection is ready, subscribe immediately
                 mqtt.subscribe(topic, qos: .qos1)
-                self.logger.log("MQTT subscribed immediately to: \(topic)", level: .debug)
+                self.logger.log(
+                    "MQTT subscribed immediately to: \(topic)",
+                    level: .debug
+                )
             } else {
                 // Connection not ready, queue for later
-                self.logger.log("MQTT queueing subscription for: \(topic)", level: .debug)
-                self._pendingSubscriptions[topic] = handler // Direct access to avoid setter
+                self.logger.log(
+                    "MQTT queueing subscription for: \(topic)",
+                    level: .debug
+                )
+                self
+                    ._pendingSubscriptions[topic] =
+                    handler // Direct access to avoid setter
             }
         }
     }
@@ -126,7 +149,10 @@ public final class MQTTConnectionManager: MQTTConnectionManagerProtocol, @unchec
             return false
         }
 
-        for (patternPart, topicPart) in zip(patternComponents, topicComponents) {
+        for (patternPart, topicPart) in zip(
+            patternComponents,
+            topicComponents
+        ) {
             if patternPart != "+", patternPart != topicPart {
                 return false
             }
@@ -140,7 +166,10 @@ public final class MQTTConnectionManager: MQTTConnectionManagerProtocol, @unchec
             let pendingCount = self._pendingSubscriptions.count
             guard pendingCount > 0 else { return }
 
-            self.logger.log("MQTT processing \(pendingCount) pending subscriptions", level: .debug)
+            self.logger.log(
+                "MQTT processing \(pendingCount) pending subscriptions",
+                level: .debug
+            )
 
             // Make a copy to avoid modification during iteration
             let subscriptionsToProcess = self._pendingSubscriptions
@@ -155,7 +184,10 @@ public final class MQTTConnectionManager: MQTTConnectionManagerProtocol, @unchec
             }
 
             self._pendingSubscriptions.removeAll()
-            self.logger.log("MQTT pending subscriptions processed and cleared", level: .debug)
+            self.logger.log(
+                "MQTT pending subscriptions processed and cleared",
+                level: .debug
+            )
         }
     }
 }
@@ -189,7 +221,8 @@ extension MQTTConnectionManager: CocoaMQTT5Delegate {
                 // Process pending subscriptions now that we're connected
                 self.processPendingSubscriptions()
             } else {
-                connectionContinuation?.resume(throwing: MQTTError.connectionFailed)
+                connectionContinuation?
+                    .resume(throwing: MQTTError.connectionFailed)
             }
             connectionContinuation = nil
         }
@@ -202,7 +235,8 @@ extension MQTTConnectionManager: CocoaMQTT5Delegate {
             }
             let errorMessage = err?.localizedDescription ?? "No error"
             self.logger.log("MQTT Disconnected: \(errorMessage)", level: .error)
-            connectionContinuation?.resume(throwing: err ?? MQTTError.connectionFailed)
+            connectionContinuation?
+                .resume(throwing: err ?? MQTTError.connectionFailed)
             connectionContinuation = nil
             mqtt = nil
         }
@@ -218,8 +252,14 @@ extension MQTTConnectionManager: CocoaMQTT5Delegate {
         logger.log(logMessage, level: .info)
     }
 
-    public func mqtt5(_: CocoaMQTT5, didReceiveAuthReasonCode reasonCode: CocoaMQTTAUTHReasonCode) {
-        logger.log("MQTT Auth received with reason code: \(reasonCode.rawValue)", level: .info)
+    public func mqtt5(
+        _: CocoaMQTT5,
+        didReceiveAuthReasonCode reasonCode: CocoaMQTTAUTHReasonCode
+    ) {
+        logger.log(
+            "MQTT Auth received with reason code: \(reasonCode.rawValue)",
+            level: .info
+        )
     }
 
     // MARK: - Message Methods
@@ -230,7 +270,10 @@ extension MQTTConnectionManager: CocoaMQTT5Delegate {
         id _: UInt16,
         publishData _: MqttDecodePublish?
     ) {
-        logger.log("MQTT message received on topic: \(message.topic)", level: .debug)
+        logger.log(
+            "MQTT message received on topic: \(message.topic)",
+            level: .debug
+        )
 
         let mqttMessage = MQTTMessage(
             topic: message.topic,
@@ -253,19 +296,40 @@ extension MQTTConnectionManager: CocoaMQTT5Delegate {
         }
 
         if !foundHandler {
-            logger.log("MQTT no handler found for topic: \(message.topic)", level: .debug)
+            logger.log(
+                "MQTT no handler found for topic: \(message.topic)",
+                level: .debug
+            )
         }
     }
 
-    public func mqtt5(_: CocoaMQTT5, didPublishMessage message: CocoaMQTT5Message, id _: UInt16) {
-        logger.log("MQTT Published message to topic: \(message.topic)", level: .debug)
+    public func mqtt5(
+        _: CocoaMQTT5,
+        didPublishMessage message: CocoaMQTT5Message,
+        id _: UInt16
+    ) {
+        logger.log(
+            "MQTT Published message to topic: \(message.topic)",
+            level: .debug
+        )
     }
 
-    public func mqtt5(_: CocoaMQTT5, didPublishAck id: UInt16, pubAckData _: MqttDecodePubAck?) {
-        logger.log("MQTT Publish acknowledged for message id: \(id)", level: .debug)
+    public func mqtt5(
+        _: CocoaMQTT5,
+        didPublishAck id: UInt16,
+        pubAckData _: MqttDecodePubAck?
+    ) {
+        logger.log(
+            "MQTT Publish acknowledged for message id: \(id)",
+            level: .debug
+        )
     }
 
-    public func mqtt5(_: CocoaMQTT5, didPublishRec id: UInt16, pubRecData _: MqttDecodePubRec?) {
+    public func mqtt5(
+        _: CocoaMQTT5,
+        didPublishRec id: UInt16,
+        pubRecData _: MqttDecodePubRec?
+    ) {
         logger.log("MQTT Publish received for message id: \(id)", level: .debug)
     }
 
@@ -274,7 +338,10 @@ extension MQTTConnectionManager: CocoaMQTT5Delegate {
         didPublishComplete id: UInt16,
         pubCompData _: MqttDecodePubComp?
     ) {
-        logger.log("MQTT Publish completed for message id: \(id)", level: .debug)
+        logger.log(
+            "MQTT Publish completed for message id: \(id)",
+            level: .debug
+        )
     }
 
     // MARK: - Subscription Methods (Using Xcode's exact signatures)

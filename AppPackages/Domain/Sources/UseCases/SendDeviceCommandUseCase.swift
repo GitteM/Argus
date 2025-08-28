@@ -9,6 +9,9 @@ public final class SendDeviceCommandUseCase: @unchecked Sendable {
     }
 
     public func execute(deviceId: String, command: Command) async throws {
-        try await deviceCommandRepository.sendDeviceCommand(deviceId: deviceId, command: command)
+        try await deviceCommandRepository.sendDeviceCommand(
+            deviceId: deviceId,
+            command: command
+        )
     }
 }

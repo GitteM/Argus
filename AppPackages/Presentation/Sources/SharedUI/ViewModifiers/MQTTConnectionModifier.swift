@@ -16,11 +16,15 @@ public struct MQTTConnectionHandler: ViewModifier {
     public func body(content: Content) -> some View {
         content
             .task {
-                if connectOnAppear, connectionManager.connectionStatus == .disconnected {
+                if connectOnAppear,
+                   connectionManager.connectionStatus == .disconnected {
                     await attemptConnection()
                 }
             }
-            .alert(Strings.mqttConnectionFailed, isPresented: $showConnectionError) {
+            .alert(
+                Strings.mqttConnectionFailed,
+                isPresented: $showConnectionError
+            ) {
                 Button(Strings.retry) {
                     Task { await attemptConnection() }
                 }

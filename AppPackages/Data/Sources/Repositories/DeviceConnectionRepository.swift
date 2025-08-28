@@ -11,17 +11,22 @@ public struct DeviceConnectionRepository: DeviceConnectionRepositoryProtocol {
         self.cacheManager = cacheManager
     }
 
-    public func addDevice(_ discoveredDevice: DiscoveredDevice) async throws -> Device {
+    public func addDevice(_ discoveredDevice: DiscoveredDevice) async throws
+        -> Device {
         let device = Device(
             id: discoveredDevice.id,
             name: discoveredDevice.name,
             type: discoveredDevice.type,
             manufacturer: discoveredDevice.manufacturer,
             model: discoveredDevice.model,
+            unitOfMeasurement: discoveredDevice.unitOfMeasurement,
+            supportsBrightness: discoveredDevice.supportsBrightness,
             isManaged: true,
             addedDate: Date(),
             lastSeen: Date(),
-            status: .connected
+            status: .connected,
+            commandTopic: discoveredDevice.commandTopic,
+            stateTopic: discoveredDevice.stateTopic
         )
 
         var managedDevices = try await getManagedDevices()

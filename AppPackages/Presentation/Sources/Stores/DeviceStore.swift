@@ -7,12 +7,29 @@ import ServiceProtocols
 import UseCases
 
 @MainActor
+public protocol DeviceStoreProtocol: Observable {
+    var viewState: DeviceViewState { get set }
+    var devices: [Device] { get set }
+    var discoveredDevices: [DiscoveredDevice] { get set }
+    var deviceStates: [String: DeviceState] { get set }
+    var selectedDevice: Device? { get set }
+
+    func loadDashboardData()
+    func subscribeToDevice(_ device: DiscoveredDevice)
+    func unsubscribeFromDevice(withId deviceId: String)
+    func sendCommand(to deviceId: String, command: Command)
+    func selectDevice(_ device: Device)
+    func clearSelection()
+}
+
+@MainActor
 @Observable
-public final class DeviceStore {
+public final class DeviceStore: DeviceStoreProtocol {
     public var viewState: DeviceViewState
     public var devices: [Device] = []
     public var discoveredDevices: [DiscoveredDevice] = []
     public var deviceStates: [String: DeviceState] = [:]
+    public var selectedDevice: Device?
 
     private let getManagedDevicesUseCase: GetManagedDevicesUseCase
     private let getDiscoveredDevicesUseCase: GetDiscoveredDevicesUseCase
@@ -24,7 +41,7 @@ public final class DeviceStore {
     private let logger: LoggerProtocol
 
     private var dashboardTask: Task<Void, Never>?
-    private var stateSubscriptionTask: Task<Void, Never>?
+    private var stateSubscriptionTasks: [String: Task<Void, Never>] = [:]
     private var discoverySubscriptionTask: Task<Void, Never>?
 
     public init(
@@ -40,7 +57,8 @@ public final class DeviceStore {
         self.getManagedDevicesUseCase = getManagedDevicesUseCase
         self.getDiscoveredDevicesUseCase = getDiscoveredDevicesUseCase
         self.subscribeToStatesUseCase = subscribeToStatesUseCase
-        self.subscribeToDiscoveredDevicesUseCase = subscribeToDiscoveredDevicesUseCase
+        self.subscribeToDiscoveredDevicesUseCase =
+            subscribeToDiscoveredDevicesUseCase
         self.addDeviceUseCase = addDeviceUseCase
         self.removeDeviceUseCase = removeDeviceUseCase
         self.sendDeviceCommandUseCase = sendDeviceCommandUseCase
@@ -56,9 +74,13 @@ public final class DeviceStore {
         dashboardTask = Task { @MainActor in
             do {
                 async let managedDevices = getManagedDevicesUseCase.execute()
-                async let discoveredDevices = getDiscoveredDevicesUseCase.execute()
+                async let discoveredDevices = getDiscoveredDevicesUseCase
+                    .execute()
 
-                let (managed, discovered) = try await (managedDevices, discoveredDevices)
+                let (managed, discovered) = try await (
+                    managedDevices,
+                    discoveredDevices
+                )
 
                 guard !Task.isCancelled else {
                     return
@@ -70,7 +92,8 @@ public final class DeviceStore {
                 // Start real-time subscriptions to get live updates
                 self.startRealtimeUpdates()
 
-                // Always set to loaded - empty discovered devices is valid state
+                // Always set to loaded - empty discovered devices is valid
+                // state
                 viewState = .loaded
                 logger.log("Dashboard data loaded", level: .info)
 
@@ -89,18 +112,25 @@ public final class DeviceStore {
     }
 
     public func stopRealtimeUpdates() {
-        stateSubscriptionTask?.cancel()
+        for task in stateSubscriptionTasks.values {
+            task.cancel()
+        }
+        stateSubscriptionTasks.removeAll()
         discoverySubscriptionTask?.cancel()
-        stateSubscriptionTask = nil
         discoverySubscriptionTask = nil
     }
 
     public func subscribeToDevice(_ discoveredDevice: DiscoveredDevice) {
         Task { @MainActor in
             do {
-                let device = try await addDeviceUseCase.execute(discoveredDevice: discoveredDevice)
+                let device = try await addDeviceUseCase
+                    .execute(discoveredDevice: discoveredDevice)
                 devices.append(device)
                 discoveredDevices.removeAll { $0.id == discoveredDevice.id }
+
+                // Restart state subscription to include new device
+                restartDeviceStateSubscription()
+
                 logger.log("Subscribed to device: \(device.name)", level: .info)
             } catch {
                 viewState = .error("Failed to subscribe to device")
@@ -110,25 +140,39 @@ public final class DeviceStore {
         }
     }
 
-    public func unsubscribeFromDevice(_ device: Device) {
+    public func unsubscribeFromDevice(withId deviceId: String) {
         Task { @MainActor in
             do {
+                guard let device = devices.first(where: { $0.id == deviceId })
+                else { return }
+
                 try await removeDeviceUseCase.execute(deviceId: device.id)
                 devices.removeAll { $0.id == device.id }
 
-                // Convert back to discovered device so it appears in available list
+                // Convert back to discovered device so it appears in available
+                // list
                 let discoveredDevice = DiscoveredDevice(
                     id: device.id,
                     name: device.name,
                     type: device.type,
                     manufacturer: device.manufacturer,
                     model: device.model,
+                    unitOfMeasurement: device.unitOfMeasurement,
+                    supportsBrightness: device.supportsBrightness,
                     discoveredAt: Date(),
-                    isAlreadyAdded: false
+                    isAlreadyAdded: false,
+                    commandTopic: device.commandTopic,
+                    stateTopic: device.stateTopic
                 )
                 discoveredDevices.append(discoveredDevice)
 
-                logger.log("Unsubscribed from device: \(device.name)", level: .info)
+                // Restart state subscription to exclude removed device
+                restartDeviceStateSubscription()
+
+                logger.log(
+                    "Unsubscribed from device: \(device.name)",
+                    level: .info
+                )
             } catch {
                 let message = "Failed to unsubscribe from device: \(error.localizedDescription)"
                 logger.log(message, level: .error)
@@ -139,7 +183,10 @@ public final class DeviceStore {
     public func sendCommand(to deviceId: String, command: Command) {
         Task { @MainActor in
             do {
-                try await sendDeviceCommandUseCase.execute(deviceId: deviceId, command: command)
+                try await sendDeviceCommandUseCase.execute(
+                    deviceId: deviceId,
+                    command: command
+                )
                 logger.log("Command sent to device \(deviceId)", level: .info)
             } catch {
                 let message = "Failed to send command \(deviceId): \(error.localizedDescription)"
@@ -148,31 +195,71 @@ public final class DeviceStore {
         }
     }
 
-    private func startDeviceStateSubscription() {
-        stateSubscriptionTask = Task { @MainActor in
-            do {
-                let stateStream = try await subscribeToStatesUseCase.execute()
-                for await states in stateStream {
-                    guard !Task.isCancelled else { break }
+    public func selectDevice(_ device: Device) {
+        selectedDevice = device
+        logger.log("Selected device: \(device.name)", level: .info)
+    }
 
-                    for state in states {
-                        deviceStates[state.deviceId] = state
+    public func clearSelection() {
+        selectedDevice = nil
+    }
+
+    private func restartDeviceStateSubscription() {
+        // Cancel existing subscriptions
+        for task in stateSubscriptionTasks.values {
+            task.cancel()
+        }
+        stateSubscriptionTasks.removeAll()
+
+        // Start new subscriptions with current device list
+        startDeviceStateSubscription()
+    }
+
+    private func startDeviceStateSubscription() {
+        // Only start subscriptions if there are devices to monitor
+        guard !devices.isEmpty else {
+            logger.log(
+                "No devices to monitor, skipping state subscription",
+                level: .debug
+            )
+            return
+        }
+
+        // Create individual subscription for each device
+        for device in devices {
+            let task = Task { @MainActor in
+                do {
+                    let stateStream = try await subscribeToStatesUseCase
+                        .execute(stateTopic: device.stateTopic)
+
+                    for await deviceState in stateStream {
+                        guard !Task.isCancelled else { break }
+
+                        deviceStates[deviceState.deviceId] = deviceState
 
                         if let deviceIndex = devices.firstIndex(
-                            where: { $0.id == state.deviceId }
+                            where: { $0.id == deviceState.deviceId }
                         ) {
                             var updatedDevice = devices[deviceIndex]
-                            updatedDevice.status = state.isOnline ? .connected : .disconnected
-                            updatedDevice.lastSeen = state.lastUpdate
+                            updatedDevice.status = deviceState
+                                .isOnline ? .connected : .disconnected
+                            updatedDevice.lastSeen = deviceState.lastUpdate
                             devices[deviceIndex] = updatedDevice
                         }
                     }
+                } catch {
+                    guard !Task.isCancelled else { return }
+                    let message = "Device state subscription error for :"
+                    let topic = device.stateTopic
+                    let errorDescription = error.localizedDescription
+                    logger.log(
+                        "\(message) \(topic) \(errorDescription)",
+                        level: .error
+                    )
                 }
-            } catch {
-                guard !Task.isCancelled else { return }
-                let message = "Device state subscription error: \(error.localizedDescription)"
-                logger.log(message, level: .error)
             }
+
+            stateSubscriptionTasks[device.id] = task
         }
     }
 
@@ -180,17 +267,22 @@ public final class DeviceStore {
         logger.log("Starting discovery subscription", level: .debug)
         discoverySubscriptionTask = Task { @MainActor in
             do {
-                let discoveryStream = try await subscribeToDiscoveredDevicesUseCase.execute()
+                let discoveryStream =
+                    try await subscribeToDiscoveredDevicesUseCase.execute()
 
                 for await newDiscoveredDevices in discoveryStream {
                     guard !Task.isCancelled else { break }
 
-                    let filteredDevices = newDiscoveredDevices.filter { discoveredDevice in
-                        !devices.contains { $0.id == discoveredDevice.id }
-                    }
+                    let filteredDevices = newDiscoveredDevices
+                        .filter { discoveredDevice in
+                            !devices.contains { $0.id == discoveredDevice.id }
+                        }
 
                     if filteredDevices.count != discoveredDevices.count {
-                        logger.log("Discovered \(filteredDevices.count) new devices", level: .info)
+                        logger.log(
+                            "Discovered \(filteredDevices.count) new devices",
+                            level: .info
+                        )
                     }
                     discoveredDevices = filteredDevices
                 }

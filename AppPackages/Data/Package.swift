@@ -28,6 +28,10 @@ let package = Package(
             name: "Repositories",
             targets: ["Repositories"]
         ),
+        .library(
+            name: "DataUtilities",
+            targets: ["DataUtilities"]
+        ),
     ],
     dependencies: [
         .package(path: "../Domain"),
@@ -52,6 +56,7 @@ let package = Package(
             dependencies: [
                 .product(name: "Domain", package: "Domain"),
                 "CocoaMQTT",
+                "DataUtilities",
             ],
             path: "Sources/DataSource"
         ),
@@ -78,6 +83,13 @@ let package = Package(
                 "DataSource",
             ],
             path: "Sources/Repositories"
+        ),
+        .target(
+            name: "DataUtilities",
+            dependencies: [
+                .product(name: "ServiceProtocols", package: "Domain"),
+            ],
+            path: "Sources/Utilities"
         ),
         .testTarget(
             name: "DataSourceTests",

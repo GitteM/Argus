@@ -29,15 +29,14 @@ public struct AppContainer {
         )
         self.connectionManager = connectionManager
 
-        let cacheManager = CacheManager()
-
         let serviceFactory = DefaultServiceFactory(
-            cacheManager: cacheManager
+            logger: logger
         )
 
         let dataSourceFactory = DefaultDataSourceFactory(
             connectionManager: connectionManager,
-            clientId: clientId
+            clientId: clientId,
+            logger: logger
         )
 
         // Create repositories
@@ -45,10 +44,14 @@ public struct AppContainer {
             serviceFactory: serviceFactory,
             dataSourceFactory: dataSourceFactory
         )
-        let deviceConnectionRepository = repositoryFactory.makeDeviceConnectionRepository()
-        let deviceDiscoveryRepository = repositoryFactory.makeDeviceDiscoveryRepository()
-        let deviceStateRepository = repositoryFactory.makeDeviceStateRepository()
-        let deviceCommandRepository = repositoryFactory.makeDeviceCommandRepository()
+        let deviceConnectionRepository = repositoryFactory
+            .makeDeviceConnectionRepository()
+        let deviceDiscoveryRepository = repositoryFactory
+            .makeDeviceDiscoveryRepository()
+        let deviceStateRepository = repositoryFactory
+            .makeDeviceStateRepository()
+        let deviceCommandRepository = repositoryFactory
+            .makeDeviceCommandRepository()
 
         // Create use cases
         let getManagedDevicesUseCase = GetManagedDevicesUseCase(
@@ -63,9 +66,10 @@ public struct AppContainer {
             deviceStateRepository: deviceStateRepository
         )
 
-        let subscribeToDiscoveredDevicesUseCase = SubscribeToDiscoveredDevicesUseCase(
-            deviceDiscoveryRepository: deviceDiscoveryRepository
-        )
+        let subscribeToDiscoveredDevicesUseCase =
+            SubscribeToDiscoveredDevicesUseCase(
+                deviceDiscoveryRepository: deviceDiscoveryRepository
+            )
 
         let addDeviceUseCase = AddDeviceUseCase(
             deviceConnectionRepository: deviceConnectionRepository

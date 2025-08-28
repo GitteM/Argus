@@ -2,10 +2,12 @@ import Entities
 import Navigation
 import Observation
 import SharedUI
+import Stores
 import SwiftUI
 
 public struct DashboardContentView: View {
     @Environment(Router.self) private var router
+    @Environment(DeviceStore.self) private var deviceStore
 
     let subscribedDevices: [Device]
     let availableDevices: [DiscoveredDevice]
@@ -27,6 +29,7 @@ public struct DashboardContentView: View {
                     ForEach(subscribedDevices, id: \.id) { device in
                         DeviceSubscribedRow(device: device)
                             .onRowTap {
+                                deviceStore.selectDevice(device)
                                 router.navigateTo(.deviceDetail)
                             }
                     }
@@ -48,26 +51,33 @@ public struct DashboardContentView: View {
     }
 }
 
-#Preview("Light Mode") {
-    DashboardContentView(
-        subscribedDevices: [.mockConnected],
-        availableDevices: DiscoveredDevice.mockDefaults
-    )
-    .preferredColorScheme(.light)
-}
-
-#Preview("Dark Mode") {
-    DashboardContentView(
-        subscribedDevices: Device.mockDefaults,
-        availableDevices: DiscoveredDevice.mockDefaults
-    )
-    .preferredColorScheme(.dark)
-}
-
-#Preview("Empty") {
-    DashboardContentView(
-        subscribedDevices: [],
-        availableDevices: []
-    )
-    .preferredColorScheme(.light)
-}
+// FIXME: need to configure environment
+//
+// #Preview("Light Mode") { @MainActor in
+//    let router = Router()
+//
+//    DashboardContentView(
+//        subscribedDevices: [.mockConnected],
+//        availableDevices: DiscoveredDevice.mockDefaults
+//    )
+//    .environment(router)
+//    .preferredColorScheme(.light)
+// }
+//
+// #Preview("Dark Mode") {
+//    DashboardContentView(
+//        subscribedDevices: Device.mockDefaults,
+//        availableDevices: DiscoveredDevice.mockDefaults
+//    )
+//    .environment(Router())
+//    .preferredColorScheme(.dark)
+// }
+//
+// #Preview("Empty") {
+//    DashboardContentView(
+//        subscribedDevices: [],
+//        availableDevices: []
+//    )
+//    .environment(Router())
+//    .preferredColorScheme(.light)
+// }

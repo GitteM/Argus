@@ -9,7 +9,8 @@ let package = Package(
         .library(
             name: "Domain",
             targets: [
-                "Entities", "RepositoryProtocols", "ServiceProtocols", "UseCases",
+                "Entities", "RepositoryProtocols", "ServiceProtocols",
+                "UseCases",
             ]
         ),
         .library(

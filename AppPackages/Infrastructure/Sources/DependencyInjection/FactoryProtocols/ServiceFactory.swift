@@ -1,21 +1,20 @@
 import DataSource
 import Persistence
 import RepositoryProtocols
+import ServiceProtocols
 
 public protocol ServiceFactory {
     func makeCacheManager() -> CacheManagerProtocol
 }
 
 public class DefaultServiceFactory: ServiceFactory {
-    private let cacheManager: CacheManagerProtocol
+    private let logger: LoggerProtocol
 
-    public init(
-        cacheManager: CacheManagerProtocol,
-    ) {
-        self.cacheManager = cacheManager
+    public init(logger: LoggerProtocol) {
+        self.logger = logger
     }
 
     public func makeCacheManager() -> CacheManagerProtocol {
-        CacheManager()
+        CacheManager(logger: logger)
     }
 }

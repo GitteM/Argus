@@ -29,7 +29,8 @@ final class DefaultStoreFactory: StoreFactory {
         self.getManagedDevicesUseCase = getManagedDevicesUseCase
         self.getDiscoveredDevicesUseCase = getDiscoveredDevicesUseCase
         self.subscribeToStatesUseCase = subscribeToStatesUseCase
-        self.subscribeToDiscoveredDevicesUseCase = subscribeToDiscoveredDevicesUseCase
+        self.subscribeToDiscoveredDevicesUseCase =
+            subscribeToDiscoveredDevicesUseCase
         self.addDeviceUseCase = addDeviceUseCase
         self.removeDeviceUseCase = removeDeviceUseCase
         self.sendDeviceCommandUseCase = sendDeviceCommandUseCase

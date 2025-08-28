@@ -40,16 +40,17 @@ struct DeviceAvailableRow: View {
     }
 }
 
-#Preview("Light Mode") {
-    List {
-        DeviceAvailableRow(device: .mockAdded1)
-            .preferredColorScheme(.light)
-    }
-}
-
-#Preview("Dark Mode") {
-    List {
-        DeviceAvailableRow(device: .mockAdded1)
-            .preferredColorScheme(.dark)
-    }
-}
+// FIXME:
+// #Preview("Light Mode") {
+//    List {
+//        DeviceAvailableRow(device: .mockAdded1)
+//            .preferredColorScheme(.light)
+//    }
+// }
+//
+// #Preview("Dark Mode") {
+//    List {
+//        DeviceAvailableRow(device: .mockAdded1)
+//            .preferredColorScheme(.dark)
+//    }
+// }

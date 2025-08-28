@@ -7,5 +7,6 @@ import Entities
 
 public protocol DeviceStateRepositoryProtocol {
     func getDeviceState(deviceId: String) async throws -> DeviceState?
-    func subscribeToDeviceStates() async throws -> AsyncStream<[DeviceState]>
+    func subscribeToDeviceState(stateTopic: String) async throws
+        -> AsyncStream<DeviceState>
 }

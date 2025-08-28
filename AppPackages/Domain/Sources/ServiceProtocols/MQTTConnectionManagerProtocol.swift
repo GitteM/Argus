@@ -8,6 +8,9 @@ public protocol MQTTConnectionManagerProtocol {
 
     func connect() async throws
     func disconnect()
-    func subscribe(to topic: String, handler: @escaping @Sendable (MQTTMessage) -> Void)
+    func subscribe(
+        to topic: String,
+        handler: @escaping @Sendable (MQTTMessage) -> Void
+    )
     func publish(topic: String, payload: String) async throws
 }

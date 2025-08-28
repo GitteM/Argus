@@ -12,7 +12,10 @@ public struct DeviceCommandDataSource: DeviceCommandDataSourceProtocol {
         self.subscriptionManager = subscriptionManager
     }
 
-    public func sendDeviceCommand(deviceId: String, command: Command) async throws {
+    public func sendDeviceCommand(
+        deviceId: String,
+        command: Command
+    ) async throws {
         let topic = "devices/\(deviceId)/commands"
         let payload = try JSONEncoder().encode(command)
         try await subscriptionManager.publish(

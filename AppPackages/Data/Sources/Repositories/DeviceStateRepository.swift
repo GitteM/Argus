@@ -15,8 +15,10 @@ public class DeviceStateRepository: DeviceStateRepositoryProtocol {
         try await deviceStateDataSource.getDeviceState(deviceId: deviceId)
     }
 
-    /// Subscribe to real-time device state updates via MQTT
-    public func subscribeToDeviceStates() async throws -> AsyncStream<[DeviceState]> {
-        await deviceStateDataSource.subscribeToDeviceStates()
+    /// Subscribe to real-time device state updates for a specific state topic
+    public func subscribeToDeviceState(stateTopic: String) async throws
+        -> AsyncStream<DeviceState> {
+        await deviceStateDataSource
+            .subscribeToDeviceState(stateTopic: stateTopic)
     }
 }

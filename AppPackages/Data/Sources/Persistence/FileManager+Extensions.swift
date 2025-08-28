@@ -10,7 +10,10 @@ extension FileManager {
     }
 
     func clearCacheFiles(in directory: URL) throws {
-        let cacheFiles = try contentsOfDirectory(at: directory, includingPropertiesForKeys: nil)
+        let cacheFiles = try contentsOfDirectory(
+            at: directory,
+            includingPropertiesForKeys: nil
+        )
         for fileURL in cacheFiles where fileURL.pathExtension == "cache" {
             try removeItem(at: fileURL)
         }

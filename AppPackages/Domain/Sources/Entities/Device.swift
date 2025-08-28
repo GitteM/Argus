@@ -6,10 +6,14 @@ public struct Device: Codable, Sendable {
     public let type: DeviceType
     public let manufacturer: String
     public let model: String
+    public let unitOfMeasurement: String?
+    public let supportsBrightness: Bool
     public let isManaged: Bool
     public let addedDate: Date
     public var lastSeen: Date?
     public var status: DeviceConnectionStatus
+    public let commandTopic: String
+    public let stateTopic: String
 
     public init(
         id: String,
@@ -17,44 +21,40 @@ public struct Device: Codable, Sendable {
         type: DeviceType,
         manufacturer: String,
         model: String,
+        unitOfMeasurement: String? = nil,
+        supportsBrightness: Bool,
         isManaged: Bool,
         addedDate: Date,
         lastSeen: Date?,
-        status: DeviceConnectionStatus
+        status: DeviceConnectionStatus,
+        commandTopic: String,
+        stateTopic: String
     ) {
         self.id = id
         self.name = name
         self.type = type
         self.manufacturer = manufacturer
         self.model = model
+        self.unitOfMeasurement = unitOfMeasurement
+        self.supportsBrightness = supportsBrightness
         self.isManaged = isManaged
         self.addedDate = addedDate
         self.lastSeen = lastSeen
         self.status = status
+        self.commandTopic = commandTopic
+        self.stateTopic = stateTopic
     }
 }
 
 public enum DeviceType: String, CaseIterable, Codable, Sendable {
     case smartLight = "smart_light"
-    case smartPlug = "smart_plug"
-    case smartThermostat = "smart_thermostat"
-    case smartCamera = "smart_camera"
-    case smartLock = "smart_lock"
-    case motionSensor = "motion_sensor"
     case temperatureSensor = "temperature_sensor"
-    case smartSpeaker = "smart_speaker"
     case unknown
 
     public var displayName: String {
         switch self {
         case .smartLight: "Smart Light"
-        case .smartPlug: "Smart Plug"
-        case .smartThermostat: "Smart Thermostat"
-        case .smartCamera: "Smart Camera"
-        case .smartLock: "Smart Lock"
-        case .motionSensor: "Motion Sensor"
         case .temperatureSensor: "Temperature Sensor"
-        case .smartSpeaker: "Smart Speaker"
         case .unknown: "Unknown"
         }
     }
@@ -62,13 +62,7 @@ public enum DeviceType: String, CaseIterable, Codable, Sendable {
     public var icon: String {
         switch self {
         case .smartLight: "lightbulb.fill"
-        case .smartPlug: "powerplug.fill"
-        case .smartThermostat: "thermometer.variable"
-        case .smartCamera: "video.fill"
-        case .smartLock: "lock.fill"
-        case .motionSensor: "sensor.tag.radiowaves.forward.fill"
         case .temperatureSensor: "thermometer.medium"
-        case .smartSpeaker: "speaker.wave.2.fill"
         case .unknown: "questionmark.diamond.fill"
         }
     }
@@ -76,27 +70,35 @@ public enum DeviceType: String, CaseIterable, Codable, Sendable {
 
 public extension Device {
     static let mockConnected = Device(
-        id: "mock-device-001",
-        name: "Mock Device Connected",
+        id: "living_room_light",
+        name: "Living Room Light",
         type: .temperatureSensor,
         manufacturer: "Smart lights",
         model: "XYZ123",
+        unitOfMeasurement: nil,
+        supportsBrightness: true,
         isManaged: false,
         addedDate: Date(),
         lastSeen: nil,
-        status: .connected
+        status: .connected,
+        commandTopic: "home/light/living_room_light/set",
+        stateTopic: "home/light/living_room_light/state"
     )
 
     static let mockDisconnected = Device(
-        id: "mock-device-002",
-        name: "Mock Device Disconnected",
+        id: "kitchen_temp_sensor",
+        name: "Kitchen Temperature Sensor",
         type: .temperatureSensor,
         manufacturer: "Smart sensors",
         model: "YZA456",
+        unitOfMeasurement: "C",
+        supportsBrightness: false,
         isManaged: false,
         addedDate: Date(),
         lastSeen: nil,
-        status: .disconnected
+        status: .disconnected,
+        commandTopic: "home/light/kitchen_temp_sensor/set",
+        stateTopic: "home/light/kitchen_temp_sensor/state"
     )
 
     static var mockDefaults: [Device] {
