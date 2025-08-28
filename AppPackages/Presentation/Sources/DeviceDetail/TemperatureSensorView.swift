@@ -15,7 +15,7 @@ struct TemperatureSensorView: View {
                     HStack {
                         Text("Temperature:")
                         Text(
-                            "\(temperatureSensor.temperature, specifier: "%.1f")°"
+                            "\(temperatureSensor.temperature, specifier: "%.1f")"
                         )
                         .fontWeight(.semibold)
                         if let unit = device.unitOfMeasurement {
