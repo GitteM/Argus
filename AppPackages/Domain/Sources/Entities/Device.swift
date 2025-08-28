@@ -69,7 +69,7 @@ public enum DeviceType: String, CaseIterable, Codable, Sendable {
 }
 
 public extension Device {
-    static let mockConnected = Device(
+    static let mockLight = Device(
         id: "living_room_light",
         name: "Living Room Light",
         type: .temperatureSensor,
@@ -85,7 +85,7 @@ public extension Device {
         stateTopic: "home/light/living_room_light/state"
     )
 
-    static let mockDisconnected = Device(
+    static let mockTemperatureSensor = Device(
         id: "kitchen_temp_sensor",
         name: "Kitchen Temperature Sensor",
         type: .temperatureSensor,
@@ -102,6 +102,6 @@ public extension Device {
     )
 
     static var mockDefaults: [Device] {
-        [.mockConnected, mockDisconnected]
+        [.mockLight, mockTemperatureSensor]
     }
 }

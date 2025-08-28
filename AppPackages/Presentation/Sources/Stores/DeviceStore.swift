@@ -8,11 +8,13 @@ import UseCases
 
 @MainActor
 public protocol DeviceStoreProtocol: Observable {
-    var viewState: DeviceViewState { get set }
-    var devices: [Device] { get set }
-    var discoveredDevices: [DiscoveredDevice] { get set }
-    var deviceStates: [String: DeviceState] { get set }
-    var selectedDevice: Device? { get set }
+    var viewState: DeviceViewState { get }
+    var devices: [Device] { get }
+    var discoveredDevices: [DiscoveredDevice] { get }
+    var deviceStates: [String: DeviceState] { get }
+
+    var selectedDevice: Device? { get }
+    var selectedDeviceState: DeviceState? { get }
 
     func loadDashboardData()
     func subscribeToDevice(_ device: DiscoveredDevice)
@@ -25,11 +27,16 @@ public protocol DeviceStoreProtocol: Observable {
 @MainActor
 @Observable
 public final class DeviceStore: DeviceStoreProtocol {
-    public var viewState: DeviceViewState
-    public var devices: [Device] = []
-    public var discoveredDevices: [DiscoveredDevice] = []
-    public var deviceStates: [String: DeviceState] = [:]
-    public var selectedDevice: Device?
+    public private(set) var viewState: DeviceViewState
+    public private(set) var devices: [Device] = []
+    public private(set) var discoveredDevices: [DiscoveredDevice] = []
+    public private(set) var deviceStates: [String: DeviceState] = [:]
+    public private(set) var selectedDevice: Device?
+
+    public var selectedDeviceState: DeviceState? {
+        guard let selectedDevice else { return nil }
+        return deviceStates[selectedDevice.id]
+    }
 
     private let getManagedDevicesUseCase: GetManagedDevicesUseCase
     private let getDiscoveredDevicesUseCase: GetDiscoveredDevicesUseCase

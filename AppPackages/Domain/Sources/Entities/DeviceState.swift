@@ -85,3 +85,33 @@ public struct LightState: Sendable, Codable {
         date = try container.decode(Date.self, forKey: .date)
     }
 }
+
+// MARK: Mock Data
+
+public extension LightState {
+    static let mockOnWithBrightness = LightState(
+        state: true,
+        brightness: 75,
+        date: Date()
+    )
+
+    static let mockOff = LightState(
+        state: false,
+        brightness: 0,
+        date: Date()
+    )
+}
+
+public extension TemperatureSensor {
+    static let mockTemperature: TemperatureSensor = .init(
+        temperature: 22.5,
+        date: Date(),
+        battery: 100
+    )
+
+    static let mockLowBattery: TemperatureSensor = .init(
+        temperature: 22.5,
+        date: Date(),
+        battery: 15
+    )
+}

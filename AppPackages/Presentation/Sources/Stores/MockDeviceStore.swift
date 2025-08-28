@@ -11,6 +11,7 @@ public final class MockDeviceStore: DeviceStoreProtocol {
     public var discoveredDevices: [DiscoveredDevice] = []
     public var deviceStates: [String: DeviceState] = [:]
     public var selectedDevice: Device?
+    public var selectedDeviceState: Entities.DeviceState?
 
     public init() {}
 

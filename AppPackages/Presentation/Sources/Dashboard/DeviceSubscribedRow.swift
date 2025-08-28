@@ -28,14 +28,14 @@ struct DeviceSubscribedRow: View {
 
 #Preview("Light Mode") {
     List {
-        DeviceSubscribedRow(device: .mockConnected)
+        DeviceSubscribedRow(device: .mockLight)
             .preferredColorScheme(.light)
     }
 }
 
 #Preview("Dark Mode") {
     List {
-        DeviceSubscribedRow(device: .mockConnected)
+        DeviceSubscribedRow(device: .mockLight)
             .preferredColorScheme(.dark)
     }
 }
