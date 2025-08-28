@@ -12,5 +12,6 @@ public protocol MQTTConnectionManagerProtocol {
         to topic: String,
         handler: @escaping @Sendable (MQTTMessage) -> Void
     )
+    func unsubscribe(from topic: String)
     func publish(topic: String, payload: String) async throws
 }

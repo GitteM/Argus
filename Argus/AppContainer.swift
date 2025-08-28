@@ -76,7 +76,8 @@ public struct AppContainer {
         )
 
         let removeDeviceUseCase = RemoveDeviceUseCase(
-            deviceConnectionRepository: deviceConnectionRepository
+            deviceConnectionRepository: deviceConnectionRepository,
+            mqttConnectionManager: connectionManager
         )
 
         let sendDeviceCommandUseCase = SendDeviceCommandUseCase(

@@ -126,6 +126,23 @@ private final class MockLogger: LoggerProtocol {
     func log(_: String, level _: OSLogType) {}
 }
 
+private final class MockMQTTConnectionManager: MQTTConnectionManagerProtocol {
+    var connectionStatus: MQTTConnectionStatus = .connected
+
+    func connect() async throws {}
+
+    func disconnect() {}
+
+    func subscribe(
+        to _: String,
+        handler _: @escaping @Sendable (MQTTMessage) -> Void
+    ) {}
+
+    func unsubscribe(from _: String) {}
+
+    func publish(topic _: String, payload _: String) async throws {}
+}
+
 // MARK: - DeviceStore Preview Extension
 
 @MainActor
@@ -145,6 +162,7 @@ public extension DeviceStore {
         let stateRepo =
             MockDeviceStateRepository(deviceState: previewDeviceState)
         let commandRepo = MockDeviceCommandRepository()
+        let mqttManager = MockMQTTConnectionManager()
         let logger = MockLogger()
 
         // Create real use cases with mock repositories
@@ -165,7 +183,8 @@ public extension DeviceStore {
                 deviceConnectionRepository: connectionRepo
             ),
             removeDeviceUseCase: RemoveDeviceUseCase(
-                deviceConnectionRepository: connectionRepo
+                deviceConnectionRepository: connectionRepo,
+                mqttConnectionManager: mqttManager
             ),
             sendDeviceCommandUseCase: SendDeviceCommandUseCase(
                 deviceCommandRepository: commandRepo
@@ -181,6 +200,7 @@ public extension DeviceStore {
         let discoveryRepo = MockDeviceDiscoveryRepository()
         let stateRepo = MockDeviceStateRepository()
         let commandRepo = MockDeviceCommandRepository()
+        let mqttManager = MockMQTTConnectionManager()
         let logger = MockLogger()
 
         return DeviceStore(
@@ -200,7 +220,8 @@ public extension DeviceStore {
                 deviceConnectionRepository: connectionRepo
             ),
             removeDeviceUseCase: RemoveDeviceUseCase(
-                deviceConnectionRepository: connectionRepo
+                deviceConnectionRepository: connectionRepo,
+                mqttConnectionManager: mqttManager
             ),
             sendDeviceCommandUseCase: SendDeviceCommandUseCase(
                 deviceCommandRepository: commandRepo
@@ -216,6 +237,7 @@ public extension DeviceStore {
         let discoveryRepo = MockDeviceDiscoveryRepository()
         let stateRepo = MockDeviceStateRepository()
         let commandRepo = MockDeviceCommandRepository()
+        let mqttManager = MockMQTTConnectionManager()
         let logger = MockLogger()
 
         return DeviceStore(
@@ -235,7 +257,8 @@ public extension DeviceStore {
                 deviceConnectionRepository: connectionRepo
             ),
             removeDeviceUseCase: RemoveDeviceUseCase(
-                deviceConnectionRepository: connectionRepo
+                deviceConnectionRepository: connectionRepo,
+                mqttConnectionManager: mqttManager
             ),
             sendDeviceCommandUseCase: SendDeviceCommandUseCase(
                 deviceCommandRepository: commandRepo
@@ -250,6 +273,7 @@ public extension DeviceStore {
         let discoveryRepo = MockDeviceDiscoveryRepository()
         let stateRepo = MockDeviceStateRepository()
         let commandRepo = MockDeviceCommandRepository()
+        let mqttManager = MockMQTTConnectionManager()
         let logger = MockLogger()
 
         return DeviceStore(
@@ -269,7 +293,8 @@ public extension DeviceStore {
                 deviceConnectionRepository: connectionRepo
             ),
             removeDeviceUseCase: RemoveDeviceUseCase(
-                deviceConnectionRepository: connectionRepo
+                deviceConnectionRepository: connectionRepo,
+                mqttConnectionManager: mqttManager
             ),
             sendDeviceCommandUseCase: SendDeviceCommandUseCase(
                 deviceCommandRepository: commandRepo

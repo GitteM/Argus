@@ -125,6 +125,35 @@ public final class MQTTConnectionManager: MQTTConnectionManagerProtocol,
         }
     }
 
+    public func unsubscribe(from topic: String) {
+        subscriptionQueue.async(flags: .barrier) {
+            self.logger.log(
+                "MQTT unsubscribing from topic: \(topic)",
+                level: .debug
+            )
+
+            // Remove from message handlers
+            self.messageHandlers.removeValue(forKey: topic)
+
+            // Remove from pending subscriptions if it exists
+            self.pendingSubscriptions.removeValue(forKey: topic)
+
+            // Unsubscribe from MQTT broker if connected
+            if let mqtt = self.mqtt, mqtt.connState == .connected {
+                mqtt.unsubscribe(topic)
+                self.logger.log(
+                    "MQTT unsubscribed from topic: \(topic)",
+                    level: .info
+                )
+            } else {
+                self.logger.log(
+                    "MQTT unsubscribe queued - not connected: \(topic)",
+                    level: .debug
+                )
+            }
+        }
+    }
+
     public func disconnect() {
         subscriptionQueue.async(flags: .barrier) {
             let message = "MQTT disconnecting - clearing handlers and pending subscriptions"
