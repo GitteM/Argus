@@ -39,28 +39,42 @@ public struct DeviceDetailView: View {
     @ViewBuilder
     private var contentView: some View {
         if let device = deviceStore.selectedDevice {
-            switch device.type {
-            case .smartLight:
-                SmartLightView(
-                    device: device,
-                    lightState: deviceStore.selectedDeviceState?.lightState
-                )
-
-            case .temperatureSensor:
-                TemperatureSensorView(
-                    device: device,
-                    temperatureSensor: deviceStore.selectedDeviceState?
-                        .temperatureSensor
-                )
-
-            case .unknown:
-                VStack(alignment: .leading, spacing: 16) {
-                    DeviceInfoSection(device: device)
-                    ErrorView(
-                        message: "Unknown device type"
+            VStack(spacing: 0) {
+                switch device.type {
+                case .smartLight:
+                    SmartLightView(
+                        device: device,
+                        lightState: deviceStore.selectedDeviceState?.lightState
                     )
+
+                case .temperatureSensor:
+                    TemperatureSensorView(
+                        device: device,
+                        temperatureSensor: deviceStore.selectedDeviceState?
+                            .temperatureSensor
+                    )
+
+                case .unknown:
+                    VStack(alignment: .leading, spacing: 16) {
+                        DeviceInfoSection(device: device)
+                        ErrorView(
+                            message: "Unknown device type"
+                        )
+                    }
+                    .padding()
                 }
-                .padding()
+
+                VStack {
+                    Divider()
+
+                    DestructiveButton(
+                        title: "Unsubscribe from Device"
+                    ) {
+                        deviceStore.unsubscribeFromDevice(withId: device.id)
+                        deviceStore.clearSelection()
+                        onNavigate(.back)
+                    }
+                }
             }
         } else {
             ErrorView(
