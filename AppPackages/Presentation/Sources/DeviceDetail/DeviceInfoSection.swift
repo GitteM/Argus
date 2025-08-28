@@ -1,19 +1,23 @@
 import Entities
+import SharedUI
 import SwiftUI
 
 struct DeviceInfoSection: View {
     let device: Device
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Device Information")
+        VStack(alignment: .leading, spacing: Spacing.s3) {
+            Text(Strings.deviceInformation)
                 .font(.headline)
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Type: \(device.type.displayName)")
-                Text("Manufacturer: \(device.manufacturer)")
-                Text("Model: \(device.model)")
-                Text("Status: \(device.status.rawValue.capitalized)")
+            VStack(alignment: .leading, spacing: Spacing.s3) {
+                InfoRow(label: Strings.type, value: device.type.displayName)
+                InfoRow(label: Strings.manufacturer, value: device.manufacturer)
+                InfoRow(label: Strings.model, value: device.model)
+                InfoRow(
+                    label: Strings.status,
+                    value: device.status.rawValue.capitalized
+                )
             }
             .font(.caption)
         }
@@ -34,11 +38,6 @@ struct DeviceInfoSection: View {
             device: .mockTemperatureSensor
         )
         .padding()
-    }
-
-    #Preview("Using Mock Data") {
-        DeviceInfoSection(device: .mockLight)
-            .padding()
     }
 
 #endif

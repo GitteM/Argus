@@ -13,11 +13,20 @@
     "Device Detail" : {
       "extractionState" : "manual"
     },
+    "Device Information" : {
+      "extractionState" : "manual"
+    },
     "Devices" : {
       "extractionState" : "manual"
     },
     "Loading..." : {
 
+    },
+    "Manufacturer" : {
+      "extractionState" : "manual"
+    },
+    "Model" : {
+      "extractionState" : "manual"
     },
     "MQTT" : {
 
@@ -43,6 +52,9 @@
     "Something went wrong" : {
 
     },
+    "Status" : {
+      "extractionState" : "manual"
+    },
     "Subscribe to a device from the list below to start receiving data" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -55,6 +67,9 @@
       }
     },
     "Subscribed" : {
+      "extractionState" : "manual"
+    },
+    "Type" : {
       "extractionState" : "manual"
     },
     "Unable to connect to MQTT broker" : {
