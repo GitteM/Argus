@@ -22,11 +22,11 @@ Ensure the Docker container and test server is running locally to provide test d
 
 ### Core Functionality
 
-- **MQTT Connection Management**: Connection and reconnection handling
-- **Connection Status Indicator**: Visual indicator that becomes tappable when disconnected to initiate reconnection
-- **Device Discovery**: Dashboard displaying list of available devices for subscription
-- **Device Monitoring**: Detail view showing basic device information and current state
-- **Subscription Controlv**: Ability to subscribe/unsubscribe from individual devices
+- **MQTT Connection Management** Connection and reconnection handling
+- **Connection Status Indicator** Visual indicator that becomes tappable when disconnected to initiate reconnection
+- **Device Discovery** Dashboard displaying list of available devices for subscription
+- **Device Monitoring** Detail view showing basic device information and current state
+- **Subscription Control** Ability to subscribe/unsubscribe from individual devices
 
 
 ### Technical Highlights
@@ -38,7 +38,7 @@ Ensure the Docker container and test server is running locally to provide test d
 - **Dependency Injection** Composition Root with State/Store
 - **Router Pattern** for navigation
 - **Async/Await** for modern concurrency
-- **Testing Practices**: TestPlan includes DeviceStore
+- **Testing Practices** TestPlan includes DeviceStore
 
 ## Architecture
 
@@ -123,8 +123,8 @@ The current interface prioritizes functionality over polish. Potential improveme
 
 ## Build Configurations
 
-- **Debug**: Development environment with verbose logging
-- **Release**: Production build with optimizations
+- **Debug** Development environment with verbose logging
+- **Release** Production build with optimizations
 
 ## Testing
 
@@ -132,9 +132,9 @@ The current interface prioritizes functionality over polish. Potential improveme
 
 This iOS app can be tested against a local MQTT broker using a containerized test environment:
 
-**Repository**: [mqtt-test-environment](https://github.com/GitteM/mqtt-test-environment)
+**Repository** [mqtt-test-environment](https://github.com/GitteM/mqtt-test-environment)
 
-**Quick Setup:**
+**Quick Setup**
 ```bash
 # Clone the test environment
 git clone git@github.com:GitteM/mqtt-test-environment.git
@@ -148,15 +148,15 @@ chmod +x setup.sh
 ./setup.sh logs
 ```
 
-#### iOS App Configuration:
-- **MQTT Broker**: localhost:1883 (or your Mac's IP for device testing)
-- **Discovery Topic**: homeassistant/+/+/config
-- **Test Devices**: Living Room Light, Kitchen Temperature Sensor
+#### iOS App Configuration
+- **MQTT Broker** localhost:1883 (or your Mac's IP for device testing)
+- **Discovery Topic** homeassistant/+/+/config
+- **Test Devices** Living Room Light, Kitchen Temperature Sensor
 
 See the [README.md](https://github.com/GitteM/mqtt-test-environment/blob/main/README.md) for complete documentation and troubleshooting.
 
 ### Limitations & Future Enhancements
-**Currently Not Implemented**:
+**Currently Not Implemented**
 - Event history display
 - Publishing capabilities to MQTT topics
 
