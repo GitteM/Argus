@@ -20,21 +20,25 @@ struct DeviceInfoSection: View {
     }
 }
 
-#Preview("Connected Device") {
-    DeviceInfoSection(
-        device: .mockLight
-    )
-    .padding()
-}
+#if DEBUG
 
-#Preview("Disconnected Device") {
-    DeviceInfoSection(
-        device: .mockTemperatureSensor
-    )
-    .padding()
-}
-
-#Preview("Using Mock Data") {
-    DeviceInfoSection(device: .mockLight)
+    #Preview("Connected Device") {
+        DeviceInfoSection(
+            device: .mockLight
+        )
         .padding()
-}
+    }
+
+    #Preview("Disconnected Device") {
+        DeviceInfoSection(
+            device: .mockTemperatureSensor
+        )
+        .padding()
+    }
+
+    #Preview("Using Mock Data") {
+        DeviceInfoSection(device: .mockLight)
+            .padding()
+    }
+
+#endif

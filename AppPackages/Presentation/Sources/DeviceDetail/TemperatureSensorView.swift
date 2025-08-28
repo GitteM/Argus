@@ -63,26 +63,30 @@ struct TemperatureSensorView: View {
     }
 }
 
-#Preview("Temperature Sensor with Data") {
-    TemperatureSensorView(
-        device: .mockTemperatureSensor,
-        temperatureSensor: .mockTemperature
-    )
-    .padding()
-}
+#if DEBUG
 
-#Preview("Low Battery") {
-    TemperatureSensorView(
-        device: .mockTemperatureSensor,
-        temperatureSensor: .mockLowBattery
-    )
-    .padding()
-}
+    #Preview("Temperature Sensor with Data") {
+        TemperatureSensorView(
+            device: .mockTemperatureSensor,
+            temperatureSensor: .mockTemperature
+        )
+        .padding()
+    }
 
-#Preview("No Temperature Data") {
-    TemperatureSensorView(
-        device: .mockTemperatureSensor,
-        temperatureSensor: nil
-    )
-    .padding()
-}
+    #Preview("Low Battery") {
+        TemperatureSensorView(
+            device: .mockTemperatureSensor,
+            temperatureSensor: .mockLowBattery
+        )
+        .padding()
+    }
+
+    #Preview("No Temperature Data") {
+        TemperatureSensorView(
+            device: .mockTemperatureSensor,
+            temperatureSensor: nil
+        )
+        .padding()
+    }
+
+#endif

@@ -47,26 +47,30 @@ struct SmartLightView: View {
     }
 }
 
-#Preview("Light On with Brightness") {
-    SmartLightView(
-        device: .mockLight,
-        lightState: .mockOnWithBrightness
-    )
-    .padding()
-}
+#if DEBUG
 
-#Preview("Light Off") {
-    SmartLightView(
-        device: .mockLight,
-        lightState: .mockOff
-    )
-    .padding()
-}
+    #Preview("Light On with Brightness") {
+        SmartLightView(
+            device: .mockLight,
+            lightState: .mockOnWithBrightness
+        )
+        .padding()
+    }
 
-#Preview("No Light State") {
-    SmartLightView(
-        device: .mockLight,
-        lightState: nil
-    )
-    .padding()
-}
+    #Preview("Light Off") {
+        SmartLightView(
+            device: .mockLight,
+            lightState: .mockOff
+        )
+        .padding()
+    }
+
+    #Preview("No Light State") {
+        SmartLightView(
+            device: .mockLight,
+            lightState: nil
+        )
+        .padding()
+    }
+
+#endif

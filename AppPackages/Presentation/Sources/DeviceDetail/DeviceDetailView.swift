@@ -91,43 +91,47 @@ public struct DeviceDetailView: View {
     }
 }
 
-#Preview("Smart Light") { @MainActor in
-    let store = DeviceStore.preview
-    let connectionManager = MQTTConnectionManager.preview
+#if DEBUG
 
-    Task { @MainActor in
-        store.loadDashboardData()
-        store.selectDevice(.mockLight)
-    }
+    #Preview("Smart Light") { @MainActor in
+        let store = DeviceStore.preview
+        let connectionManager = MQTTConnectionManager.preview
 
-    return DeviceDetailView { _ in }
-        .environment(store)
-        .environment(connectionManager)
-}
-
-#Preview("Temperature Sensor") { @MainActor in
-    let store = DeviceStore.preview
-    let connectionManager = MQTTConnectionManager.preview
-
-    Task { @MainActor in
-        store.loadDashboardData()
-        store
-            .selectDevice(.mockTemperatureSensor)
-    }
-
-    return DeviceDetailView { _ in }
-        .environment(store)
-        .environment(connectionManager)
-}
-
-#Preview("No Selection") { @MainActor in
-    let store = DeviceStore.emptyPreview
-    let connectionManager = MQTTConnectionManager.preview
-
-    DeviceDetailView { _ in }
-        .environment(store)
-        .environment(connectionManager)
-        .task {
+        Task { @MainActor in
             store.loadDashboardData()
+            store.selectDevice(.mockLight)
         }
-}
+
+        return DeviceDetailView { _ in }
+            .environment(store)
+            .environment(connectionManager)
+    }
+
+    #Preview("Temperature Sensor") { @MainActor in
+        let store = DeviceStore.preview
+        let connectionManager = MQTTConnectionManager.preview
+
+        Task { @MainActor in
+            store.loadDashboardData()
+            store
+                .selectDevice(.mockTemperatureSensor)
+        }
+
+        return DeviceDetailView { _ in }
+            .environment(store)
+            .environment(connectionManager)
+    }
+
+    #Preview("No Selection") { @MainActor in
+        let store = DeviceStore.emptyPreview
+        let connectionManager = MQTTConnectionManager.preview
+
+        DeviceDetailView { _ in }
+            .environment(store)
+            .environment(connectionManager)
+            .task {
+                store.loadDashboardData()
+            }
+    }
+
+#endif

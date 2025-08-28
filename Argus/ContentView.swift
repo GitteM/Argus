@@ -35,20 +35,24 @@ struct ContentView: View {
     }
 }
 
-#Preview("Light Mode") { @MainActor in
-    let appContainer = AppContainer()
-    ContentView()
-        .environment(appContainer.connectionManager)
-        .environment(appContainer.deviceStore)
-        .environment(appContainer.router)
-        .preferredColorScheme(.light)
-}
+#if DEBUG
 
-#Preview("Dark Mode") { @MainActor in
-    let appContainer = AppContainer()
-    ContentView()
-        .environment(appContainer.connectionManager)
-        .environment(appContainer.deviceStore)
-        .environment(appContainer.router)
-        .preferredColorScheme(.dark)
-}
+    #Preview("Light Mode") { @MainActor in
+        let appContainer = AppContainer()
+        ContentView()
+            .environment(appContainer.connectionManager)
+            .environment(appContainer.deviceStore)
+            .environment(appContainer.router)
+            .preferredColorScheme(.light)
+    }
+
+    #Preview("Dark Mode") { @MainActor in
+        let appContainer = AppContainer()
+        ContentView()
+            .environment(appContainer.connectionManager)
+            .environment(appContainer.deviceStore)
+            .environment(appContainer.router)
+            .preferredColorScheme(.dark)
+    }
+
+#endif

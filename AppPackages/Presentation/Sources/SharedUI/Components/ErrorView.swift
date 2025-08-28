@@ -34,14 +34,18 @@ public struct ErrorView: View {
     }
 }
 
-#Preview("Error with Retry") {
-    let message = "Failed to load data. Check connection and try again."
-    ErrorView(
-        message: message,
-        retryAction: { print("Retry tapped") }
-    )
-}
+#if DEBUG
 
-#Preview("Error without Retry") {
-    ErrorView(message: "Unable to connect to server")
-}
+    #Preview("Error with Retry") {
+        let message = "Failed to load data. Check connection and try again."
+        ErrorView(
+            message: message,
+            retryAction: { print("Retry tapped") }
+        )
+    }
+
+    #Preview("Error without Retry") {
+        ErrorView(message: "Unable to connect to server")
+    }
+
+#endif

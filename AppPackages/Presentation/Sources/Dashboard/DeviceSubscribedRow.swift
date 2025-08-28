@@ -26,16 +26,20 @@ struct DeviceSubscribedRow: View {
     }
 }
 
-#Preview("Light Mode") {
-    List {
-        DeviceSubscribedRow(device: .mockLight)
-            .preferredColorScheme(.light)
-    }
-}
+#if DEBUG
 
-#Preview("Dark Mode") {
-    List {
-        DeviceSubscribedRow(device: .mockLight)
-            .preferredColorScheme(.dark)
+    #Preview("Light Mode") {
+        List {
+            DeviceSubscribedRow(device: .mockLight)
+                .preferredColorScheme(.light)
+        }
     }
-}
+
+    #Preview("Dark Mode") {
+        List {
+            DeviceSubscribedRow(device: .mockLight)
+                .preferredColorScheme(.dark)
+        }
+    }
+
+#endif

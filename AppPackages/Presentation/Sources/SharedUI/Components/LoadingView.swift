@@ -14,12 +14,16 @@ public struct LoadingView: View {
     }
 }
 
-#Preview("Light Mode") {
-    LoadingView()
-        .preferredColorScheme(.light)
-}
+#if DEBUG
 
-#Preview("Dark Mode") {
-    LoadingView()
-        .preferredColorScheme(.dark)
-}
+    #Preview("Light Mode") {
+        LoadingView()
+            .preferredColorScheme(.light)
+    }
+
+    #Preview("Dark Mode") {
+        LoadingView()
+            .preferredColorScheme(.dark)
+    }
+
+#endif

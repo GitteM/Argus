@@ -42,40 +42,44 @@ public struct DashboardContentView: View {
     }
 }
 
-#Preview("Light Mode") { @MainActor in
-    let router = Router()
-    let store = DeviceStore.preview
+#if DEBUG
 
-    DashboardContentView()
-        .environment(router)
-        .environment(store)
-        .preferredColorScheme(.light)
-        .task {
-            store.loadDashboardData()
-        }
-}
+    #Preview("Light Mode") { @MainActor in
+        let router = Router()
+        let store = DeviceStore.preview
 
-#Preview("Dark Mode") { @MainActor in
-    let router = Router()
-    let store = DeviceStore.preview
+        DashboardContentView()
+            .environment(router)
+            .environment(store)
+            .preferredColorScheme(.light)
+            .task {
+                store.loadDashboardData()
+            }
+    }
 
-    DashboardContentView()
-        .environment(router)
-        .environment(store)
-        .preferredColorScheme(.dark)
-        .task {
-            store.loadDashboardData()
-        }
-}
+    #Preview("Dark Mode") { @MainActor in
+        let router = Router()
+        let store = DeviceStore.preview
 
-#Preview("Empty") { @MainActor in
-    let router = Router()
-    let store = DeviceStore.emptyPreview
-    DashboardContentView()
-        .environment(router)
-        .environment(store)
-        .preferredColorScheme(.light)
-        .task {
-            store.loadDashboardData()
-        }
-}
+        DashboardContentView()
+            .environment(router)
+            .environment(store)
+            .preferredColorScheme(.dark)
+            .task {
+                store.loadDashboardData()
+            }
+    }
+
+    #Preview("Empty") { @MainActor in
+        let router = Router()
+        let store = DeviceStore.emptyPreview
+        DashboardContentView()
+            .environment(router)
+            .environment(store)
+            .preferredColorScheme(.light)
+            .task {
+                store.loadDashboardData()
+            }
+    }
+
+#endif
