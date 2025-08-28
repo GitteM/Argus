@@ -99,10 +99,17 @@ public final class DeviceStore: DeviceStoreProtocol {
                 // Start real-time subscriptions to get live updates
                 self.startRealtimeUpdates()
 
-                // Always set to loaded - empty discovered devices is valid
-                // state
-                viewState = .loaded
-                logger.log("Dashboard data loaded", level: .info)
+                // Set view state based on whether we have any devices
+                if managed.isEmpty, discovered.isEmpty {
+                    viewState = .empty
+                    logger.log(
+                        "Dashboard data loaded - no devices loaded yet",
+                        level: .info
+                    )
+                } else {
+                    viewState = .loaded
+                    logger.log("Dashboard data loaded", level: .info)
+                }
 
             } catch {
                 guard let dashboardTask else { return }
@@ -292,6 +299,16 @@ public final class DeviceStore: DeviceStoreProtocol {
                         )
                     }
                     discoveredDevices = filteredDevices
+
+                    // Update view state if we went from empty to having devices
+                    if viewState == .empty,
+                       !devices.isEmpty || !discoveredDevices.isEmpty {
+                        viewState = .loaded
+                        logger.log(
+                            "View state changed from empty to loaded",
+                            level: .info
+                        )
+                    }
                 }
             } catch {
                 guard !Task.isCancelled else { return }

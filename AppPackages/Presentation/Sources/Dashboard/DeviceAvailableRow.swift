@@ -4,9 +4,10 @@ import Stores
 import SwiftUI
 
 struct DeviceAvailableRow: View {
-    let device: DiscoveredDevice
-    @State private var isLoading = false
     @Environment(DeviceStore.self) private var deviceStore
+    @State private var isLoading = false
+
+    let device: DiscoveredDevice
 
     var body: some View {
         HStack(spacing: Spacing.s4) {
@@ -40,17 +41,18 @@ struct DeviceAvailableRow: View {
     }
 }
 
-// FIXME:
-// #Preview("Light Mode") {
-//    List {
-//        DeviceAvailableRow(device: .mockAdded1)
-//            .preferredColorScheme(.light)
-//    }
-// }
-//
-// #Preview("Dark Mode") {
-//    List {
-//        DeviceAvailableRow(device: .mockAdded1)
-//            .preferredColorScheme(.dark)
-//    }
-// }
+#Preview("Light Mode") { @MainActor in
+    List {
+        DeviceAvailableRow(device: .mockNew1)
+            .environment(DeviceStore.preview)
+            .preferredColorScheme(.light)
+    }
+}
+
+#Preview("Dark Mode") { @MainActor in
+    List {
+        DeviceAvailableRow(device: .mockNew2)
+            .environment(DeviceStore.preview)
+            .preferredColorScheme(.dark)
+    }
+}

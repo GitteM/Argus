@@ -1,5 +1,6 @@
 import Entities
 import Infrastructure
+import Navigation
 import SharedUI
 import Stores
 import SwiftUI
@@ -34,4 +35,48 @@ public struct DashboardView: View {
             )
         }
     }
+}
+
+#Preview("Loaded State") { @MainActor in
+    let store = DeviceStore.preview
+    let router = Router()
+
+    DashboardView()
+        .environment(store)
+        .environment(router)
+        .task {
+            store.loadDashboardData()
+        }
+}
+
+#Preview("Loading State") { @MainActor in
+    let store = DeviceStore.loadingPreview
+    let router = Router()
+    DashboardView()
+        .environment(store)
+        .environment(router)
+}
+
+#Preview("Empty State") { @MainActor in
+    let store = DeviceStore.emptyPreview
+    let router = Router()
+
+    DashboardView()
+        .environment(store)
+        .environment(router)
+        .task {
+            store.loadDashboardData()
+        }
+}
+
+#Preview("Error State") { @MainActor in
+    let store = DeviceStore.errorPreview
+    let router = Router()
+
+    DashboardView()
+        .environment(store)
+        .environment(router)
+        .task {
+            store.loadDashboardData()
+        }
 }

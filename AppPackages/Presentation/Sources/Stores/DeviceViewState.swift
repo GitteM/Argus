@@ -1,4 +1,4 @@
-public enum DeviceViewState {
+public enum DeviceViewState: Equatable {
     case loading
     case loaded
     case error(String)

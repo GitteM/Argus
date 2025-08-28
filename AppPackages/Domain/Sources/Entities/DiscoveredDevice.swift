@@ -42,30 +42,30 @@ public struct DiscoveredDevice: Codable, Sendable {
 
 public extension DiscoveredDevice {
     static let mockNew1 = DiscoveredDevice(
-        id: "living_room_light",
-        name: "Living Room Light",
+        id: "bedroom_light_discovered",
+        name: "Bedroom Light",
         type: .smartLight,
         manufacturer: "Smart lights",
-        model: "XYZ123",
+        model: "XYZ456",
         supportsBrightness: true,
         discoveredAt: Date(),
         isAlreadyAdded: false,
-        commandTopic: "home/light/living_room_light/set",
-        stateTopic: "home/light/living_room_light/state"
+        commandTopic: "home/light/bedroom_light/set",
+        stateTopic: "home/light/bedroom_light/state"
     )
 
     static let mockNew2 = DiscoveredDevice(
-        id: "kitchen_temp_sensor",
-        name: "Kitchen Temperature Sensor",
+        id: "bathroom_temp_discovered",
+        name: "Bathroom Temperature",
         type: .temperatureSensor,
         manufacturer: "Smart sensors",
-        model: "YZA456",
+        model: "YZA789",
         unitOfMeasurement: "C",
         supportsBrightness: false,
         discoveredAt: Date().addingTimeInterval(-120),
-        isAlreadyAdded: true,
-        commandTopic: "home/light/kitchen_temp_sensor/set",
-        stateTopic: "home/light/kitchen_temp_sensor/state"
+        isAlreadyAdded: false,
+        commandTopic: "home/sensor/bathroom_temp/set",
+        stateTopic: "home/sensor/bathroom_temp/state"
     )
 
     static var mockDefaults: [DiscoveredDevice] {

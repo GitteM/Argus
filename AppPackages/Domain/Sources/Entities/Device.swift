@@ -72,7 +72,7 @@ public extension Device {
     static let mockLight = Device(
         id: "living_room_light",
         name: "Living Room Light",
-        type: .temperatureSensor,
+        type: .smartLight,
         manufacturer: "Smart lights",
         model: "XYZ123",
         unitOfMeasurement: nil,

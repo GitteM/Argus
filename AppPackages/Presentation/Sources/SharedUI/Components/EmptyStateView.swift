@@ -1,6 +1,6 @@
 import SwiftUI
 
-// TODO: Incomplete
+// FIXME: Incomplete
 public struct EmptyStateView: View {
     let message: String
     let icon: String
