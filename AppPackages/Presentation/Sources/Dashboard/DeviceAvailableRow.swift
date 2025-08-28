@@ -38,6 +38,9 @@ struct DeviceAvailableRow: View {
             }
             deviceStore.subscribeToDevice(device)
         }
+        .onDisappear {
+            isLoading = false
+        }
     }
 }
 
