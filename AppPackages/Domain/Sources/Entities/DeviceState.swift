@@ -27,65 +27,6 @@ public struct DeviceState: Sendable, Codable {
     }
 }
 
-public struct TemperatureSensor: Sendable, Codable {
-    public let temperature: Double
-    public let date: Date
-    public let battery: Int
-
-    public init(
-        temperature: Double,
-        date: Date,
-        battery: Int
-    ) {
-        self.temperature = temperature
-        self.date = date
-        self.battery = battery
-    }
-
-    enum CodingKeys: String, CodingKey {
-        case temperature, battery
-        case date = "timestamp"
-    }
-}
-
-public struct LightState: Sendable, Codable {
-    public let state: Bool
-    public let brightness: Int?
-    public let date: Date
-
-    public init(
-        state: Bool,
-        brightness: Int?,
-        date: Date
-    ) {
-        self.state = state
-        self.brightness = brightness
-        self.date = date
-    }
-
-    enum CodingKeys: String, CodingKey {
-        case state, brightness
-        case date = "timestamp"
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-
-        if let stateString = try? container
-            .decode(String.self, forKey: .state) {
-            state = stateString.lowercased() == "on"
-        } else {
-            state = try container.decode(Bool.self, forKey: .state)
-        }
-
-        brightness = try container.decodeIfPresent(
-            Int.self,
-            forKey: .brightness
-        )
-        date = try container.decode(Date.self, forKey: .date)
-    }
-}
-
 // MARK: Mock Data
 
 public extension DeviceState {
@@ -107,33 +48,5 @@ public extension DeviceState {
         payload: nil,
         temperatureSensor: nil,
         lightState: .mockOnWithBrightness
-    )
-}
-
-public extension LightState {
-    static let mockOnWithBrightness = LightState(
-        state: true,
-        brightness: 75,
-        date: Date()
-    )
-
-    static let mockOff = LightState(
-        state: false,
-        brightness: 0,
-        date: Date()
-    )
-}
-
-public extension TemperatureSensor {
-    static let mockTemperature: TemperatureSensor = .init(
-        temperature: 22.5,
-        date: Date(),
-        battery: 100
-    )
-
-    static let mockLowBattery: TemperatureSensor = .init(
-        temperature: 22.5,
-        date: Date(),
-        battery: 15
     )
 }
