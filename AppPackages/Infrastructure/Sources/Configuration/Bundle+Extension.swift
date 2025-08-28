@@ -5,12 +5,10 @@ public extension Bundle {
         Bundle.main.infoDictionary?["MQTT_HOST"] as? String ?? "localhost"
 
     static let mqttPort: UInt16 = {
-        guard let portString =
-            Bundle.main.infoDictionary?["MQTT_PORT"] as? String,
-            let port = UInt16(portString)
-        else {
-            return 1883 // Default MQTT port
+        if let portString = Bundle.main.infoDictionary?["MQTT_PORT"] as? String,
+           let port = UInt16(portString) {
+            return port
         }
-        return port
+        return 1883
     }()
 }

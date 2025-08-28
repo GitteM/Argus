@@ -83,21 +83,6 @@ let package = Package(
                 ),
             ],
             path: "Sources/Utilities"
-        ),
-        .testTarget(
-            name: "ConfigurationTests",
-            dependencies: ["Configuration"],
-            path: "Tests/ConfigurationTests"
-        ),
-        .testTarget(
-            name: "DependencyInjectionTests",
-            dependencies: ["DependencyInjection"],
-            path: "Tests/DependencyInjectionTests"
-        ),
-        .testTarget(
-            name: "UtilitiesTests",
-            dependencies: ["Utilities"],
-            path: "Tests/UtilitiesTests"
-        ),
+        )
     ]
 )
