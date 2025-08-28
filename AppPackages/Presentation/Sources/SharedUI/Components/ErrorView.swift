@@ -1,6 +1,5 @@
 import SwiftUI
 
-// FIXME: Example replace localization, images, spacing etc
 public struct ErrorView: View {
     let message: String
     let retryAction: (() -> Void)?
@@ -11,9 +10,9 @@ public struct ErrorView: View {
     }
 
     public var body: some View {
-        VStack(spacing: 20) {
-            Image(systemName: "exclamationmark.triangle")
-                .font(.system(size: 50))
+        VStack(spacing: Spacing.m2) {
+            Image(systemName: Icons.warning)
+                .font(.system(size: Spacing.l4))
                 .foregroundColor(.orange)
 
             Text(Strings.somethingWentWrong)

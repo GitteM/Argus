@@ -29,7 +29,14 @@ struct ContentView: View {
                 .navigationBarTitleDisplayMode(.inline)
             #endif
                 .toolbar {
-                    ConnectionStatusIndicator(status: connectionStatus)
+                    ConnectionStatusIndicator(
+                        status: connectionStatus,
+                        onTapWhenDisconnected: {
+                            Task {
+                                try await connectionManager.connect()
+                            }
+                        }
+                    )
                 }
         }
     }
