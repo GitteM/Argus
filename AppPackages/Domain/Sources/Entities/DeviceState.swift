@@ -88,6 +88,28 @@ public struct LightState: Sendable, Codable {
 
 // MARK: Mock Data
 
+public extension DeviceState {
+    static let mockTemperature = DeviceState(
+        deviceId: "12345",
+        deviceType: .temperatureSensor,
+        isOnline: true,
+        lastUpdate: Date(),
+        payload: nil,
+        temperatureSensor: .mockTemperature,
+        lightState: nil
+    )
+
+    static let mockLight = DeviceState(
+        deviceId: "6789",
+        deviceType: .smartLight,
+        isOnline: true,
+        lastUpdate: Date(),
+        payload: nil,
+        temperatureSensor: nil,
+        lightState: .mockOnWithBrightness
+    )
+}
+
 public extension LightState {
     static let mockOnWithBrightness = LightState(
         state: true,

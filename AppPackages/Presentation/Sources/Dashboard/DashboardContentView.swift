@@ -9,24 +9,15 @@ public struct DashboardContentView: View {
     @Environment(Router.self) private var router
     @Environment(DeviceStore.self) private var deviceStore
 
-    let subscribedDevices: [Device]
-    let availableDevices: [DiscoveredDevice]
-
-    public init(
-        subscribedDevices: [Device],
-        availableDevices: [DiscoveredDevice]
-    ) {
-        self.subscribedDevices = subscribedDevices
-        self.availableDevices = availableDevices
-    }
+    public init() {}
 
     public var body: some View {
         List {
             Section {
-                if subscribedDevices.isEmpty {
+                if deviceStore.devices.isEmpty {
                     WarningRow(message: Strings.subscribeToDeviceWarning)
                 } else {
-                    ForEach(subscribedDevices, id: \.id) { device in
+                    ForEach(deviceStore.devices, id: \.id) { device in
                         DeviceSubscribedRow(device: device)
                             .onRowTap {
                                 deviceStore.selectDevice(device)
@@ -38,9 +29,9 @@ public struct DashboardContentView: View {
                 Text(Strings.subscribed)
             }
 
-            if !availableDevices.isEmpty {
+            if !deviceStore.discoveredDevices.isEmpty {
                 Section {
-                    ForEach(availableDevices, id: \.id) { device in
+                    ForEach(deviceStore.discoveredDevices, id: \.id) { device in
                         DeviceAvailableRow(device: device)
                     }
                 } header: {
@@ -51,33 +42,40 @@ public struct DashboardContentView: View {
     }
 }
 
-// FIXME: need to configure environment
-//
-// #Preview("Light Mode") { @MainActor in
-//    let router = Router()
-//
-//    DashboardContentView(
-//        subscribedDevices: [.mockConnected],
-//        availableDevices: DiscoveredDevice.mockDefaults
-//    )
-//    .environment(router)
-//    .preferredColorScheme(.light)
-// }
-//
-// #Preview("Dark Mode") {
-//    DashboardContentView(
-//        subscribedDevices: Device.mockDefaults,
-//        availableDevices: DiscoveredDevice.mockDefaults
-//    )
-//    .environment(Router())
-//    .preferredColorScheme(.dark)
-// }
-//
-// #Preview("Empty") {
-//    DashboardContentView(
-//        subscribedDevices: [],
-//        availableDevices: []
-//    )
-//    .environment(Router())
-//    .preferredColorScheme(.light)
-// }
+#Preview("Light Mode") { @MainActor in
+    let router = Router()
+    let store = DeviceStore.preview
+
+    DashboardContentView()
+        .environment(router)
+        .environment(store)
+        .preferredColorScheme(.light)
+        .task {
+            store.loadDashboardData()
+        }
+}
+
+#Preview("Dark Mode") { @MainActor in
+    let router = Router()
+    let store = DeviceStore.preview
+
+    DashboardContentView()
+        .environment(router)
+        .environment(store)
+        .preferredColorScheme(.dark)
+        .task {
+            store.loadDashboardData()
+        }
+}
+
+#Preview("Empty") { @MainActor in
+    let router = Router()
+    let store = DeviceStore.emptyPreview
+    DashboardContentView()
+        .environment(router)
+        .environment(store)
+        .preferredColorScheme(.light)
+        .task {
+            store.loadDashboardData()
+        }
+}

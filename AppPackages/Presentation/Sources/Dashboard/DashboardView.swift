@@ -19,10 +19,7 @@ public struct DashboardView: View {
                 }
 
         case .loaded:
-            DashboardContentView(
-                subscribedDevices: deviceStore.devices,
-                availableDevices: deviceStore.discoveredDevices
-            )
+            DashboardContentView()
 
         case .empty:
             EmptyStateView(
