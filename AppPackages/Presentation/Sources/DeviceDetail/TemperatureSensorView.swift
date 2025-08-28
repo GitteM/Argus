@@ -1,4 +1,5 @@
 import Entities
+import SharedUI
 import SwiftUI
 
 struct TemperatureSensorView: View {
@@ -6,14 +7,14 @@ struct TemperatureSensorView: View {
     let temperatureSensor: TemperatureSensor?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 32) {
-            Text("Temperature Sensor")
+        VStack(alignment: .leading, spacing: Spacing.l2) {
+            Text(Strings.temperatureSensor)
                 .font(.headline)
 
             if let temperatureSensor {
-                VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: Spacing.s3) {
                     HStack {
-                        Text("Temperature:")
+                        Text("\(Strings.temperature):")
                         Text(
                             "\(temperatureSensor.temperature, specifier: "%.1f")"
                         )
@@ -24,20 +25,20 @@ struct TemperatureSensorView: View {
                     }
 
                     HStack {
-                        Text("Battery:")
+                        Text("\(Strings.battery):")
                         Text("\(temperatureSensor.battery)%")
-                            .foregroundColor(batteryColor(for: temperatureSensor
-                                    .battery
-                            ))
+                            .foregroundColor(temperatureSensor.batteryColor)
                             .fontWeight(.semibold)
                     }
 
-                    Text("Last Reading: \(temperatureSensor.date.formatted())")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                    Text(
+                        "\(Strings.lastReading): \(temperatureSensor.date.abbreviatedDateTime)"
+                    )
+                    .font(.caption)
+                    .foregroundColor(.secondary)
                 }
             } else {
-                Text("No temperature data available")
+                Text(Strings.noTemperatureDataAvailable)
                     .foregroundColor(.secondary)
             }
 
@@ -50,9 +51,11 @@ struct TemperatureSensorView: View {
             alignment: .topLeading
         )
     }
+}
 
-    private func batteryColor(for batteryLevel: Int) -> Color {
-        switch batteryLevel {
+private extension TemperatureSensor {
+    var batteryColor: Color {
+        switch battery {
         case 0 ... 20:
             .red
         case 21 ... 50:

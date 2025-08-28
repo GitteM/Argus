@@ -6,11 +6,6 @@ struct SmartLightView: View {
     let device: Device
     let lightState: LightState?
 
-    private var formattedLastUpdated: String {
-        guard let lightState else { return "" }
-        return lightState.date.formatted(date: .abbreviated, time: .shortened)
-    }
-
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.l2) {
             Text(Strings.lightControls)
@@ -34,7 +29,7 @@ struct SmartLightView: View {
                     }
 
                     Text(
-                        "\(Strings.lastUpdated): \(formattedLastUpdated)"
+                        "\(Strings.lastUpdated): \(lightState.date.abbreviatedDateTime)"
                     )
                     .font(.caption)
                     .foregroundColor(.secondary)

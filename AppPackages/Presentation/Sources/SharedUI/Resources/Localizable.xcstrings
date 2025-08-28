@@ -7,6 +7,9 @@
     "Back" : {
 
     },
+    "Battery" : {
+      "extractionState" : "manual"
+    },
     "Brightness" : {
       "extractionState" : "manual"
     },
@@ -20,6 +23,9 @@
       "extractionState" : "manual"
     },
     "Devices" : {
+      "extractionState" : "manual"
+    },
+    "Last Reading" : {
       "extractionState" : "manual"
     },
     "Last Updated" : {
@@ -50,6 +56,9 @@
       "extractionState" : "manual"
     },
     "No light state data available" : {
+      "extractionState" : "manual"
+    },
+    "No temperature data available" : {
       "extractionState" : "manual"
     },
     "Off" : {
@@ -85,6 +94,12 @@
       }
     },
     "Subscribed" : {
+      "extractionState" : "manual"
+    },
+    "Temperature" : {
+      "extractionState" : "manual"
+    },
+    "Temperature Sensor" : {
       "extractionState" : "manual"
     },
     "Type" : {
