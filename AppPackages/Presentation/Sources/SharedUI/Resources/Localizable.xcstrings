@@ -22,6 +22,9 @@
     "MQTT Connection Failed" : {
 
     },
+    "No data available" : {
+      "extractionState" : "manual"
+    },
     "No devices currently avalailable" : {
       "extractionState" : "manual"
     },

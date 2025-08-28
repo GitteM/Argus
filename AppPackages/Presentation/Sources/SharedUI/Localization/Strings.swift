@@ -10,6 +10,8 @@ public enum Strings {
     public static let mqtt = String(localized: "MQTT")
     public static let mqttConnectionFailed =
         String(localized: "MQTT Connection Failed")
+    public static let noDataAvailable =
+        String(localized: "No data available")
     public static let noDevicesAvailable =
         String(localized: "No devices currently avalailable")
     public static let retry = String(localized: "Retry")

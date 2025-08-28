@@ -24,8 +24,8 @@ public struct DashboardView: View {
 
         case .empty:
             EmptyStateView(
-                message: "No data available",
-                icon: "questionmark.circle"
+                message: Strings.noDataAvailable,
+                icon: Icons.noData
             )
 
         case let .error(error):
