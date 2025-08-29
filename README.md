@@ -1,7 +1,7 @@
 # Argus: MQTT Integration Demo iOS App
 
 <p align="center">
-  <img src="Argus/Assets.xcassets/AppIcon.appiconset/Icon-App-1024x1024.png" alt="Argus App Icon" width="120" height="120">
+  <img src="Argus/Argus/Assets.xcassets/AppIcon.appiconset/appIcon.png" alt="Argus App Icon" width="120" height="120">
 </p>
 
 A modern iOS application demonstrating MQTT integration with Clean Architecture and a modular design with Swift Package Manager.
