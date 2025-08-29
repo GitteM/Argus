@@ -110,9 +110,7 @@ Open the file Argus/Argus.xcworkspace (not the .xcodeproj).
 3. **Build and run**
 
 **Initial Setup**
-- Create a Scheme: If one doesn't exist, you may need to create one.
 - Select Target: Choose the "Argus" Scheme and your desired simulator.
-- Add Test Plan: Edit the newly created Scheme to add the existing TestPlan.
 
 **Build the Project**
 - First Build: The initial build will take a long time (~250 seconds or over 4 minutes). This is normal for a first build.
