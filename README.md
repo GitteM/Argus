@@ -4,7 +4,6 @@ A modern iOS application demonstrating MQTT integration with Clean Architecture 
 
 ![Swift](https://img.shields.io/badge/Swift-6.1-orange.svg)
 ![iOS](https://img.shields.io/badge/iOS-17.0%2B-blue.svg)
-![Architecture](https://img.shields.io/badge/Architecture-Clean%20+%20MVVM-green.svg)
 ![SPM](https://img.shields.io/badge/SPM-Modular-red.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
@@ -117,8 +116,8 @@ Open the file Argus/Argus.xcworkspace (not the .xcodeproj).
 - Subsequent Builds: Future builds will be much faster (~5 seconds).
 
 **Run & Test**
-To run the app: Press Cmd+R 
-To run the tests: Press Cmd+U
+- To run the app: Press Cmd+R 
+- To run the tests: Press Cmd+U
 
 ## UI/UX Design
 
@@ -173,7 +172,7 @@ Occasional missed updates during connection state transitions
 
 
 ## License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License.
 
 ## Author
 **Brigitte Michau**
