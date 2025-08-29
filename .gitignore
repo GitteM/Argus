@@ -22,3 +22,6 @@ playground.xcworkspace
 Packages/
 Package.resolved
 *.xcodeproj/
+
+# macOS system files
+.DS_Store
