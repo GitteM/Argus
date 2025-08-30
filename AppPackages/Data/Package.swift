@@ -24,11 +24,7 @@ let package = Package(
         .library(
             name: "Repositories",
             targets: ["Repositories"]
-        ),
-        .library(
-            name: "DataUtilities",
-            targets: ["DataUtilities"]
-        ),
+        )
     ],
     dependencies: [
         .package(path: "../Domain"),

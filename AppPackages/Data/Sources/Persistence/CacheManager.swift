@@ -1,3 +1,4 @@
+import DataUtilities
 import Entities
 import Foundation
 import ServiceProtocols
@@ -53,9 +54,11 @@ public final class CacheManager: CacheManagerProtocol, Sendable {
             if let memoryItem = memoryCache
                 .object(forKey: NSString(string: key)) {
                 if !memoryItem.isExpired {
-                    return try? JSONDecoder().decode(
+                    return JSONDecoder().decode(
                         T.self,
-                        from: memoryItem.data
+                        from: memoryItem.data,
+                        logger: logger,
+                        context: "get Cached value"
                     )
                 } else {
                     memoryCache.removeObject(forKey: NSString(string: key))
@@ -164,10 +167,14 @@ public final class CacheManager: CacheManagerProtocol, Sendable {
 
         do {
             let data = try Data(contentsOf: fileURL)
-            let diskItem = try JSONDecoder().decode(
+            guard let diskItem = JSONDecoder().decode(
                 DiskCacheItem.self,
-                from: data
-            )
+                from: data,
+                logger: logger,
+                context: "from load from disk"
+            ) else {
+                return nil
+            }
 
             if let expirationDate = diskItem.expirationDate,
                Date() > expirationDate {
@@ -175,7 +182,12 @@ public final class CacheManager: CacheManagerProtocol, Sendable {
                 return nil
             }
 
-            return try JSONDecoder().decode(T.self, from: diskItem.data)
+            return JSONDecoder().decode(
+                T.self,
+                from: diskItem.data,
+                logger: logger,
+                context: "from load from disk not expired"
+            )
         } catch {
             return nil
         }
@@ -191,10 +203,14 @@ public final class CacheManager: CacheManagerProtocol, Sendable {
 
             do {
                 let data = try Data(contentsOf: fileURL)
-                let diskItem = try JSONDecoder().decode(
+                guard let diskItem = JSONDecoder().decode(
                     DiskCacheItem.self,
-                    from: data
-                )
+                    from: data,
+                    logger: logger,
+                    context: "from load cached items back into memory on startup"
+                ) else {
+                    continue
+                }
 
                 // Check if not expired
                 if let expirationDate = diskItem.expirationDate,
