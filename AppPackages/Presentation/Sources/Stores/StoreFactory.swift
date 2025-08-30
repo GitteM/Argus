@@ -1,12 +1,11 @@
 import ServiceProtocols
-import Stores
 import UseCases
 
-protocol StoreFactory {
+public protocol StoreFactory {
     @MainActor func makeDeviceStore() -> DeviceStore
 }
 
-final class DefaultStoreFactory: StoreFactory {
+public final class DefaultStoreFactory: StoreFactory {
     private let getManagedDevicesUseCase: GetManagedDevicesUseCase
     private let getDiscoveredDevicesUseCase: GetDiscoveredDevicesUseCase
     private let subscribeToStatesUseCase: SubscribeToDeviceStatesUseCase
@@ -16,7 +15,7 @@ final class DefaultStoreFactory: StoreFactory {
     private let sendDeviceCommandUseCase: SendDeviceCommandUseCase
     private let logger: LoggerProtocol
 
-    init(
+    public init(
         getManagedDevicesUseCase: GetManagedDevicesUseCase,
         getDiscoveredDevicesUseCase: GetDiscoveredDevicesUseCase,
         subscribeToStatesUseCase: SubscribeToDeviceStatesUseCase,
@@ -37,7 +36,7 @@ final class DefaultStoreFactory: StoreFactory {
         self.logger = logger
     }
 
-    @MainActor func makeDeviceStore() -> DeviceStore {
+    @MainActor public func makeDeviceStore() -> DeviceStore {
         DeviceStore(
             getManagedDevicesUseCase: getManagedDevicesUseCase,
             getDiscoveredDevicesUseCase: getDiscoveredDevicesUseCase,
