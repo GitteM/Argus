@@ -34,7 +34,8 @@ public final class DefaultDataSourceFactory: DataSourceFactory {
         -> DeviceDiscoveryDataSourceProtocol {
         DeviceDiscoveryDataSource(
             subscriptionManager: makeMQTTSubscriptionManager(),
-            clientId: clientId
+            clientId: clientId,
+            logger: logger
         )
     }
 
