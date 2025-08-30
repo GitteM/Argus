@@ -18,10 +18,6 @@ let package = Package(
             targets: ["DataSource"]
         ),
         .library(
-            name: "Network",
-            targets: ["Network"]
-        ),
-        .library(
             name: "Persistence",
             targets: ["Persistence"]
         ),
@@ -46,7 +42,6 @@ let package = Package(
             name: "Core",
             dependencies: [
                 "Repositories",
-                "Network",
                 "Persistence",
                 "DataSource",
             ],
@@ -62,13 +57,6 @@ let package = Package(
             path: "Sources/DataSource"
         ),
         .target(
-            name: "Network",
-            dependencies: [
-                .product(name: "Domain", package: "Domain"),
-            ],
-            path: "Sources/Network"
-        ),
-        .target(
             name: "Persistence",
             dependencies: [
                 .product(name: "Domain", package: "Domain"),
@@ -79,7 +67,6 @@ let package = Package(
             name: "Repositories",
             dependencies: [
                 .product(name: "Domain", package: "Domain"),
-                "Network",
                 "Persistence",
                 "DataSource",
             ],
@@ -98,11 +85,6 @@ let package = Package(
                 "DataSource",
                 .product(name: "Domain", package: "Domain"),
             ]
-        ),
-        .testTarget(
-            name: "NetworkTests",
-            dependencies: ["Network"],
-            path: "Tests/NetworkTests"
         ),
         .testTarget(
             name: "PersistenceTests",
