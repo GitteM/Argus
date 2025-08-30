@@ -403,17 +403,3 @@ extension MQTTConnectionManager: CocoaMQTT5Delegate {
         logger.log("MQTT Pong received", level: .debug)
     }
 }
-
-// TODO: Localize
-public extension MQTTError {
-    var localizedDescription: String {
-        switch self {
-        case .connectionFailed:
-            "Failed to connect to MQTT broker"
-        case .notConnected:
-            "MQTT client is not connected"
-        case .publishFailed:
-            "Failed to publish MQTT message"
-        }
-    }
-}
