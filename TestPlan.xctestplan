@@ -14,6 +14,13 @@
   "testTargets" : [
     {
       "target" : {
+        "containerPath" : "container:AppPackages\/Domain",
+        "identifier" : "UseCasesTests",
+        "name" : "UseCasesTests"
+      }
+    },
+    {
+      "target" : {
         "containerPath" : "container:AppPackages\/Presentation",
         "identifier" : "StoresTests",
         "name" : "StoresTests"

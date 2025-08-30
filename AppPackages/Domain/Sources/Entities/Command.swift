@@ -1,9 +1,9 @@
 import Foundation
 
 public struct Command: Codable, Sendable {
-    let type: CommandType
-    let payload: Data
-    let targetDevice: String
+    public let type: CommandType
+    public let payload: Data
+    public let targetDevice: String
 
     public init(
         type: CommandType,

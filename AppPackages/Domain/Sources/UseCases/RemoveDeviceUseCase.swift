@@ -30,7 +30,9 @@ public final class RemoveDeviceUseCase: @unchecked Sendable {
     }
 }
 
-public enum RemoveDeviceError: Error, LocalizedError {
+#warning("@brigitte Improve App Error")
+
+public enum RemoveDeviceError: Error, LocalizedError, Equatable {
     case deviceNotFound(String)
 
     public var errorDescription: String? {

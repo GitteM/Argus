@@ -67,6 +67,16 @@ let package = Package(
                 "ServiceProtocols",
             ],
             path: "Sources/UseCases"
+        ),
+        .testTarget(
+            name: "UseCasesTests",
+            dependencies: [
+                "UseCases",
+                "Entities",
+                "RepositoryProtocols",
+                "ServiceProtocols",
+            ],
+            path: "Tests/UseCasesTests"
         )
     ]
 )
