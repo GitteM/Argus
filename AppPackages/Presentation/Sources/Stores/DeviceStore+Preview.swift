@@ -7,17 +7,6 @@ import UseCases
 
 // MARK: - Mock Repositories for Preview
 
-private enum MockError: Error, LocalizedError {
-    case connectionFailed
-
-    var errorDescription: String? {
-        switch self {
-        case .connectionFailed:
-            "Failed to connect to MQTT broker"
-        }
-    }
-}
-
 private final class MockDeviceConnectionRepository: DeviceConnectionRepositoryProtocol {
     private let devices: [Device]
     private let shouldThrowError: Bool
@@ -65,7 +54,8 @@ private final class MockDeviceConnectionRepository: DeviceConnectionRepositoryPr
         try? await Task.sleep(for: .milliseconds(500))
 
         if shouldThrowError {
-            throw MockError.connectionFailed
+            throw AppError
+                .mqttConnectionFailed("Failed to connect to MQTT broker")
         }
         return devices
     }
