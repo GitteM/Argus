@@ -94,9 +94,9 @@ Argus/
 
 ### Prerequisites
 
-- Xcode 16.0+
+- Xcode 16.4+
 - iOS 17.0+ deployment target
-- Swift 6.0+
+- Swift 6.1+
 
 ### Installation
 
