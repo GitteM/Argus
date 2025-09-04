@@ -32,7 +32,7 @@ public struct DeviceConnectionRepository: DeviceConnectionRepositoryProtocol {
         var managedDevices = try await getManagedDevices()
         managedDevices.append(device)
 
-        switch cacheManager.set(
+        switch await cacheManager.set(
             managedDevices,
             key: "managed_devices",
             ttl: nil
@@ -50,7 +50,7 @@ public struct DeviceConnectionRepository: DeviceConnectionRepositoryProtocol {
         let managedDevices = try await getManagedDevices()
         let filteredDevices = managedDevices.filter { $0.id != deviceId }
 
-        switch cacheManager.set(
+        switch await cacheManager.set(
             filteredDevices,
             key: "managed_devices",
             ttl: nil

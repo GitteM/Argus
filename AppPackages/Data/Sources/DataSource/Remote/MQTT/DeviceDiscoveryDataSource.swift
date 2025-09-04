@@ -28,7 +28,11 @@ public actor DeviceDiscoveryDataSource: DeviceDiscoveryDataSourceProtocol {
     public func subscribeToDeviceDiscovery()
         -> AsyncStream<[DiscoveredDevice]> {
         AsyncStream { continuation in
-            Task {
+            Task { [weak self] in
+                guard let self else {
+                    continuation.finish()
+                    return
+                }
                 do {
                     // Ensure connection is established before subscribing
                     try await subscriptionManager.connect()
@@ -46,18 +50,18 @@ public actor DeviceDiscoveryDataSource: DeviceDiscoveryDataSourceProtocol {
                                 topic: message.topic,
                                 payload: message.payload
                             )
-                            Task {
+                            Task { [weak self] in
+                                guard let self else { return }
                                 do {
-                                    if let discoveredDevice = try self
-                                        .parseHomeAssistantConfigMessage(
+                                    if let discoveredDevice =
+                                        try parseHomeAssistantConfigMessage(
                                             messageCopy
                                         ) {
-                                        await self
-                                            .addDiscoveredDevice(
-                                                discoveredDevice
-                                            )
-                                        let devices = await self
-                                            .getDiscoveredDevices()
+                                        await addDiscoveredDevice(
+                                            discoveredDevice
+                                        )
+                                        let devices =
+                                            await getDiscoveredDevices()
                                         continuation.yield(devices)
                                     }
                                 } catch {
@@ -69,9 +73,10 @@ public actor DeviceDiscoveryDataSource: DeviceDiscoveryDataSourceProtocol {
                                 }
                             }
                         }
+
                 } catch {
                     // Handle connection or subscription setup errors
-                    let appError = self.wrapDiscoveryError(error)
+                    let appError = wrapDiscoveryError(error)
                     let errorDesc = appError.errorDescription ?? "Unknown error"
                     logger.log(
                         "Device discovery subscription error: \(errorDesc)",

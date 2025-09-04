@@ -32,7 +32,11 @@ public enum AppError: Error, LocalizedError {
 
     // MARK: - System Errors
 
-    case fileSystemError(operation: String, path: String? = nil)
+    case fileSystemError(
+        operation: String,
+        path: String? = nil,
+        underlyingError: Error? = nil
+    )
     case configurationError(component: String, reason: String)
     case serviceUnavailable(service: String)
     case timeout(operation: String, duration: TimeInterval? = nil)
@@ -110,11 +114,16 @@ public extension AppError {
             return "No devices were discovered"
 
         // MARK: System Errors
-        case let .fileSystemError(operation, path):
-            if let path {
-                return "File system error during '\(operation)' at path '\(path)'"
+        case let .fileSystemError(operation, path, error):
+            let baseMessage = "File system error during '\(operation)'"
+            guard let path else {
+                if let errorDescription = error?.localizedDescription {
+                    return "\(baseMessage): \(errorDescription)"
+                }
+                return baseMessage
             }
-            return "File system error during '\(operation)'"
+            let errorDescription = error?.localizedDescription ?? "unknown error"
+            return "\(baseMessage) at path '\(path)': \(errorDescription)"
         case let .configurationError(component, reason):
             return "Configuration error for '\(component)': \(reason)"
         case let .serviceUnavailable(service):

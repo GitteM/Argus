@@ -61,19 +61,28 @@ open class MQTTConnectionManager: MQTTConnectionManagerProtocol,
 
         return try await withCheckedThrowingContinuation { continuation in
             self.connectionContinuation = continuation
+            var connectionError: Error?
+
+            defer {
+                if connectionError != nil {
+                    self.mqtt = nil
+                    self.connectionContinuation = nil
+                }
+            }
 
             guard self.mqtt?.connect() == true else {
+                connectionError = AppError.mqttConnectionFailed(
+                    "Connection failed for broker \(broker):\(port)"
+                )
                 Task {
                     await MainActor.run {
                         self.connectionStatus = .disconnected
                     }
                 }
                 continuation.resume(
-                    throwing: AppError.mqttConnectionFailed(
-                        "Connection failed for broker \(broker):\(port)"
-                    )
+                    throwing: connectionError
+                        ?? AppError.unknown(underlying: nil)
                 )
-                self.connectionContinuation = nil
                 return
             }
         }

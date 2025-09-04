@@ -5,7 +5,11 @@ import ServiceProtocols
 
 public protocol CacheManagerProtocol: Sendable {
     func get<T: Codable>(key: String) -> Result<T?, AppError>
-    func set(_ value: some Codable & Sendable, key: String, ttl: TimeInterval?)
+    func set(
+        _ value: some Codable & Sendable,
+        key: String,
+        ttl: TimeInterval?
+    ) async
         -> Result<Void, AppError>
     func remove(key: String)
     func clear() -> Result<Void, AppError>
@@ -42,7 +46,8 @@ public final class CacheManager: CacheManagerProtocol, Sendable {
         } catch {
             throw AppError.fileSystemError(
                 operation: "create",
-                path: cacheDirectory.path
+                path: cacheDirectory.path,
+                underlyingError: error
             )
         }
 
@@ -89,7 +94,7 @@ public final class CacheManager: CacheManagerProtocol, Sendable {
         _ value: some Codable & Sendable,
         key: String,
         ttl: TimeInterval? = nil
-    ) -> Result<Void, AppError> {
+    ) async -> Result<Void, AppError> {
         cacheQueue.sync(flags: .barrier) { [weak self] in
             guard let self else {
                 return .failure(AppError.unknown(underlying: nil))
@@ -148,10 +153,13 @@ public final class CacheManager: CacheManagerProtocol, Sendable {
                 try fileManager.clearCacheFiles(in: cacheDirectory)
                 return .success(())
             } catch {
-                return .failure(AppError.fileSystemError(
-                    operation: "clear",
-                    path: cacheDirectory.path
-                ))
+                return .failure(
+                    AppError.fileSystemError(
+                        operation: "clear",
+                        path: cacheDirectory.path,
+                        underlyingError: error
+                    )
+                )
             }
         }
     }
@@ -189,7 +197,8 @@ public final class CacheManager: CacheManagerProtocol, Sendable {
         } catch {
             let appError = error as? AppError ?? AppError.fileSystemError(
                 operation: "save",
-                path: fileURL.path
+                path: fileURL.path,
+                underlyingError: error
             )
             logCacheError(appError, context: "disk cache save", key: key)
         }
@@ -207,7 +216,8 @@ public final class CacheManager: CacheManagerProtocol, Sendable {
         } catch {
             let appError = error as? AppError ?? AppError.fileSystemError(
                 operation: "save",
-                path: fileURL.path
+                path: fileURL.path,
+                underlyingError: error
             )
             return .failure(appError)
         }
@@ -263,7 +273,8 @@ public final class CacheManager: CacheManagerProtocol, Sendable {
             } else {
                 return .failure(AppError.fileSystemError(
                     operation: "read",
-                    path: fileURL.path
+                    path: fileURL.path,
+                    underlyingError: error
                 ))
             }
         }
@@ -346,20 +357,21 @@ public final class CacheManager: CacheManagerProtocol, Sendable {
     /// Build technical details string from AppError for cache operations
     private func buildCacheTechnicalDetails(for error: AppError) -> String {
         switch error {
-        case let .fileSystemError(operation, path):
-            "operation=\(operation), path=\(path ?? "unknown")"
+        case let .fileSystemError(operation, path, underlyingError):
+            let localizedError = underlyingError?.localizedDescription ?? "unknown"
+            return "operation=\(operation), path=\(path ?? "unknown"), error=\(localizedError)"
 
         case let .serializationError(type, details):
-            "type=\(type), details=\(details ?? "unknown")"
+            return "type=\(type), details=\(details ?? "unknown")"
 
         case let .deserializationError(type, details):
-            "type=\(type), details=\(details ?? "unknown")"
+            return "type=\(type), details=\(details ?? "unknown")"
 
         case let .cacheError(key, operation):
-            "cache_key=\(key), operation=\(operation)"
+            return "cache_key=\(key), operation=\(operation)"
 
         default:
-            ""
+            return ""
         }
     }
 }

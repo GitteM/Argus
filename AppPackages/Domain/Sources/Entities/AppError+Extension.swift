@@ -137,10 +137,13 @@ private extension AppError {
     static func compareSystemErrors(_ lhs: AppError, _ rhs: AppError) -> Bool {
         switch (lhs, rhs) {
         case let (
-            .fileSystemError(lhsOp, lhsPath),
-            .fileSystemError(rhsOp, rhsPath)
+            .fileSystemError(lhsOp, lhsPath, lhsError),
+            .fileSystemError(rhsOp, rhsPath, rhsError)
         ):
-            lhsOp == rhsOp && lhsPath == rhsPath
+            lhsOp == rhsOp && lhsPath == rhsPath && compareOptionalErrors(
+                lhsError,
+                rhsError
+            )
         case let (
             .configurationError(lhsComponent, lhsReason),
             .configurationError(rhsComponent, rhsReason)
@@ -161,14 +164,18 @@ private extension AppError {
     static func compareUnknownErrors(_ lhs: AppError, _ rhs: AppError) -> Bool {
         switch (lhs, rhs) {
         case let (.unknown(lhsUnderlying), .unknown(rhsUnderlying)):
-            switch (lhsUnderlying, rhsUnderlying) {
-            case (nil, nil):
-                true
-            case let (lhsError?, rhsError?):
-                String(describing: lhsError) == String(describing: rhsError)
-            default:
-                false
-            }
+            compareOptionalErrors(lhsUnderlying, rhsUnderlying)
+        default:
+            false
+        }
+    }
+
+    static func compareOptionalErrors(_ lhs: Error?, _ rhs: Error?) -> Bool {
+        switch (lhs, rhs) {
+        case (nil, nil):
+            true
+        case let (lhsError?, rhsError?):
+            String(describing: lhsError) == String(describing: rhsError)
         default:
             false
         }
