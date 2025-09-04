@@ -25,7 +25,7 @@ This directory contains GitHub Actions workflows for the Argus project.
 ## Requirements
 
 - **Runner**: macOS (latest)
-- **Xcode**: 16.0 (automatically selected)
+- **Xcode**: 16.4 (automatically selected)
 - **iOS Simulator**: iPhone 16 with latest iOS
 
 ## Test Configuration
