@@ -23,7 +23,7 @@ jobs:
       run: sudo xcode-select -s /Applications/Xcode_16.0.app/Contents/Developer
     
     - name: Show Xcode version
-      run: xcode-build -version
+      run: xcodebuild -version
     
     - name: Cache Swift Package Manager
       uses: actions/cache@v4
