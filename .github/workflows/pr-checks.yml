@@ -46,7 +46,7 @@ jobs:
           xcodebuild \
             -project Argus.xcodeproj \
             -scheme Argus \
-            -destination 'platform=iOS Simulator,OS=latest' \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
             -configuration Debug \
             build-for-testing \
             | xcpretty --color --simple
@@ -57,7 +57,7 @@ jobs:
           xcodebuild \
             -project Argus.xcodeproj \
             -scheme Argus \
-            -destination 'platform=iOS Simulator,OS=latest' \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
             -configuration Debug \
             test-without-building \
             -skip-testing:ArgusUITests \
