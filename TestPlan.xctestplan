@@ -14,6 +14,13 @@
   "testTargets" : [
     {
       "target" : {
+        "containerPath" : "container:AppPackages\/Data",
+        "identifier" : "PersistenceTests",
+        "name" : "PersistenceTests"
+      }
+    },
+    {
+      "target" : {
         "containerPath" : "container:AppPackages\/Domain",
         "identifier" : "UseCasesTests",
         "name" : "UseCasesTests"
@@ -24,6 +31,13 @@
         "containerPath" : "container:AppPackages\/Presentation",
         "identifier" : "StoresTests",
         "name" : "StoresTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Argus.xcodeproj",
+        "identifier" : "EC78E3A62E4F694900262F13",
+        "name" : "ArgusTests"
       }
     }
   ],

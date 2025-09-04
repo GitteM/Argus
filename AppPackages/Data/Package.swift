@@ -56,6 +56,7 @@ let package = Package(
             name: "Persistence",
             dependencies: [
                 .product(name: "Domain", package: "Domain"),
+                "DataUtilities",
             ],
             path: "Sources/Persistence"
         ),
@@ -84,7 +85,11 @@ let package = Package(
         ),
         .testTarget(
             name: "PersistenceTests",
-            dependencies: ["Persistence"],
+            dependencies: [
+                "Persistence",
+                "DataUtilities",
+                .product(name: "Domain", package: "Domain"),
+            ],
             path: "Tests/PersistenceTests"
         ),
         .testTarget(
