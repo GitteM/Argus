@@ -30,7 +30,8 @@ public struct DashboardView: View {
 
         case let .error(error):
             ErrorView(
-                message: error,
+                message: error
+                    .errorDescription ?? "An unexpected error occurred",
                 retryAction: { deviceStore.loadDashboardData() }
             )
         }

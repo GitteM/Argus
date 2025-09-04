@@ -114,8 +114,8 @@ struct RemoveDeviceUseCaseTests {
         )
 
         // When/Then
-        await #expect(throws: RemoveDeviceError
-            .deviceNotFound(nonExistentDeviceId)
+        await #expect(throws: AppError
+            .deviceNotFound(deviceId: nonExistentDeviceId)
         ) {
             try await sut.execute(deviceId: nonExistentDeviceId)
         }
@@ -138,7 +138,7 @@ struct RemoveDeviceUseCaseTests {
         )
 
         // When/Then
-        await #expect(throws: RemoveDeviceError.deviceNotFound(deviceId)) {
+        await #expect(throws: AppError.deviceNotFound(deviceId: deviceId)) {
             try await sut.execute(deviceId: deviceId)
         }
     }

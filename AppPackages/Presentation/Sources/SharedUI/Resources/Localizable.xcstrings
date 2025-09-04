@@ -1,6 +1,12 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "App Error" : {
+
+    },
+    "Argus" : {
+
+    },
     "Available / Not Subscribed" : {
       "extractionState" : "manual"
     },
@@ -14,6 +20,9 @@
       "extractionState" : "manual"
     },
     "Cancel" : {
+
+    },
+    "Connection Lost" : {
 
     },
     "Device Detail" : {
@@ -73,7 +82,13 @@
     "Please select a device to view its details." : {
 
     },
+    "Reconnect" : {
+
+    },
     "Retry" : {
+
+    },
+    "Setting up your device connections" : {
 
     },
     "Something went wrong" : {
@@ -95,6 +110,9 @@
     },
     "Subscribed" : {
       "extractionState" : "manual"
+    },
+    "Suggestion" : {
+
     },
     "Temperature" : {
       "extractionState" : "manual"

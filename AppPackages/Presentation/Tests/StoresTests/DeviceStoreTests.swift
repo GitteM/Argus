@@ -63,9 +63,10 @@ struct DeviceStoreTests {
         // Wait for async operation
         try await Task.sleep(for: .milliseconds(100))
 
-        if case let .error(message) = store.viewState {
+        if case let .error(appError) = store.viewState {
             // The error message should contain our mock error description
-            #expect(message.contains("Mock error occurred during testing"))
+            let errorMessage = appError.errorDescription ?? ""
+            #expect(errorMessage.contains("Mock error occurred during testing"))
         } else {
             Issue.record("Expected error state, but got: \(store.viewState)")
         }

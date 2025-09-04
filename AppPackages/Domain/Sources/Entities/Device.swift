@@ -1,6 +1,6 @@
 import Foundation
 
-public struct Device: Codable, Sendable {
+public struct Device: Codable, Sendable, Equatable {
     public let id: String
     public let name: String
     public let type: DeviceType

@@ -72,3 +72,21 @@ public extension DiscoveredDevice {
         [.mockNew1, .mockNew2]
     }
 }
+
+public extension DiscoveredDevice {
+    init(device: Device) {
+        self.init(
+            id: device.id,
+            name: device.name,
+            type: device.type,
+            manufacturer: device.manufacturer,
+            model: device.model,
+            unitOfMeasurement: device.unitOfMeasurement,
+            supportsBrightness: device.supportsBrightness,
+            discoveredAt: Date(),
+            isAlreadyAdded: false,
+            commandTopic: device.commandTopic,
+            stateTopic: device.stateTopic
+        )
+    }
+}

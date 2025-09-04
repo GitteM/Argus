@@ -4,16 +4,16 @@ import Foundation
 import ServiceProtocols
 
 public protocol CacheManagerProtocol: Sendable {
-    func get<T: Codable>(key: String) -> T?
-    func set(_ value: some Codable & Sendable, key: String, ttl: TimeInterval?)
+    func get<T: Codable>(key: String) -> Result<T?, AppError>
+    func set(
+        _ value: some Codable & Sendable,
+        key: String,
+        ttl: TimeInterval?
+    ) async
+        -> Result<Void, AppError>
     func remove(key: String)
-    func clear()
+    func clear() -> Result<Void, AppError>
     func exists(key: String) -> Bool
-}
-
-public enum CacheError: Error {
-    case cachesDirectoryNotFound
-    case cacheCreationFailed
 }
 
 public final class CacheManager: CacheManagerProtocol, Sendable {
@@ -28,16 +28,29 @@ public final class CacheManager: CacheManagerProtocol, Sendable {
 
     public init(
         logger: LoggerProtocol
-    ) {
+    ) throws {
         self.logger = logger
         guard let cachesDirectory = fileManager.urls(
             for: .cachesDirectory,
             in: .userDomainMask
         ).first else {
-            fatalError("Unable to locate caches directory")
+            throw AppError.fileSystemError(
+                operation: "locate",
+                path: "caches directory"
+            )
         }
         cacheDirectory = cachesDirectory.appendingPathComponent("AppCache")
-        try? fileManager.createCacheDirectory(at: cacheDirectory)
+
+        do {
+            try fileManager.createCacheDirectory(at: cacheDirectory)
+        } catch {
+            throw AppError.fileSystemError(
+                operation: "create",
+                path: cacheDirectory.path,
+                underlyingError: error
+            )
+        }
+
         setupCache()
     }
 
@@ -48,18 +61,25 @@ public final class CacheManager: CacheManagerProtocol, Sendable {
         loadCriticalItemsFromDisk()
     }
 
-    public func get<T: Codable>(key: String) -> T? {
+    public func get<T: Codable>(key: String) -> Result<T?, AppError> {
         cacheQueue.sync {
             // Try memory cache first
             if let memoryItem = memoryCache
                 .object(forKey: NSString(string: key)) {
                 if !memoryItem.isExpired {
-                    return JSONDecoder().decode(
+                    if let decoded: T = JSONDecoder().decode(
                         T.self,
                         from: memoryItem.data,
                         logger: logger,
                         context: "get Cached value"
-                    )
+                    ) {
+                        return .success(decoded)
+                    } else {
+                        return .failure(AppError.deserializationError(
+                            type: String(describing: T.self),
+                            details: "Failed to decode cached value"
+                        ))
+                    }
                 } else {
                     memoryCache.removeObject(forKey: NSString(string: key))
                 }
@@ -74,9 +94,11 @@ public final class CacheManager: CacheManagerProtocol, Sendable {
         _ value: some Codable & Sendable,
         key: String,
         ttl: TimeInterval? = nil
-    ) {
-        cacheQueue.async(flags: .barrier) { [weak self] in
-            guard let self else { return }
+    ) async -> Result<Void, AppError> {
+        cacheQueue.sync(flags: .barrier) { [weak self] in
+            guard let self else {
+                return .failure(AppError.unknown(underlying: nil))
+            }
 
             do {
                 let data = try JSONEncoder().encode(value)
@@ -93,11 +115,16 @@ public final class CacheManager: CacheManagerProtocol, Sendable {
 
                 // Store on disk for persistence (for important items)
                 if shouldPersistToDisk(key: key) {
-                    saveToDisk(key: key, item: cacheItem)
+                    return saveToDiskWithResult(key: key, item: cacheItem)
                 }
 
+                return .success(())
+
             } catch {
-                print("Cache encode error for key '\(key)': \(error)")
+                return .failure(AppError.serializationError(
+                    type: "cache_item",
+                    details: error.localizedDescription
+                ))
             }
         }
     }
@@ -113,16 +140,26 @@ public final class CacheManager: CacheManagerProtocol, Sendable {
         }
     }
 
-    public func clear() {
-        cacheQueue.async(flags: .barrier) { [weak self] in
-            guard let self else { return }
+    public func clear() -> Result<Void, AppError> {
+        cacheQueue.sync(flags: .barrier) { [weak self] in
+            guard let self else {
+                return .failure(AppError.unknown(underlying: nil))
+            }
+
             memoryCache.removeAllObjects()
 
             // Also clear disk cache
             do {
                 try fileManager.clearCacheFiles(in: cacheDirectory)
+                return .success(())
             } catch {
-                print("Failed to clear disk cache: \(error)")
+                return .failure(
+                    AppError.fileSystemError(
+                        operation: "clear",
+                        path: cacheDirectory.path,
+                        underlyingError: error
+                    )
+                )
             }
         }
     }
@@ -158,11 +195,35 @@ public final class CacheManager: CacheManagerProtocol, Sendable {
             let cacheData = try JSONEncoder().encode(DiskCacheItem(from: item))
             try cacheData.write(to: fileURL)
         } catch {
-            print("Failed to save cache item to disk: \(error)")
+            let appError = error as? AppError ?? AppError.fileSystemError(
+                operation: "save",
+                path: fileURL.path,
+                underlyingError: error
+            )
+            logCacheError(appError, context: "disk cache save", key: key)
         }
     }
 
-    private func loadFromDisk<T: Codable>(key: String) -> T? {
+    private func saveToDiskWithResult(
+        key: String,
+        item: CacheItem
+    ) -> Result<Void, AppError> {
+        let fileURL = cacheDirectory.appendingPathComponent("\(key).cache")
+        do {
+            let cacheData = try JSONEncoder().encode(DiskCacheItem(from: item))
+            try cacheData.write(to: fileURL)
+            return .success(())
+        } catch {
+            let appError = error as? AppError ?? AppError.fileSystemError(
+                operation: "save",
+                path: fileURL.path,
+                underlyingError: error
+            )
+            return .failure(appError)
+        }
+    }
+
+    private func loadFromDisk<T: Codable>(key: String) -> Result<T?, AppError> {
         let fileURL = cacheDirectory.appendingPathComponent("\(key).cache")
 
         do {
@@ -173,23 +234,49 @@ public final class CacheManager: CacheManagerProtocol, Sendable {
                 logger: logger,
                 context: "from load from disk"
             ) else {
-                return nil
+                return .failure(AppError.deserializationError(
+                    type: "DiskCacheItem",
+                    details: "Failed to decode disk cache item"
+                ))
             }
 
             if let expirationDate = diskItem.expirationDate,
                Date() > expirationDate {
                 fileManager.removeItemSafely(at: fileURL)
-                return nil
+                return .success(nil)
             }
 
-            return JSONDecoder().decode(
+            if let decoded: T = JSONDecoder().decode(
                 T.self,
                 from: diskItem.data,
                 logger: logger,
                 context: "from load from disk not expired"
-            )
+            ) {
+                return .success(decoded)
+            } else {
+                return .failure(AppError.deserializationError(
+                    type: String(describing: T.self),
+                    details: "Failed to decode cached value from disk"
+                ))
+            }
         } catch {
-            return nil
+            if error is DecodingError {
+                return .failure(AppError.deserializationError(
+                    type: String(describing: T.self),
+                    details: error.localizedDescription
+                ))
+            } else if let nsError = error as NSError?,
+                      nsError.domain == NSCocoaErrorDomain,
+                      nsError.code == NSFileReadNoSuchFileError {
+                // File doesn't exist - this is normal for cache misses
+                return .success(nil)
+            } else {
+                return .failure(AppError.fileSystemError(
+                    operation: "read",
+                    path: fileURL.path,
+                    underlyingError: error
+                ))
+            }
         }
     }
 
@@ -230,6 +317,61 @@ public final class CacheManager: CacheManagerProtocol, Sendable {
                 // Ignore errors and continue with next key
                 continue
             }
+        }
+    }
+
+    // MARK: - Error Logging
+
+    /// Centralized cache error logging using AppError structured information
+    private func logCacheError(
+        _ error: AppError,
+        context: String,
+        key: String? = nil
+    ) {
+        let keyContext = key.map { " (key: \($0))" } ?? ""
+        let baseMessage =
+            """
+                [CACHE \(context.uppercased())]:
+                \(error.errorDescription ?? "Unknown error")
+                \(keyContext)
+            """
+
+        // Add technical details based on error type
+        let technicalDetails = buildCacheTechnicalDetails(for: error)
+        let fullMessage = technicalDetails.isEmpty
+            ? baseMessage
+
+            : "\(baseMessage) - \(technicalDetails)"
+
+        logger.log(fullMessage, level: .error)
+
+        // Log recovery suggestion if available
+        if let recoverySuggestion = error.recoverySuggestion {
+            logger.log(
+                "💡 Recovery suggestion: \(recoverySuggestion)",
+                level: .info
+            )
+        }
+    }
+
+    /// Build technical details string from AppError for cache operations
+    private func buildCacheTechnicalDetails(for error: AppError) -> String {
+        switch error {
+        case let .fileSystemError(operation, path, underlyingError):
+            let localizedError = underlyingError?.localizedDescription ?? "unknown"
+            return "operation=\(operation), path=\(path ?? "unknown"), error=\(localizedError)"
+
+        case let .serializationError(type, details):
+            return "type=\(type), details=\(details ?? "unknown")"
+
+        case let .deserializationError(type, details):
+            return "type=\(type), details=\(details ?? "unknown")"
+
+        case let .cacheError(key, operation):
+            return "cache_key=\(key), operation=\(operation)"
+
+        default:
+            return ""
         }
     }
 }

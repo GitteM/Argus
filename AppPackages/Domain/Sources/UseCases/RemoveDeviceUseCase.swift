@@ -17,28 +17,18 @@ public final class RemoveDeviceUseCase: @unchecked Sendable {
 
     public func execute(deviceId: String) async throws {
         // Get device details before removing (to access stateTopic)
-        let devices = try await deviceConnectionRepository.getManagedDevices()
-        guard let device = devices.first(where: { $0.id == deviceId }) else {
-            throw RemoveDeviceError.deviceNotFound(deviceId)
+        let devices = try await deviceConnectionRepository
+            .getManagedDevices()
+        guard let device = devices.first(where: { $0.id == deviceId })
+        else {
+            throw AppError.deviceNotFound(deviceId: deviceId)
         }
 
         // Unsubscribe from MQTT topic
         mqttConnectionManager.unsubscribe(from: device.stateTopic)
 
         // Remove device from persistence
-        try await deviceConnectionRepository.removeDevice(deviceId: deviceId)
-    }
-}
-
-#warning("@brigitte Improve App Error")
-
-public enum RemoveDeviceError: Error, LocalizedError, Equatable {
-    case deviceNotFound(String)
-
-    public var errorDescription: String? {
-        switch self {
-        case let .deviceNotFound(deviceId):
-            "Device with ID '\(deviceId)' not found"
-        }
+        try await deviceConnectionRepository
+            .removeDevice(deviceId: deviceId)
     }
 }

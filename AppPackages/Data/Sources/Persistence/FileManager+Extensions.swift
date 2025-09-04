@@ -10,12 +10,22 @@ extension FileManager {
     }
 
     func clearCacheFiles(in directory: URL) throws {
+        guard fileExists(atPath: directory.path) else {
+            // Directory doesn't exist - nothing to clear, consider this success
+            return
+        }
+
         let cacheFiles = try contentsOfDirectory(
             at: directory,
             includingPropertiesForKeys: nil
         )
         for fileURL in cacheFiles where fileURL.pathExtension == "cache" {
-            try removeItem(at: fileURL)
+            do {
+                try removeItem(at: fileURL)
+            } catch CocoaError.fileNoSuchFile {
+                // File was already deleted, ignore this error
+                continue
+            }
         }
     }
 

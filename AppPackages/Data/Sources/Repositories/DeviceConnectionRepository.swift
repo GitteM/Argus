@@ -31,7 +31,17 @@ public struct DeviceConnectionRepository: DeviceConnectionRepositoryProtocol {
 
         var managedDevices = try await getManagedDevices()
         managedDevices.append(device)
-        cacheManager.set(managedDevices, key: "managed_devices", ttl: nil)
+
+        switch await cacheManager.set(
+            managedDevices,
+            key: "managed_devices",
+            ttl: nil
+        ) {
+        case .success:
+            break
+        case let .failure(error):
+            throw error
+        }
 
         return device
     }
@@ -39,13 +49,28 @@ public struct DeviceConnectionRepository: DeviceConnectionRepositoryProtocol {
     public func removeDevice(deviceId: String) async throws {
         let managedDevices = try await getManagedDevices()
         let filteredDevices = managedDevices.filter { $0.id != deviceId }
-        cacheManager.set(filteredDevices, key: "managed_devices", ttl: nil)
+
+        switch await cacheManager.set(
+            filteredDevices,
+            key: "managed_devices",
+            ttl: nil
+        ) {
+        case .success:
+            break
+        case let .failure(error):
+            throw error
+        }
     }
 
     public func getManagedDevices() async throws -> [Device] {
-        if let cached: [Device] = cacheManager.get(key: "managed_devices") {
-            return cached
+        switch cacheManager.get(key: "managed_devices") as Result<
+            [Device]?,
+            AppError
+        > {
+        case let .success(cached):
+            return cached ?? []
+        case let .failure(error):
+            throw error
         }
-        return []
     }
 }

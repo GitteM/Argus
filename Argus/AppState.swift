@@ -1,12 +1,13 @@
 import Entities
 
-public enum DeviceViewState: Equatable {
+public enum AppState: Equatable {
+    case initializing
     case loading
-    case loaded
+    case ready
     case error(AppError)
-    case empty
+    case disconnected
 
-    /// Convenience computed property to get user-friendly error message
+    // Convenience computed properties
     public var errorMessage: String? {
         switch self {
         case let .error(appError):
@@ -16,13 +17,21 @@ public enum DeviceViewState: Equatable {
         }
     }
 
-    /// Convenience computed property to get recovery suggestion
     public var recoverySuggestion: String? {
         switch self {
         case let .error(appError):
             appError.recoverySuggestion
         default:
             nil
+        }
+    }
+
+    public var canNavigate: Bool {
+        switch self {
+        case .ready:
+            true
+        default:
+            false
         }
     }
 }

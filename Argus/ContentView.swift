@@ -2,64 +2,72 @@ import DataSource
 import Entities
 import Infrastructure
 import Navigation
+import OSLog
 import Presentation
+import ServiceProtocols
 import SharedUI
 import Stores
 import SwiftUI
 
 struct ContentView: View {
-    @Environment(MQTTConnectionManager.self) private var connectionManager
-    @Environment(Router.self) private var router
-    @Environment(DeviceStore.self) private var deviceStore
-
-    private var connectionStatus: MQTTConnectionStatus {
-        connectionManager.connectionStatus
-    }
+    @Environment(AppContainer.self) private var appContainer
 
     var body: some View {
-        @Bindable var router = router
-        NavigationStack(path: $router.routes) {
-            DashboardView()
-                .navigationDestination(for: Route.self) { route in
-                    route.destination(router: router)
+        switch appContainer.appState {
+        case .initializing, .loading:
+            AppLoadingView()
+
+        case .ready:
+            MainNavigationView()
+                .environment(appContainer.connectionManager)
+                .environment(appContainer.router)
+                .environment(appContainer.deviceStore)
+
+        case .disconnected:
+            DisconnectedView {
+                Task {
+                    do {
+                        try await appContainer.connectionManager.connect()
+                    } catch {
+                        #if DEBUG
+                            // Connection failure will be handled by the status
+                            // observer
+                            print(
+                                "ContentView: Reconnect attempt failed \(error)"
+                            )
+                        #endif
+                    }
                 }
-                .mqttConnectionHandler()
-                .navigationTitle(Strings.devices)
-            #if os(iOS)
-                .navigationBarTitleDisplayMode(.inline)
-            #endif
-                .toolbar {
-                    ConnectionStatusIndicator(
-                        status: connectionStatus,
-                        onTapWhenDisconnected: {
-                            Task {
-                                try await connectionManager.connect()
-                            }
-                        }
-                    )
-                }
+            }
+
+        case let .error(appError):
+            AppErrorView(
+                error: appError,
+                retryAction: { appContainer.retry() }
+            )
         }
     }
 }
 
 #if DEBUG
-
-    #Preview("Light Mode") { @MainActor in
-        let appContainer = AppContainer()
+    #Preview("Loading State") { @MainActor in
         ContentView()
-            .environment(appContainer.connectionManager)
-            .environment(appContainer.deviceStore)
-            .environment(appContainer.router)
-            .preferredColorScheme(.light)
+            .environment(AppContainer.loadingPreview)
     }
 
-    #Preview("Dark Mode") { @MainActor in
-        let appContainer = AppContainer()
+    #Preview("Ready State") { @MainActor in
         ContentView()
-            .environment(appContainer.connectionManager)
-            .environment(appContainer.deviceStore)
-            .environment(appContainer.router)
-            .preferredColorScheme(.dark)
+            .environment(AppContainer.preview)
+    }
+
+    #Preview("Disconnected State") { @MainActor in
+        ContentView()
+            .environment(AppContainer.disconnectedPreview)
+    }
+
+    #Preview("Error with Recovery Suggestion") { @MainActor in
+        ContentView()
+            .environment(AppContainer.errorWithRecoveryPreview)
     }
 
 #endif

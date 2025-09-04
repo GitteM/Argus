@@ -12,39 +12,83 @@ public actor DeviceDiscoveryDataSource: DeviceDiscoveryDataSourceProtocol {
     private let subscriptionManager: MQTTSubscriptionManagerProtocol
     private var discoveredDevicesCache: [DiscoveredDevice] = []
     private let clientId: String
+    private let logger: LoggerProtocol
 
     public init(
         subscriptionManager: MQTTSubscriptionManagerProtocol,
-        clientId: String
+        clientId: String,
+        logger: LoggerProtocol
     ) {
         self.subscriptionManager = subscriptionManager
         self.clientId = clientId
+        self.logger = logger
     }
 
     @available(macOS 10.15, iOS 13, *)
     public func subscribeToDeviceDiscovery()
         -> AsyncStream<[DiscoveredDevice]> {
         AsyncStream { continuation in
-            // Primary: Subscribe to Home Assistant MQTT Discovery config topics
-            // Pattern: homeassistant/{component}/{node_id}/config
-            let discoveryTopic = "homeassistant/+/+/config"
-            subscriptionManager
-                .subscribe(to: discoveryTopic) { [weak self] message in
-                    guard let self else { return }
-
-                    let messageCopy = MQTTMessage(
-                        topic: message.topic,
-                        payload: message.payload
-                    )
-                    Task {
-                        if let discoveredDevice = self
-                            .parseHomeAssistantConfigMessage(messageCopy) {
-                            await self.addDiscoveredDevice(discoveredDevice)
-                            let devices = await self.getDiscoveredDevices()
-                            continuation.yield(devices)
-                        }
-                    }
+            Task { [weak self] in
+                guard let self else {
+                    continuation.finish()
+                    return
                 }
+                do {
+                    // Ensure connection is established before subscribing
+                    try await subscriptionManager.connect()
+
+                    // Primary: Subscribe to Home Assistant MQTT Discovery config topics
+                    // Pattern: homeassistant/{component}/{node_id}/config
+                    let discoveryTopic = "homeassistant/+/+/config"
+
+                    // Wrap subscription in error handling
+                    subscriptionManager
+                        .subscribe(to: discoveryTopic) { [weak self] message in
+                            guard let self else { return }
+
+                            let messageCopy = MQTTMessage(
+                                topic: message.topic,
+                                payload: message.payload
+                            )
+                            Task { [weak self] in
+                                guard let self else { return }
+                                do {
+                                    if let discoveredDevice =
+                                        try parseHomeAssistantConfigMessage(
+                                            messageCopy
+                                        ) {
+                                        await addDiscoveredDevice(
+                                            discoveredDevice
+                                        )
+                                        let devices =
+                                            await getDiscoveredDevices()
+                                        continuation.yield(devices)
+                                    }
+                                } catch {
+                                    let errorDesc = error.localizedDescription
+                                    logger.log(
+                                        "Device discovery parsing error: \(errorDesc)",
+                                        level: .error
+                                    )
+                                }
+                            }
+                        }
+
+                } catch {
+                    // Handle connection or subscription setup errors
+                    let appError = wrapDiscoveryError(error)
+                    let errorDesc = appError.errorDescription ?? "Unknown error"
+                    logger.log(
+                        "Device discovery subscription error: \(errorDesc)",
+                        level: .error
+                    )
+                    // Note: AsyncStream doesn't support throwing during
+                    // creation
+                    // The stream will simply not yield any values if setup
+                    // fails
+                    continuation.finish()
+                }
+            }
         }
     }
 
@@ -79,17 +123,42 @@ public actor DeviceDiscoveryDataSource: DeviceDiscoveryDataSourceProtocol {
 
     private nonisolated func parseHomeAssistantConfigMessage(
         _ message: MQTTMessage
-    ) -> DiscoveredDevice? {
+    ) throws -> DiscoveredDevice? {
         // Parse Home Assistant MQTT Discovery config message
         // Topic format: homeassistant/{component}/{node_id}/config
         let topicComponents = message.topic.components(separatedBy: "/")
-        guard topicComponents.count >= 4,
-              topicComponents[0] == "homeassistant",
-              let data = message.payload.data(using: .utf8),
-              let json = try? JSONSerialization
-              .jsonObject(with: data) as? [String: Any]
-        else {
-            return nil
+
+        // Validate topic format
+        guard topicComponents.count >= 4 else {
+            let count = topicComponents.count
+            throw AppError.validationError(
+                field: "topic",
+                reason: "Invalid topic format: expected at least 4 components, got \(count)"
+            )
+        }
+
+        guard topicComponents[0] == "homeassistant" else {
+            let invalid = topicComponents[0]
+            throw AppError.validationError(
+                field: "topic",
+                reason: "Invalid topic prefix: expected 'homeassistant', got '\(invalid)'"
+            )
+        }
+
+        // Parse JSON payload
+        guard let data = message.payload.data(using: .utf8) else {
+            throw AppError.deserializationError(
+                type: "MQTTMessage",
+                details: "Failed to convert payload to UTF-8 data"
+            )
+        }
+
+        guard let json = try? JSONSerialization
+            .jsonObject(with: data) as? [String: Any] else {
+            throw AppError.deserializationError(
+                type: "JSON",
+                details: "Failed to parse MQTT payload as JSON object"
+            )
         }
 
         let component = topicComponents[1] // light, sensor, etc.
@@ -142,6 +211,31 @@ public actor DeviceDiscoveryDataSource: DeviceDiscoveryDataSourceProtocol {
             .temperatureSensor // Default sensor type, could be refined further
         default:
             .unknown
+        }
+    }
+
+    /// Wraps errors that occur during device discovery with appropriate
+    /// AppError types
+    private nonisolated func wrapDiscoveryError(_ error: Error) -> AppError {
+        // If it's already an AppError, return as-is
+        if let appError = error as? AppError {
+            return appError
+        }
+
+        // Handle common error patterns
+        let errorDescription = error.localizedDescription.lowercased()
+
+        if errorDescription.contains("connection") || errorDescription
+            .contains("network") {
+            return .mqttConnectionFailed(
+                "Device discovery connection failed: \(error.localizedDescription)"
+            )
+        } else if errorDescription.contains("timeout") {
+            return .discoveryTimeout
+        } else if errorDescription.contains("subscription") {
+            return .mqttSubscriptionFailed(topic: "homeassistant/+/+/config")
+        } else {
+            return .discoveryFailed(reason: error.localizedDescription)
         }
     }
 }

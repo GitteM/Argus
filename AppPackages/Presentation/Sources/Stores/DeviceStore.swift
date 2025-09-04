@@ -7,24 +7,6 @@ import ServiceProtocols
 import UseCases
 
 @MainActor
-public protocol DeviceStoreProtocol: Observable {
-    var viewState: DeviceViewState { get }
-    var devices: [Device] { get }
-    var discoveredDevices: [DiscoveredDevice] { get }
-    var deviceStates: [String: DeviceState] { get }
-
-    var selectedDevice: Device? { get }
-    var selectedDeviceState: DeviceState? { get }
-
-    func loadDashboardData()
-    func subscribeToDevice(_ device: DiscoveredDevice)
-    func unsubscribeFromDevice(withId deviceId: String)
-    func sendCommand(to deviceId: String, command: Command)
-    func selectDevice(_ device: Device)
-    func clearSelection()
-}
-
-@MainActor
 @Observable
 public final class DeviceStore: DeviceStoreProtocol {
     public private(set) var viewState: DeviceViewState
@@ -114,13 +96,28 @@ public final class DeviceStore: DeviceStoreProtocol {
             } catch {
                 guard let dashboardTask else { return }
                 if !dashboardTask.isCancelled {
-                    viewState = .error(error.localizedDescription)
+                    handleUnknownError(
+                        error,
+                        fallbackAppError: AppError.unknown(underlying: error),
+                        context: "dashboard loading"
+                    )
                 }
             }
         }
     }
 
     public func startRealtimeUpdates() {
+        // If we're in empty state, reload data when starting realtime updates
+        // This handles reconnection scenarios where we lost data
+        if viewState == .empty {
+            logger.log(
+                "Reloading dashboard data due to empty state during realtime updates start",
+                level: .info
+            )
+            loadDashboardData()
+            return
+        }
+
         startDeviceStateSubscription()
         startDiscoverySubscription()
     }
@@ -139,17 +136,23 @@ public final class DeviceStore: DeviceStoreProtocol {
             do {
                 let device = try await addDeviceUseCase
                     .execute(discoveredDevice: discoveredDevice)
-                devices.append(device)
-                discoveredDevices.removeAll { $0.id == discoveredDevice.id }
+                convertAvailableDeviceToDevice(
+                    discoveredDevice,
+                    device: device
+                )
 
                 // Restart state subscription to include new device
                 restartDeviceStateSubscription()
 
                 logger.log("Subscribed to device: \(device.name)", level: .info)
             } catch {
-                viewState = .error("Failed to subscribe to device")
-                let message = "Failed to subscribe to device: \(error.localizedDescription)"
-                logger.log(message, level: .error)
+                handleUnknownError(
+                    error,
+                    fallbackAppError: AppError
+                        .deviceConnectionFailed(deviceId: discoveredDevice.id),
+                    context: "device subscription",
+                    entityName: discoveredDevice.name
+                )
             }
         }
     }
@@ -157,28 +160,18 @@ public final class DeviceStore: DeviceStoreProtocol {
     public func unsubscribeFromDevice(withId deviceId: String) {
         Task { @MainActor in
             do {
-                guard let device = devices.first(where: { $0.id == deviceId })
-                else { return }
+                guard let device = findDevice(withId: deviceId)
+                else {
+                    handleError(
+                        AppError.deviceNotFound(deviceId: deviceId),
+                        context: "device removal"
+                    )
+                    return
+                }
 
                 try await removeDeviceUseCase.execute(deviceId: device.id)
-                devices.removeAll { $0.id == device.id }
 
-                // Convert back to discovered device so it appears in available
-                // list
-                let discoveredDevice = DiscoveredDevice(
-                    id: device.id,
-                    name: device.name,
-                    type: device.type,
-                    manufacturer: device.manufacturer,
-                    model: device.model,
-                    unitOfMeasurement: device.unitOfMeasurement,
-                    supportsBrightness: device.supportsBrightness,
-                    discoveredAt: Date(),
-                    isAlreadyAdded: false,
-                    commandTopic: device.commandTopic,
-                    stateTopic: device.stateTopic
-                )
-                discoveredDevices.append(discoveredDevice)
+                convertDeviceToAvailableDevice(device)
 
                 // Restart state subscription to exclude removed device
                 restartDeviceStateSubscription()
@@ -188,8 +181,13 @@ public final class DeviceStore: DeviceStoreProtocol {
                     level: .info
                 )
             } catch {
-                let message = "Failed to unsubscribe from device: \(error.localizedDescription)"
-                logger.log(message, level: .error)
+                let deviceName = findDevice(withId: deviceId)?.name ?? "Unknown"
+                handleUnknownError(
+                    error,
+                    fallbackAppError: AppError.unknown(underlying: error),
+                    context: "device removal",
+                    entityName: deviceName
+                )
             }
         }
     }
@@ -203,8 +201,16 @@ public final class DeviceStore: DeviceStoreProtocol {
                 )
                 logger.log("Command sent to device \(deviceId)", level: .info)
             } catch {
-                let message = "Failed to send command \(deviceId): \(error.localizedDescription)"
-                logger.log(message, level: .error)
+                handleUnknownError(
+                    error,
+                    fallbackAppError: AppError.deviceCommandFailed(
+                        deviceId: deviceId,
+                        command: String(describing: command.type)
+                    ),
+                    context: "command execution",
+                    shouldUpdateViewState: false // Commands shouldn't change
+                    // main view state
+                )
             }
         }
     }
@@ -216,68 +222,14 @@ public final class DeviceStore: DeviceStoreProtocol {
 
     public func clearSelection() {
         selectedDevice = nil
+        logger.log("Clear Selected device", level: .info)
     }
+}
 
-    private func restartDeviceStateSubscription() {
-        // Cancel existing subscriptions
-        for task in stateSubscriptionTasks.values {
-            task.cancel()
-        }
-        stateSubscriptionTasks.removeAll()
+// MARK: Private methods
 
-        // Start new subscriptions with current device list
-        startDeviceStateSubscription()
-    }
-
-    private func startDeviceStateSubscription() {
-        // Only start subscriptions if there are devices to monitor
-        guard !devices.isEmpty else {
-            logger.log(
-                "No devices to monitor, skipping state subscription",
-                level: .debug
-            )
-            return
-        }
-
-        // Create individual subscription for each device
-        for device in devices {
-            let task = Task { @MainActor in
-                do {
-                    let stateStream = try await subscribeToStatesUseCase
-                        .execute(stateTopic: device.stateTopic)
-
-                    for await deviceState in stateStream {
-                        guard !Task.isCancelled else { break }
-
-                        deviceStates[deviceState.deviceId] = deviceState
-
-                        if let deviceIndex = devices.firstIndex(
-                            where: { $0.id == deviceState.deviceId }
-                        ) {
-                            var updatedDevice = devices[deviceIndex]
-                            updatedDevice.status = deviceState
-                                .isOnline ? .connected : .disconnected
-                            updatedDevice.lastSeen = deviceState.lastUpdate
-                            devices[deviceIndex] = updatedDevice
-                        }
-                    }
-                } catch {
-                    guard !Task.isCancelled else { return }
-                    let message = "Device state subscription error for :"
-                    let topic = device.stateTopic
-                    let errorDescription = error.localizedDescription
-                    logger.log(
-                        "\(message) \(topic) \(errorDescription)",
-                        level: .error
-                    )
-                }
-            }
-
-            stateSubscriptionTasks[device.id] = task
-        }
-    }
-
-    private func startDiscoverySubscription() {
+private extension DeviceStore {
+    func startDiscoverySubscription() {
         logger.log("Starting discovery subscription", level: .debug)
         discoverySubscriptionTask = Task { @MainActor in
             do {
@@ -312,9 +264,203 @@ public final class DeviceStore: DeviceStoreProtocol {
                 }
             } catch {
                 guard !Task.isCancelled else { return }
-                let message = "Device discovery subscription error: \(error.localizedDescription)"
-                logger.log(message, level: .error)
+                handleUnknownError(
+                    error,
+                    fallbackAppError: AppError
+                        .discoveryFailed(reason: error.localizedDescription),
+                    context: "device discovery",
+                    shouldUpdateViewState: false // Background discovery
+                    // shouldn't change main view state
+                )
             }
+        }
+    }
+
+    func startDeviceStateSubscription() {
+        // Only start subscriptions if there are devices to monitor
+        guard !devices.isEmpty else {
+            logger.log(
+                "No devices to monitor, skipping state subscription",
+                level: .debug
+            )
+            return
+        }
+
+        // Create individual subscription for each device
+        for device in devices {
+            let task = Task { @MainActor in
+                do {
+                    let stateStream = try await subscribeToStatesUseCase
+                        .execute(stateTopic: device.stateTopic)
+
+                    for await deviceState in stateStream {
+                        guard !Task.isCancelled else { break }
+
+                        deviceStates[deviceState.deviceId] = deviceState
+
+                        if let deviceIndex = devices.firstIndex(
+                            where: { $0.id == deviceState.deviceId }
+                        ) {
+                            var updatedDevice = devices[deviceIndex]
+                            updatedDevice.status = deviceState
+                                .isOnline ? .connected : .disconnected
+                            updatedDevice.lastSeen = deviceState.lastUpdate
+                            devices[deviceIndex] = updatedDevice
+                        }
+
+                        if viewState == .empty, !devices.isEmpty {
+                            viewState = .loaded
+                            logger.log(
+                                "View state loaded due to device state update",
+                                level: .info
+                            )
+                        }
+                    }
+                } catch {
+                    guard !Task.isCancelled else { return }
+                    handleUnknownError(
+                        error,
+                        fallbackAppError: AppError
+                            .mqttSubscriptionFailed(topic: device.stateTopic),
+                        context: "device state subscription",
+                        entityName: device.name,
+                        shouldUpdateViewState: false
+                        // Background subscriptions shouldn't change main view
+                        // state
+                    )
+                }
+            }
+
+            stateSubscriptionTasks[device.id] = task
+        }
+    }
+
+    func restartDeviceStateSubscription() {
+        // Cancel existing subscriptions
+        for task in stateSubscriptionTasks.values {
+            task.cancel()
+        }
+        stateSubscriptionTasks.removeAll()
+
+        // Start new subscriptions with current device list
+        startDeviceStateSubscription()
+    }
+
+    func findDevice(withId deviceId: String) -> Device? {
+        devices.first(where: { $0.id == deviceId })
+    }
+
+    func convertDeviceToAvailableDevice(_ device: Device) {
+        devices.removeAll { $0.id == device.id }
+        discoveredDevices.append(DiscoveredDevice(device: device))
+
+        // Clear selection if the selected device was removed
+        if selectedDevice?.id == device.id {
+            selectedDevice = nil
+            logger.log(
+                "Cleared selection for removed device: \(device.name)",
+                level: .info
+            )
+        }
+    }
+
+    func convertAvailableDeviceToDevice(
+        _ discoveredDevice: DiscoveredDevice,
+        device: Device
+    ) {
+        discoveredDevices.removeAll { $0.id == discoveredDevice.id }
+        devices.append(device)
+    }
+}
+
+// MARK: AppError and Error Logging
+
+private extension DeviceStore {
+    func handleError(
+        _ error: AppError,
+        context: String,
+        entityName: String? = nil,
+        shouldUpdateViewState: Bool = true
+    ) {
+        // Set the AppError directly to viewState for rich error information
+        if shouldUpdateViewState {
+            viewState = .error(error)
+        }
+
+        // Use AppError's structured information for consistent logging
+        logAppError(error, context: context, entityName: entityName)
+    }
+
+    func handleUnknownError(
+        _ error: Error,
+        fallbackAppError: AppError,
+        context: String,
+        entityName: String? = nil,
+        shouldUpdateViewState: Bool = true
+    ) {
+        let appError = error as? AppError ?? fallbackAppError
+        handleError(
+            appError,
+            context: context,
+            entityName: entityName,
+            shouldUpdateViewState: shouldUpdateViewState
+        )
+    }
+
+    func logAppError(
+        _ error: AppError,
+        context: String,
+        entityName: String? = nil
+    ) {
+        let entityContext = entityName.map { " (entity: \($0))" } ?? ""
+        let baseMessage =
+            """
+            [\(context.uppercased())]
+            \(error.errorDescription ?? "Unknown error")
+            \(entityContext)
+            """
+
+        let technicalDetails = buildTechnicalDetails(for: error)
+        let fullMessage = technicalDetails.isEmpty
+            ? baseMessage
+            : "\(baseMessage) - \(technicalDetails)"
+
+        logger.log(fullMessage, level: .error)
+
+        if let recoverySuggestion = error.recoverySuggestion {
+            logger.log(
+                "💡 Recovery suggestion: \(recoverySuggestion)",
+                level: .info
+            )
+        }
+    }
+
+    func buildTechnicalDetails(for error: AppError) -> String {
+        switch error {
+        case let .deviceNotFound(deviceId):
+            return "deviceId=\(deviceId)"
+
+        case let .mqttConnectionFailed(details):
+            return "mqtt_details=\(details ?? "connection_failed")"
+
+        case let .persistenceError(operation, details):
+            let detailsString = details.map { ", details=\($0)" } ?? ""
+            return "operation=\(operation)\(detailsString)"
+
+        case let .deviceConnectionFailed(deviceId):
+            return "target_device=\(deviceId)"
+
+        case let .deviceCommandFailed(deviceId, command):
+            return "target_device=\(deviceId), command=\(command)"
+
+        case let .timeout(operation, duration):
+            return "operation=\(operation), timeout_duration=\(String(describing: duration))s"
+
+        case let .unknown(underlying):
+            return "underlying_error=\(underlying?.localizedDescription ?? "nil")"
+
+        default:
+            return ""
         }
     }
 }

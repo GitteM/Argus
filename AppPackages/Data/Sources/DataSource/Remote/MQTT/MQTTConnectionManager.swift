@@ -6,7 +6,7 @@ import OSLog
 import ServiceProtocols
 
 @Observable
-public final class MQTTConnectionManager: MQTTConnectionManagerProtocol,
+open class MQTTConnectionManager: MQTTConnectionManagerProtocol,
     @unchecked Sendable {
     public private(set) var connectionStatus: MQTTConnectionStatus =
         .disconnected
@@ -43,7 +43,7 @@ public final class MQTTConnectionManager: MQTTConnectionManagerProtocol,
         self.logger = logger
     }
 
-    public func connect() async throws {
+    open func connect() async throws {
         guard mqtt == nil else { return }
 
         logger.log(
@@ -61,21 +61,34 @@ public final class MQTTConnectionManager: MQTTConnectionManagerProtocol,
 
         return try await withCheckedThrowingContinuation { continuation in
             self.connectionContinuation = continuation
+            var connectionError: Error?
+
+            defer {
+                if connectionError != nil {
+                    self.mqtt = nil
+                    self.connectionContinuation = nil
+                }
+            }
 
             guard self.mqtt?.connect() == true else {
+                connectionError = AppError.mqttConnectionFailed(
+                    "Connection failed for broker \(broker):\(port)"
+                )
                 Task {
                     await MainActor.run {
                         self.connectionStatus = .disconnected
                     }
                 }
-                continuation.resume(throwing: MQTTError.connectionFailed)
-                self.connectionContinuation = nil
+                continuation.resume(
+                    throwing: connectionError
+                        ?? AppError.unknown(underlying: nil)
+                )
                 return
             }
         }
     }
 
-    public func subscribe(
+    open func subscribe(
         to topic: String,
         handler: @escaping @Sendable (MQTTMessage) -> Void
     ) {
@@ -106,9 +119,9 @@ public final class MQTTConnectionManager: MQTTConnectionManagerProtocol,
         }
     }
 
-    public func publish(topic: String, payload: String) async throws {
+    open func publish(topic: String, payload: String) async throws {
         guard let mqtt, mqtt.connState == .connected else {
-            throw MQTTError.notConnected
+            throw AppError.mqttNotConnected
         }
 
         let properties = MqttPublishProperties()
@@ -121,11 +134,11 @@ public final class MQTTConnectionManager: MQTTConnectionManagerProtocol,
         )
 
         if messageId == 0 {
-            throw MQTTError.publishFailed
+            throw AppError.mqttPublishFailed(topic: topic)
         }
     }
 
-    public func unsubscribe(from topic: String) {
+    open func unsubscribe(from topic: String) {
         subscriptionQueue.async(flags: .barrier) {
             self.logger.log(
                 "MQTT unsubscribing from topic: \(topic)",
@@ -154,7 +167,7 @@ public final class MQTTConnectionManager: MQTTConnectionManagerProtocol,
         }
     }
 
-    public func disconnect() {
+    open func disconnect() {
         subscriptionQueue.async(flags: .barrier) {
             let message = "MQTT disconnecting - clearing handlers and pending subscriptions"
             self.logger.log(message, level: .info)
@@ -219,6 +232,34 @@ public final class MQTTConnectionManager: MQTTConnectionManagerProtocol,
             )
         }
     }
+
+    private func notifySubscriptionFailure(topic: String, error _: AppError) {
+        subscriptionQueue.async(flags: .barrier) {
+            // Remove the failed handler to prevent memory leaks and confusion
+            if self.messageHandlers[topic] != nil {
+                self.messageHandlers.removeValue(forKey: topic)
+                self.logger.log(
+                    "MQTT removed failed subscription handler for topic: \(topic)",
+                    level: .debug
+                )
+            }
+
+            // Remove from pending subscriptions as well
+            if self._pendingSubscriptions[topic] != nil {
+                self._pendingSubscriptions.removeValue(forKey: topic)
+                self.logger.log(
+                    "MQTT removed failed pending subscription for topic: \(topic)",
+                    level: .debug
+                )
+            }
+
+            // Log the error details for debugging
+            self.logger.log(
+                "MQTT subscription failure cleanup completed for topic: \(topic)",
+                level: .debug
+            )
+        }
+    }
 }
 
 // MARK: - CocoaMQTT5Delegate
@@ -251,7 +292,9 @@ extension MQTTConnectionManager: CocoaMQTT5Delegate {
                 self.processPendingSubscriptions()
             } else {
                 connectionContinuation?
-                    .resume(throwing: MQTTError.connectionFailed)
+                    .resume(throwing: AppError
+                        .mqttConnectionFailed(ackDescription)
+                    )
             }
             connectionContinuation = nil
         }
@@ -265,7 +308,9 @@ extension MQTTConnectionManager: CocoaMQTT5Delegate {
             let errorMessage = err?.localizedDescription ?? "No error"
             self.logger.log("MQTT Disconnected: \(errorMessage)", level: .error)
             connectionContinuation?
-                .resume(throwing: err ?? MQTTError.connectionFailed)
+                .resume(throwing: err ?? AppError
+                    .mqttConnectionFailed(errorMessage)
+                )
             connectionContinuation = nil
             mqtt = nil
         }
@@ -383,6 +428,18 @@ extension MQTTConnectionManager: CocoaMQTT5Delegate {
     ) {
         let logMessage = "MQTT Subscribed to topics - Success: \(success), Failed: \(failed)"
         logger.log(logMessage, level: .info)
+
+        // Handle failed subscriptions with proper error reporting
+        for failedTopic in failed {
+            let error = AppError.mqttSubscriptionFailed(topic: failedTopic)
+            logger.log(
+                error.errorDescription ?? "Subscription failed",
+                level: .error
+            )
+
+            // Clean up failed subscription handlers
+            notifySubscriptionFailure(topic: failedTopic, error: error)
+        }
     }
 
     public func mqtt5(

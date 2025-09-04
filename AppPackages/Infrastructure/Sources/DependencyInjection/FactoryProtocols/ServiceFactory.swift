@@ -4,7 +4,7 @@ import RepositoryProtocols
 import ServiceProtocols
 
 public protocol ServiceFactory {
-    func makeCacheManager() -> CacheManagerProtocol
+    func makeCacheManager() throws -> CacheManagerProtocol
 }
 
 public class DefaultServiceFactory: ServiceFactory {
@@ -14,7 +14,7 @@ public class DefaultServiceFactory: ServiceFactory {
         self.logger = logger
     }
 
-    public func makeCacheManager() -> CacheManagerProtocol {
-        CacheManager(logger: logger)
+    public func makeCacheManager() throws -> CacheManagerProtocol {
+        try CacheManager(logger: logger)
     }
 }
