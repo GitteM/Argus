@@ -31,7 +31,7 @@ jobs:
           path: |
             .build
             ~/Library/Caches/org.swift.swiftpm
-          key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
+          key: ${{ runner.os }}-xcode16-spm-${{ hashFiles('**/Package.resolved', '**/Package.swift') }}
           restore-keys: |
             ${{ runner.os }}-spm-
 
@@ -53,7 +53,7 @@ jobs:
           xcodebuild \
             -project Argus.xcodeproj \
             -scheme Argus \
-            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
+            -destination 'platform=iOS Simulator,OS=latest' \
             -configuration Debug \
             build-for-testing
 
@@ -62,7 +62,7 @@ jobs:
           xcodebuild \
             -project Argus.xcodeproj \
             -scheme Argus \
-            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
+            -destination 'platform=iOS Simulator,OS=latest' \
             -configuration Debug \
             test-without-building \
             -skip-testing:ArgusUITests
