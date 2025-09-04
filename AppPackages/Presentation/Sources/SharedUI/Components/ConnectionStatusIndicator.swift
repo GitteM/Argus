@@ -3,14 +3,9 @@ import SwiftUI
 
 public struct ConnectionStatusIndicator: View {
     let status: MQTTConnectionStatus
-    var onTapWhenDisconnected: (() -> Void)?
 
-    public init(
-        status: MQTTConnectionStatus,
-        onTapWhenDisconnected: (() -> Void)? = nil
-    ) {
+    public init(status: MQTTConnectionStatus) {
         self.status = status
-        self.onTapWhenDisconnected = onTapWhenDisconnected
     }
 
     public var body: some View {
@@ -28,19 +23,13 @@ public struct ConnectionStatusIndicator: View {
                     Circle()
                         .fill(Color.green)
                         .frame(width: Spacing.s4, height: Spacing.s4)
-                case .disconnected:
+                case .disconnected, .error:
                     Circle()
                         .fill(Color.red)
                         .frame(width: Spacing.s4, height: Spacing.s4)
                 }
             }
             .animation(.easeInOut(duration: 0.3), value: status)
-        }
-        .contentShape(Rectangle())
-        .onTapGesture {
-            if status == .disconnected {
-                onTapWhenDisconnected?()
-            }
         }
     }
 }

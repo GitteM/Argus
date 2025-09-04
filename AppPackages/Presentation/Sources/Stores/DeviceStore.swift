@@ -107,6 +107,17 @@ public final class DeviceStore: DeviceStoreProtocol {
     }
 
     public func startRealtimeUpdates() {
+        // If we're in empty state, reload data when starting realtime updates
+        // This handles reconnection scenarios where we lost data
+        if viewState == .empty {
+            logger.log(
+                "Reloading dashboard data due to empty state during realtime updates start",
+                level: .info
+            )
+            loadDashboardData()
+            return
+        }
+
         startDeviceStateSubscription()
         startDiscoverySubscription()
     }
@@ -296,6 +307,14 @@ private extension DeviceStore {
                             updatedDevice.lastSeen = deviceState.lastUpdate
                             devices[deviceIndex] = updatedDevice
                         }
+
+                        if viewState == .empty, !devices.isEmpty {
+                            viewState = .loaded
+                            logger.log(
+                                "View state loaded due to device state update",
+                                level: .info
+                            )
+                        }
                     }
                 } catch {
                     guard !Task.isCancelled else { return }
@@ -334,6 +353,15 @@ private extension DeviceStore {
     func convertDeviceToAvailableDevice(_ device: Device) {
         devices.removeAll { $0.id == device.id }
         discoveredDevices.append(DiscoveredDevice(device: device))
+
+        // Clear selection if the selected device was removed
+        if selectedDevice?.id == device.id {
+            selectedDevice = nil
+            logger.log(
+                "Cleared selection for removed device: \(device.name)",
+                level: .info
+            )
+        }
     }
 
     func convertAvailableDeviceToDevice(

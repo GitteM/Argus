@@ -24,12 +24,21 @@ public struct DeviceDetailView: View {
     public var body: some View {
         contentView
             .navigationTitle(navigationTitle)
+            .onAppear {
+                if let selected = deviceStore.selectedDevice {
+                    lastSelectedDevice = selected
+                }
+            }
+            .onChange(of: deviceStore.selectedDevice) { _, newDevice in
+                if let newDevice {
+                    lastSelectedDevice = newDevice
+                }
+            }
         #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarBackButtonHidden()
             .toolbar {
                 BackToolbarItem {
-                    deviceStore.clearSelection()
                     onNavigate(.back)
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -39,9 +48,12 @@ public struct DeviceDetailView: View {
         #endif
     }
 
+    @State private var lastSelectedDevice: Device?
+
     @ViewBuilder
     private var contentView: some View {
-        if let device = deviceStore.selectedDevice {
+        let device = deviceStore.selectedDevice ?? lastSelectedDevice
+        if let device {
             VStack(spacing: 0) {
                 switch device.type {
                 case .smartLight:
@@ -74,7 +86,6 @@ public struct DeviceDetailView: View {
                         title: Strings.unsubscribeFromDevice
                     ) {
                         deviceStore.unsubscribeFromDevice(withId: device.id)
-                        deviceStore.clearSelection()
                         onNavigate(.back)
                     }
                 }

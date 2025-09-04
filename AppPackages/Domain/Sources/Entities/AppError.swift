@@ -40,6 +40,10 @@ public enum AppError: Error, LocalizedError {
     // MARK: - Unknown Errors
 
     case unknown(underlying: Error? = nil)
+
+    // MARK: - App Init Errors
+
+    case initializationError(component: String, reason: String)
 }
 
 // MARK: - LocalizedError Implementation
@@ -121,6 +125,10 @@ public extension AppError {
             }
             return "Operation '\(operation)' timed out"
 
+        // MARK: App Initialization Errors
+        case let .initializationError(component, reason):
+            return "Initialization error for '\(component)': \(reason)"
+
         // MARK: Unknown Errors
         case let .unknown(underlying):
             if let underlying {
@@ -190,6 +198,8 @@ public extension AppError {
         case .fileSystemError, .configurationError, .serviceUnavailable,
              .timeout:
             .system
+        case .initializationError:
+            .initialization
         case .unknown:
             .unknown
         }
@@ -236,6 +246,7 @@ public enum ErrorCategory: String, CaseIterable {
     case data
     case discovery
     case system
+    case initialization
     case unknown
 }
 
@@ -297,6 +308,10 @@ public enum ErrorCategory: String, CaseIterable {
         case invalidParameters
         case preconditionFailed
         case postconditionFailed
+
+        // MARK: - App Init Errors
+
+        case initializationError
     }
 
     extension TestError: LocalizedError {
@@ -366,6 +381,8 @@ public enum ErrorCategory: String, CaseIterable {
                 "Test precondition failed"
             case .postconditionFailed:
                 "Test postcondition failed"
+            case .initializationError:
+                "Test app initialization failed"
             }
         }
     }
@@ -388,6 +405,8 @@ public enum ErrorCategory: String, CaseIterable {
                 .generic
             case .connectivity:
                 .mqttError
+            case .initialization:
+                .initializationError
             }
         }
 

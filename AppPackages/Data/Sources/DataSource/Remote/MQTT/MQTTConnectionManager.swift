@@ -6,7 +6,7 @@ import OSLog
 import ServiceProtocols
 
 @Observable
-public final class MQTTConnectionManager: MQTTConnectionManagerProtocol,
+open class MQTTConnectionManager: MQTTConnectionManagerProtocol,
     @unchecked Sendable {
     public private(set) var connectionStatus: MQTTConnectionStatus =
         .disconnected
@@ -43,7 +43,7 @@ public final class MQTTConnectionManager: MQTTConnectionManagerProtocol,
         self.logger = logger
     }
 
-    public func connect() async throws {
+    open func connect() async throws {
         guard mqtt == nil else { return }
 
         logger.log(
@@ -79,7 +79,7 @@ public final class MQTTConnectionManager: MQTTConnectionManagerProtocol,
         }
     }
 
-    public func subscribe(
+    open func subscribe(
         to topic: String,
         handler: @escaping @Sendable (MQTTMessage) -> Void
     ) {
@@ -110,7 +110,7 @@ public final class MQTTConnectionManager: MQTTConnectionManagerProtocol,
         }
     }
 
-    public func publish(topic: String, payload: String) async throws {
+    open func publish(topic: String, payload: String) async throws {
         guard let mqtt, mqtt.connState == .connected else {
             throw AppError.mqttNotConnected
         }
@@ -129,7 +129,7 @@ public final class MQTTConnectionManager: MQTTConnectionManagerProtocol,
         }
     }
 
-    public func unsubscribe(from topic: String) {
+    open func unsubscribe(from topic: String) {
         subscriptionQueue.async(flags: .barrier) {
             self.logger.log(
                 "MQTT unsubscribing from topic: \(topic)",
@@ -158,7 +158,7 @@ public final class MQTTConnectionManager: MQTTConnectionManagerProtocol,
         }
     }
 
-    public func disconnect() {
+    open func disconnect() {
         subscriptionQueue.async(flags: .barrier) {
             let message = "MQTT disconnecting - clearing handlers and pending subscriptions"
             self.logger.log(message, level: .info)

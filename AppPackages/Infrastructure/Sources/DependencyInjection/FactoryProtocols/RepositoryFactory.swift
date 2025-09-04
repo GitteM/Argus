@@ -1,8 +1,9 @@
 import Repositories
 import RepositoryProtocols
 
-protocol RepositoryFactory {
-    func makeDeviceConnectionRepository() -> DeviceConnectionRepositoryProtocol
+public protocol RepositoryFactory {
+    func makeDeviceConnectionRepository() throws
+        -> DeviceConnectionRepositoryProtocol
     func makeDeviceDiscoveryRepository() -> DeviceDiscoveryRepositoryProtocol
     func makeDeviceStateRepository() -> DeviceStateRepositoryProtocol
     func makeDeviceCommandRepository() -> DeviceCommandRepositoryProtocol
@@ -20,9 +21,9 @@ public class DefaultRepositoryFactory: RepositoryFactory {
         self.dataSourceFactory = dataSourceFactory
     }
 
-    public func makeDeviceConnectionRepository()
+    public func makeDeviceConnectionRepository() throws
         -> DeviceConnectionRepositoryProtocol {
-        DeviceConnectionRepository(
+        try DeviceConnectionRepository(
             cacheManager: serviceFactory.makeCacheManager()
         )
     }
