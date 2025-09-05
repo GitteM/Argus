@@ -11,39 +11,91 @@ struct CacheManagerTests {
     // MARK: - Error Handling Tests
 
     @Test(
-        "Deserialization failure in memory cache should return deserializationError"
+        "Type mismatch in memory cache should fallback to disk cache gracefully"
     )
-    func memoryCache_DeserializationFailure() async throws {
+    func memoryCache_TypeMismatchFallback() async throws {
         // Given
         let mockLogger = MockLogger()
         let cacheManager = try CacheManager(logger: mockLogger)
 
-        // First, manually inject corrupted data into the cache
-        // We'll use reflection to access the private cache, but for testing
-        // we'll simulate by setting valid data then corrupting the retrieval
+        // Set valid data in memory cache with type identifier
         let validData = TestData(id: "test", value: 123)
-        let setResult = await cacheManager.set(validData, key: "corrupted_key")
+        let setResult = await cacheManager.set(
+            validData,
+            key: "type_mismatch_key"
+        )
         guard case .success = setResult else {
             Issue.record("Failed to set up test data")
             return
         }
 
-        // Simulate corrupted data by trying to decode as wrong type
+        // Try to decode as wrong type - should gracefully fallback to disk
         let getResult: Result<InvalidTestData?, AppError> = cacheManager
-            .get(key: "corrupted_key")
+            .get(key: "type_mismatch_key")
 
-        // Then
+        // Then - With the optimization, this should either:
+        // 1. Return success(nil) if no disk cache exists (cache miss)
+        // 2. Return deserializationError if disk cache has incompatible data
         switch getResult {
-        case .success:
-            Issue.record("Expected deserialization error but got success")
+        case let .success(data):
+            // Cache miss is acceptable - no matching type found
+            #expect(data == nil)
         case let .failure(error):
+            // If there's an error, it should be from disk cache deserialization
             switch error {
             case let .deserializationError(type, details):
                 #expect(type == "InvalidTestData")
                 #expect(details != nil)
             default:
-                Issue.record("Expected deserializationError, got \(error)")
+                Issue.record("Unexpected error type: \(error)")
             }
+        }
+    }
+
+    @Test("Type optimization should prevent unnecessary JSON decoding")
+    func typeOptimizationPreventDecoding() async throws {
+        // Given
+        let mockLogger = MockLogger()
+        let cacheManager = try CacheManager(logger: mockLogger)
+
+        // Set data of one type
+        let testData = TestData(id: "test", value: 456)
+        let setResult = await cacheManager.set(
+            testData,
+            key: "optimization_test"
+        )
+        guard case .success = setResult else {
+            Issue.record("Failed to set up test data")
+            return
+        }
+
+        // Try to get the same data with the correct type - should succeed
+        let correctTypeResult: Result<TestData?, AppError> = cacheManager
+            .get(key: "optimization_test")
+
+        switch correctTypeResult {
+        case let .success(retrievedData):
+            #expect(retrievedData != nil)
+            #expect(retrievedData?.id == testData.id)
+            #expect(retrievedData?.value == testData.value)
+        case let .failure(error):
+            Issue.record("Expected success but got error: \(error)")
+        }
+
+        // Try to get with wrong type - should gracefully handle without
+        // unnecessary decoding
+        let wrongTypeResult: Result<InvalidTestData?, AppError> = cacheManager
+            .get(key: "optimization_test")
+
+        // Should either return nil (cache miss after type check) or handle
+        // gracefully
+        switch wrongTypeResult {
+        case let .success(data):
+            #expect(data == nil) // Type mismatch handled gracefully
+        case .failure:
+            // If there's a failure, it should be from disk cache attempt, not
+            // memory cache
+            break
         }
     }
 

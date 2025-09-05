@@ -56,25 +56,36 @@ public final class CacheManager: CacheManagerProtocol, Sendable {
 
     public func get<T: Codable>(key: String) -> Result<T?, AppError> {
         cacheQueue.sync {
+            let requestedType = String(describing: T.self)
+
             // Try memory cache first
             if let memoryItem = memoryCache
                 .object(forKey: NSString(string: key)) {
                 if !memoryItem.isExpired {
-                    do {
-                        let decoded: T = try JSONDecoder().decode(
-                            T.self,
-                            from: memoryItem.data,
-                            logger: logger,
-                            context: "get Cached value"
-                        )
-                        return .success(decoded)
-                    } catch let appError as AppError {
-                        return .failure(appError)
-                    } catch {
-                        return .failure(AppError.deserializationError(
-                            type: String(describing: T.self),
-                            details: "Failed to decode cached value: \(error.localizedDescription)"
-                        ))
+                    // Check type compatibility before expensive decoding
+                    if memoryItem.typeIdentifier.isEmpty || memoryItem
+                        .typeIdentifier == requestedType {
+                        do {
+                            let decoded: T = try JSONDecoder().decode(
+                                T.self,
+                                from: memoryItem.data,
+                                logger: logger,
+                                context: "get Cached value"
+                            )
+                            return .success(decoded)
+                        } catch let appError as AppError {
+                            return .failure(appError)
+                        } catch {
+                            let localizedError = error.localizedDescription
+                            return .failure(AppError.deserializationError(
+                                type: requestedType,
+                                details: "Failed to decode cached value: \(localizedError)"
+                            ))
+                        }
+                    } else {
+                        // Type mismatch - don't attempt to decode, go straight
+                        // to disk
+                        return loadFromDisk(key: key)
                     }
                 } else {
                     memoryCache.removeObject(forKey: NSString(string: key))
@@ -99,11 +110,13 @@ public final class CacheManager: CacheManagerProtocol, Sendable {
             do {
                 let data = try JSONEncoder().encode(value)
                 let expirationDate = ttl.map { Date().addingTimeInterval($0) }
+                let typeIdentifier = String(describing: type(of: value))
 
                 let cacheItem = CacheItem(
                     data: data,
                     expirationDate: expirationDate,
-                    createdAt: Date()
+                    createdAt: Date(),
+                    typeIdentifier: typeIdentifier
                 )
 
                 // Store in memory
@@ -326,7 +339,8 @@ private extension CacheManager {
                 let cacheItem = CacheItem(
                     data: diskItem.data,
                     expirationDate: diskItem.expirationDate,
-                    createdAt: diskItem.createdAt
+                    createdAt: diskItem.createdAt,
+                    typeIdentifier: diskItem.typeIdentifier
                 )
 
                 memoryCache.setObject(cacheItem, forKey: NSString(string: key))
