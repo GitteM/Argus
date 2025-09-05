@@ -118,12 +118,13 @@ struct SendDeviceCommandUseCaseTests {
         )
         let mockRepository = MockDeviceCommandRepository()
         await mockRepository.setShouldThrowError(true)
-        await mockRepository.setErrorToThrow(MockError.commandSendFailure)
+        await mockRepository
+            .setErrorToThrow(AppError.TestFactory.commandSendFailure)
         let sut =
             SendDeviceCommandUseCase(deviceCommandRepository: mockRepository)
 
         // When/Then
-        await #expect(throws: MockError.commandSendFailure) {
+        await #expect(throws: AppError.TestFactory.commandSendFailure) {
             try await sut.execute(deviceId: deviceId, command: command)
         }
         #expect(await mockRepository.sendDeviceCommandCallCount == 1)
@@ -142,12 +143,13 @@ struct SendDeviceCommandUseCaseTests {
         )
         let mockRepository = MockDeviceCommandRepository()
         await mockRepository.setShouldThrowError(true)
-        await mockRepository.setErrorToThrow(MockError.deviceNotFound)
+        await mockRepository
+            .setErrorToThrow(AppError.TestFactory.deviceNotFound)
         let sut =
             SendDeviceCommandUseCase(deviceCommandRepository: mockRepository)
 
         // When/Then
-        await #expect(throws: MockError.deviceNotFound) {
+        await #expect(throws: AppError.TestFactory.deviceNotFound) {
             try await sut.execute(deviceId: deviceId, command: command)
         }
     }
@@ -163,12 +165,12 @@ struct SendDeviceCommandUseCaseTests {
         )
         let mockRepository = MockDeviceCommandRepository()
         await mockRepository.setShouldThrowError(true)
-        await mockRepository.setErrorToThrow(MockError.mqttError)
+        await mockRepository.setErrorToThrow(AppError.TestFactory.mqttError)
         let sut =
             SendDeviceCommandUseCase(deviceCommandRepository: mockRepository)
 
         // When/Then
-        await #expect(throws: MockError.mqttError) {
+        await #expect(throws: AppError.TestFactory.mqttError) {
             try await sut.execute(deviceId: deviceId, command: command)
         }
     }
@@ -377,7 +379,7 @@ private actor MockDeviceCommandRepository: DeviceCommandRepositoryProtocol {
     var lastDeviceId: String?
     var lastCommand: Command?
     var shouldThrowError = false
-    var errorToThrow: Error = MockError.commandSendFailure
+    var errorToThrow: Error = AppError.TestFactory.commandSendFailure
 
     func sendDeviceCommand(deviceId: String, command: Command) async throws {
         sendDeviceCommandCallCount += 1
@@ -396,13 +398,4 @@ private actor MockDeviceCommandRepository: DeviceCommandRepositoryProtocol {
     func setErrorToThrow(_ error: Error) {
         errorToThrow = error
     }
-}
-
-// MARK: - Mock Error
-
-private enum MockError: Error, Equatable {
-    case commandSendFailure
-    case deviceNotFound
-    case mqttError
-    case invalidCommand
 }

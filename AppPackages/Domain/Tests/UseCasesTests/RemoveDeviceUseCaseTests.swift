@@ -149,7 +149,7 @@ struct RemoveDeviceUseCaseTests {
         let deviceId = "test_device"
         let mockRepository = MockDeviceConnectionRepository()
         mockRepository.shouldThrowErrorOnGet = true
-        mockRepository.errorToThrow = MockError.repositoryFailure
+        mockRepository.errorToThrow = AppError.TestFactory.repositoryError
         let mockMqttManager = MockMQTTConnectionManager()
         let sut = RemoveDeviceUseCase(
             deviceConnectionRepository: mockRepository,
@@ -157,7 +157,7 @@ struct RemoveDeviceUseCaseTests {
         )
 
         // When/Then
-        await #expect(throws: MockError.repositoryFailure) {
+        await #expect(throws: AppError.TestFactory.repositoryError) {
             try await sut.execute(deviceId: deviceId)
         }
 
@@ -175,7 +175,7 @@ struct RemoveDeviceUseCaseTests {
         let mockRepository = MockDeviceConnectionRepository()
         mockRepository.managedDevices = [device]
         mockRepository.shouldThrowErrorOnRemove = true
-        mockRepository.errorToThrow = MockError.removalFailure
+        mockRepository.errorToThrow = AppError.TestFactory.removeDeviceFailure
         let mockMqttManager = MockMQTTConnectionManager()
         let sut = RemoveDeviceUseCase(
             deviceConnectionRepository: mockRepository,
@@ -183,7 +183,7 @@ struct RemoveDeviceUseCaseTests {
         )
 
         // When/Then
-        await #expect(throws: MockError.removalFailure) {
+        await #expect(throws: AppError.TestFactory.removeDeviceFailure) {
             try await sut.execute(deviceId: device.id)
         }
 
@@ -367,7 +367,7 @@ private final class MockDeviceConnectionRepository: DeviceConnectionRepositoryPr
     var managedDevices: [Device] = []
     var shouldThrowErrorOnGet = false
     var shouldThrowErrorOnRemove = false
-    var errorToThrow: Error = MockError.repositoryFailure
+    var errorToThrow: Error = AppError.TestFactory.repositoryError
     var lastRemovedDeviceId: String?
 
     func getManagedDevices() async throws -> [Device] {
@@ -425,12 +425,4 @@ private final class MockMQTTConnectionManager: MQTTConnectionManagerProtocol {
     func publish(topic _: String, payload _: String) async throws {
         // Not needed for RemoveDeviceUseCase tests
     }
-}
-
-// MARK: - Mock Error
-
-private enum MockError: Error, Equatable {
-    case repositoryFailure
-    case removalFailure
-    case deviceNotFound
 }

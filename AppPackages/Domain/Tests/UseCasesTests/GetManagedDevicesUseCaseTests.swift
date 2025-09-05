@@ -224,7 +224,7 @@ struct GetManagedDevicesUseCaseTests {
     @Test("Execute when repository throws error should propagate error")
     func executeWhenRepositoryThrowsError() async {
         // Given
-        let expectedError = MockError.repositoryFailure
+        let expectedError = AppError.TestFactory.repositoryError
         let mockRepository = MockDeviceConnectionRepository()
         mockRepository.shouldThrowError = true
         mockRepository.errorToThrow = expectedError
@@ -233,7 +233,7 @@ struct GetManagedDevicesUseCaseTests {
         )
 
         // When/Then
-        await #expect(throws: MockError.repositoryFailure) {
+        await #expect(throws: AppError.TestFactory.repositoryError) {
             try await sut.execute()
         }
         #expect(mockRepository.getManagedDevicesCallCount == 1)
@@ -244,7 +244,7 @@ struct GetManagedDevicesUseCaseTests {
     )
     func executeWhenRepositoryThrowsDeviceNotFoundError() async {
         // Given
-        let expectedError = MockError.deviceNotFound
+        let expectedError = AppError.TestFactory.deviceNotFound
         let mockRepository = MockDeviceConnectionRepository()
         mockRepository.shouldThrowError = true
         mockRepository.errorToThrow = expectedError
@@ -253,7 +253,7 @@ struct GetManagedDevicesUseCaseTests {
         )
 
         // When/Then
-        await #expect(throws: MockError.deviceNotFound) {
+        await #expect(throws: AppError.TestFactory.deviceNotFound) {
             try await sut.execute()
         }
     }
@@ -347,7 +347,7 @@ private final class MockDeviceConnectionRepository: DeviceConnectionRepositoryPr
     var removeDeviceCallCount = 0
     var managedDevices: [Device] = []
     var shouldThrowError = false
-    var errorToThrow: Error = MockError.repositoryFailure
+    var errorToThrow: Error = AppError.TestFactory.repositoryError
 
     func getManagedDevices() async throws -> [Device] {
         getManagedDevicesCallCount += 1
@@ -369,11 +369,4 @@ private final class MockDeviceConnectionRepository: DeviceConnectionRepositoryPr
         removeDeviceCallCount += 1
         // Not needed for GetManagedDevicesUseCase tests
     }
-}
-
-// MARK: - Mock Error
-
-private enum MockError: Error, Equatable {
-    case repositoryFailure
-    case deviceNotFound
 }
