@@ -9,7 +9,6 @@ A modern iOS application demonstrating MQTT integration with Clean Architecture 
 ![Swift](https://img.shields.io/badge/Swift-6.1-orange.svg)
 ![iOS](https://img.shields.io/badge/iOS-17.0%2B-blue.svg)
 ![SPM](https://img.shields.io/badge/SPM-Modular-red.svg)
-![Coverage](https://github.com/GitteM/Argus/actions/workflows/coverage.yml/badge.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
 ## Overview
@@ -175,7 +174,7 @@ See the [README.md](https://github.com/GitteM/mqtt-test-environment/blob/main/RE
 Automated code coverage tracking is integrated into the CI/CD pipeline:
 
 - **Coverage reports** are generated automatically on every PR and push to main
-- **Coverage badges** are updated automatically and shown above
+- **Coverage badges** will appear in the README after the first workflow run
 - **Detailed coverage breakdowns** are posted as comments on PRs
 - **Coverage artifacts** are stored for 30 days for analysis
 
