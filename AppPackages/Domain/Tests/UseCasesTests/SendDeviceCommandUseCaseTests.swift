@@ -25,11 +25,11 @@ struct SendDeviceCommandUseCaseTests {
         try await sut.execute(deviceId: deviceId, command: command)
 
         // Then
-        #expect(mockRepository.sendDeviceCommandCallCount == 1)
-        #expect(mockRepository.lastDeviceId == deviceId)
-        #expect(mockRepository.lastCommand?.type == command.type)
-        #expect(mockRepository.lastCommand?.payload == command.payload)
-        #expect(mockRepository.lastCommand?.targetDevice == command
+        #expect(await mockRepository.sendDeviceCommandCallCount == 1)
+        #expect(await mockRepository.lastDeviceId == deviceId)
+        #expect(await mockRepository.lastCommand?.type == command.type)
+        #expect(await mockRepository.lastCommand?.payload == command.payload)
+        #expect(await mockRepository.lastCommand?.targetDevice == command
             .targetDevice
         )
     }
@@ -53,9 +53,9 @@ struct SendDeviceCommandUseCaseTests {
         try await sut.execute(deviceId: deviceId, command: command)
 
         // Then
-        #expect(mockRepository.sendDeviceCommandCallCount == 1)
-        #expect(mockRepository.lastDeviceId == "bedroom_light_456")
-        #expect(mockRepository.lastCommand?.targetDevice == deviceId)
+        #expect(await mockRepository.sendDeviceCommandCallCount == 1)
+        #expect(await mockRepository.lastDeviceId == "bedroom_light_456")
+        #expect(await mockRepository.lastCommand?.targetDevice == deviceId)
     }
 
     @Test("Execute with empty payload should still send command")
@@ -75,8 +75,8 @@ struct SendDeviceCommandUseCaseTests {
         try await sut.execute(deviceId: deviceId, command: command)
 
         // Then
-        #expect(mockRepository.sendDeviceCommandCallCount == 1)
-        #expect(mockRepository.lastCommand?.payload.isEmpty == true)
+        #expect(await mockRepository.sendDeviceCommandCallCount == 1)
+        #expect(await mockRepository.lastCommand?.payload.isEmpty == true)
     }
 
     @Test("Execute with large payload should handle correctly")
@@ -98,9 +98,11 @@ struct SendDeviceCommandUseCaseTests {
         try await sut.execute(deviceId: deviceId, command: command)
 
         // Then
-        #expect(mockRepository.sendDeviceCommandCallCount == 1)
-        #expect(mockRepository.lastCommand?.payload == largePayload)
-        #expect(mockRepository.lastCommand?.payload.count == largePayload.count)
+        #expect(await mockRepository.sendDeviceCommandCallCount == 1)
+        #expect(await mockRepository.lastCommand?.payload == largePayload)
+        #expect(await mockRepository.lastCommand?.payload.count == largePayload
+            .count
+        )
     }
 
     // MARK: - Error Cases
@@ -115,8 +117,8 @@ struct SendDeviceCommandUseCaseTests {
             targetDevice: deviceId
         )
         let mockRepository = MockDeviceCommandRepository()
-        mockRepository.shouldThrowError = true
-        mockRepository.errorToThrow = MockError.commandSendFailure
+        await mockRepository.setShouldThrowError(true)
+        await mockRepository.setErrorToThrow(MockError.commandSendFailure)
         let sut =
             SendDeviceCommandUseCase(deviceCommandRepository: mockRepository)
 
@@ -124,7 +126,7 @@ struct SendDeviceCommandUseCaseTests {
         await #expect(throws: MockError.commandSendFailure) {
             try await sut.execute(deviceId: deviceId, command: command)
         }
-        #expect(mockRepository.sendDeviceCommandCallCount == 1)
+        #expect(await mockRepository.sendDeviceCommandCallCount == 1)
     }
 
     @Test(
@@ -139,8 +141,8 @@ struct SendDeviceCommandUseCaseTests {
             targetDevice: deviceId
         )
         let mockRepository = MockDeviceCommandRepository()
-        mockRepository.shouldThrowError = true
-        mockRepository.errorToThrow = MockError.deviceNotFound
+        await mockRepository.setShouldThrowError(true)
+        await mockRepository.setErrorToThrow(MockError.deviceNotFound)
         let sut =
             SendDeviceCommandUseCase(deviceCommandRepository: mockRepository)
 
@@ -160,8 +162,8 @@ struct SendDeviceCommandUseCaseTests {
             targetDevice: deviceId
         )
         let mockRepository = MockDeviceCommandRepository()
-        mockRepository.shouldThrowError = true
-        mockRepository.errorToThrow = MockError.mqttError
+        await mockRepository.setShouldThrowError(true)
+        await mockRepository.setErrorToThrow(MockError.mqttError)
         let sut =
             SendDeviceCommandUseCase(deviceCommandRepository: mockRepository)
 
@@ -191,11 +193,13 @@ struct SendDeviceCommandUseCaseTests {
         try await sut.execute(deviceId: deviceId, command: command)
 
         // Then
-        #expect(mockRepository.sendDeviceCommandCallCount == 1)
-        #expect(mockRepository.lastDeviceId == "precise_device_id")
-        #expect(mockRepository.lastCommand?.type == .unknown)
-        #expect(mockRepository.lastCommand?.payload == payload)
-        #expect(mockRepository.lastCommand?.targetDevice == "target_device")
+        #expect(await mockRepository.sendDeviceCommandCallCount == 1)
+        #expect(await mockRepository.lastDeviceId == "precise_device_id")
+        #expect(await mockRepository.lastCommand?.type == .unknown)
+        #expect(await mockRepository.lastCommand?.payload == payload)
+        #expect(await mockRepository.lastCommand?
+            .targetDevice == "target_device"
+        )
     }
 
     @Test("Execute multiple commands should call repository each time")
@@ -222,9 +226,9 @@ struct SendDeviceCommandUseCaseTests {
         try await sut.execute(deviceId: deviceId2, command: command2)
 
         // Then
-        #expect(mockRepository.sendDeviceCommandCallCount == 2)
-        #expect(mockRepository.lastDeviceId == deviceId2)
-        #expect(mockRepository.lastCommand?.targetDevice == deviceId2)
+        #expect(await mockRepository.sendDeviceCommandCallCount == 2)
+        #expect(await mockRepository.lastDeviceId == deviceId2)
+        #expect(await mockRepository.lastCommand?.targetDevice == deviceId2)
     }
 
     @Test("Execute should preserve command data integrity")
@@ -246,11 +250,11 @@ struct SendDeviceCommandUseCaseTests {
         try await sut.execute(deviceId: deviceId, command: command)
 
         // Then
-        #expect(mockRepository.lastCommand?.payload == originalData)
+        #expect(await mockRepository.lastCommand?.payload == originalData)
 
         // Verify data integrity by converting back to string
-        let receivedString = String(
-            data: mockRepository.lastCommand!.payload,
+        let receivedString = await String(
+            data: (mockRepository.lastCommand!).payload,
             encoding: .utf8
         )
         let originalString = String(data: originalData, encoding: .utf8)
@@ -278,9 +282,9 @@ struct SendDeviceCommandUseCaseTests {
         try await sut.execute(deviceId: deviceId, command: command)
 
         // Then
-        #expect(mockRepository.sendDeviceCommandCallCount == 1)
-        #expect(mockRepository.lastDeviceId == "actual_device_id")
-        #expect(mockRepository.lastCommand?
+        #expect(await mockRepository.sendDeviceCommandCallCount == 1)
+        #expect(await mockRepository.lastDeviceId == "actual_device_id")
+        #expect(await mockRepository.lastCommand?
             .targetDevice == "different_target_id"
         )
     }
@@ -305,8 +309,10 @@ struct SendDeviceCommandUseCaseTests {
         try await sut.execute(deviceId: deviceId, command: command)
 
         // Then
-        #expect(mockRepository.sendDeviceCommandCallCount == 1)
-        #expect(mockRepository.lastDeviceId == "device-with_special.chars@123")
+        #expect(await mockRepository.sendDeviceCommandCallCount == 1)
+        #expect(await mockRepository
+            .lastDeviceId == "device-with_special.chars@123"
+        )
     }
 
     @Test("Execute with binary payload should handle correctly")
@@ -327,9 +333,9 @@ struct SendDeviceCommandUseCaseTests {
         try await sut.execute(deviceId: deviceId, command: command)
 
         // Then
-        #expect(mockRepository.sendDeviceCommandCallCount == 1)
-        #expect(mockRepository.lastCommand?.payload == binaryData)
-        #expect(mockRepository.lastCommand?.payload.count == 7)
+        #expect(await mockRepository.sendDeviceCommandCallCount == 1)
+        #expect(await mockRepository.lastCommand?.payload == binaryData)
+        #expect(await mockRepository.lastCommand?.payload.count == 7)
     }
 
     @Test("Execute with concurrent commands should handle correctly")
@@ -360,13 +366,13 @@ struct SendDeviceCommandUseCaseTests {
         }
 
         // Then
-        #expect(mockRepository.sendDeviceCommandCallCount == 10)
+        #expect(await mockRepository.sendDeviceCommandCallCount == 10)
     }
 }
 
 // MARK: - Mock Repository
 
-private final class MockDeviceCommandRepository: DeviceCommandRepositoryProtocol {
+private actor MockDeviceCommandRepository: DeviceCommandRepositoryProtocol {
     var sendDeviceCommandCallCount = 0
     var lastDeviceId: String?
     var lastCommand: Command?
@@ -381,6 +387,14 @@ private final class MockDeviceCommandRepository: DeviceCommandRepositoryProtocol
         if shouldThrowError {
             throw errorToThrow
         }
+    }
+
+    func setShouldThrowError(_ value: Bool) {
+        shouldThrowError = value
+    }
+
+    func setErrorToThrow(_ error: Error) {
+        errorToThrow = error
     }
 }
 

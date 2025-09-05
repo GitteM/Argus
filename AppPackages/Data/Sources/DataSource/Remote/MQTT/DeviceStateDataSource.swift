@@ -36,6 +36,11 @@ public actor DeviceStateDataSource: DeviceStateDataSourceProtocol {
                         if let deviceState = await self.parseMessage(message) {
                             await self.updateDeviceState(deviceState)
                             continuation.yield(deviceState)
+                        } else {
+                            self.logger.log(
+                                "Failed to parse message from topic: \(message.topic)",
+                                level: .info
+                            )
                         }
                     }
                 }
@@ -62,6 +67,15 @@ public actor DeviceStateDataSource: DeviceStateDataSourceProtocol {
         // Extract device ID based on topic pattern
         guard topicComponents.count >= 3,
               topicComponents[0] == "home" else {
+            let logMessage =
+                """
+                Invalid topic format: \(message.topic).
+                Expected format: home/{deviceType}/{deviceId}
+                """
+            logger.log(
+                logMessage,
+                level: .info
+            )
             return nil
         }
 
