@@ -54,13 +54,13 @@ struct AddDeviceUseCaseTests {
     func executeWhenRepositoryThrowsError() async {
         // Given
         let discoveredDevice = DiscoveredDevice.mockNew1
-        let expectedError = MockError.repositoryFailure
+        let expectedError = TestError.repositoryError
         let mockRepository = MockDeviceConnectionRepository()
         mockRepository.addDeviceResult = .failure(expectedError)
         let sut = AddDeviceUseCase(deviceConnectionRepository: mockRepository)
 
         // When/Then
-        await #expect(throws: MockError.repositoryFailure) {
+        await #expect(throws: TestError.repositoryError) {
             try await sut.execute(discoveredDevice: discoveredDevice)
         }
         #expect(mockRepository.addDeviceCallCount == 1)
@@ -70,13 +70,13 @@ struct AddDeviceUseCaseTests {
     func executeWhenDeviceAlreadyExists() async {
         // Given
         let discoveredDevice = DiscoveredDevice.mockNew1
-        let expectedError = MockError.deviceAlreadyExists
+        let expectedError = TestError.deviceAlreadyExists
         let mockRepository = MockDeviceConnectionRepository()
         mockRepository.addDeviceResult = .failure(expectedError)
         let sut = AddDeviceUseCase(deviceConnectionRepository: mockRepository)
 
         // When/Then
-        await #expect(throws: MockError.deviceAlreadyExists) {
+        await #expect(throws: TestError.deviceAlreadyExists) {
             try await sut.execute(discoveredDevice: discoveredDevice)
         }
     }
@@ -166,11 +166,4 @@ private final class MockDeviceConnectionRepository: DeviceConnectionRepositoryPr
         // Not needed for AddDeviceUseCase tests
         []
     }
-}
-
-// MARK: - Mock Error
-
-private enum MockError: Error, Equatable {
-    case repositoryFailure
-    case deviceAlreadyExists
 }

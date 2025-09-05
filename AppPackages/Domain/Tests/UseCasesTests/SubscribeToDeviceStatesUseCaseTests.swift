@@ -148,13 +148,13 @@ struct SubscribeToDeviceStatesUseCaseTests {
         let stateTopic = "home/device/error/state"
         let mockRepository = MockDeviceStateRepository()
         mockRepository.shouldThrowError = true
-        mockRepository.errorToThrow = MockError.subscriptionFailure
+        mockRepository.errorToThrow = TestError.subscriptionFailure
         let sut =
             SubscribeToDeviceStatesUseCase(deviceStateRepository: mockRepository
             )
 
         // When/Then
-        await #expect(throws: MockError.subscriptionFailure) {
+        await #expect(throws: TestError.subscriptionFailure) {
             try await sut.execute(stateTopic: stateTopic)
         }
         #expect(mockRepository.subscribeToDeviceStateCallCount == 1)
@@ -166,13 +166,13 @@ struct SubscribeToDeviceStatesUseCaseTests {
         let stateTopic = "home/device/mqtt_error/state"
         let mockRepository = MockDeviceStateRepository()
         mockRepository.shouldThrowError = true
-        mockRepository.errorToThrow = MockError.mqttError
+        mockRepository.errorToThrow = TestError.mqttError
         let sut =
             SubscribeToDeviceStatesUseCase(deviceStateRepository: mockRepository
             )
 
         // When/Then
-        await #expect(throws: MockError.mqttError) {
+        await #expect(throws: TestError.mqttError) {
             try await sut.execute(stateTopic: stateTopic)
         }
     }
@@ -185,13 +185,13 @@ struct SubscribeToDeviceStatesUseCaseTests {
         let stateTopic = "invalid/topic/format"
         let mockRepository = MockDeviceStateRepository()
         mockRepository.shouldThrowError = true
-        mockRepository.errorToThrow = MockError.invalidTopic
+        mockRepository.errorToThrow = TestError.invalidTopic
         let sut =
             SubscribeToDeviceStatesUseCase(deviceStateRepository: mockRepository
             )
 
         // When/Then
-        await #expect(throws: MockError.invalidTopic) {
+        await #expect(throws: TestError.invalidTopic) {
             try await sut.execute(stateTopic: stateTopic)
         }
     }
@@ -418,7 +418,7 @@ private final class MockDeviceStateRepository: DeviceStateRepositoryProtocol {
     var lastStateTopic: String?
     var deviceStates: [DeviceState] = []
     var shouldThrowError = false
-    var errorToThrow: Error = MockError.subscriptionFailure
+    var errorToThrow: Error = TestError.subscriptionFailure
 
     func subscribeToDeviceState(stateTopic: String) async throws
         -> AsyncStream<DeviceState> {
@@ -442,13 +442,4 @@ private final class MockDeviceStateRepository: DeviceStateRepositoryProtocol {
         // Not needed for SubscribeToDeviceStatesUseCase tests
         return deviceStates.first { $0.deviceId == deviceId }
     }
-}
-
-// MARK: - Mock Error
-
-private enum MockError: Error, Equatable {
-    case subscriptionFailure
-    case mqttError
-    case invalidTopic
-    case deviceNotFound
 }
