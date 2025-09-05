@@ -47,7 +47,7 @@ public actor DeviceStateDataSource: DeviceStateDataSourceProtocol {
         }
     }
 
-    public func getDeviceState(deviceId: String) -> DeviceState? {
+    public func getDeviceState(deviceId: String) async throws -> DeviceState? {
         deviceStatesCache[deviceId]
     }
 
@@ -55,7 +55,7 @@ public actor DeviceStateDataSource: DeviceStateDataSourceProtocol {
         deviceStatesCache[deviceState.deviceId] = deviceState
     }
 
-    private func parseMessage(_ message: MQTTMessage) async -> DeviceState? {
+    func parseMessage(_ message: MQTTMessage) async -> DeviceState? {
         let topicComponents = message.topic.components(separatedBy: "/")
         let payload = message.payload
 
@@ -100,6 +100,8 @@ public actor DeviceStateDataSource: DeviceStateDataSourceProtocol {
         #if DEBUG
             dump(deviceState)
         #endif
+
+        updateDeviceState(deviceState)
         return deviceState
     }
 
@@ -119,12 +121,16 @@ public actor DeviceStateDataSource: DeviceStateDataSourceProtocol {
 
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .formatted(DateFormatter.iso)
-        return decoder.decode(
-            TemperatureSensor.self,
-            from: data,
-            logger: logger,
-            context: "from MQTT topic: \(topic)"
-        )
+        do {
+            return try decoder.decode(
+                TemperatureSensor.self,
+                from: data,
+                logger: logger,
+                context: "from MQTT topic: \(topic)"
+            )
+        } catch {
+            return nil
+        }
     }
 
     // MARK: - Light State Decoding
@@ -143,11 +149,15 @@ public actor DeviceStateDataSource: DeviceStateDataSourceProtocol {
 
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .formatted(DateFormatter.iso)
-        return decoder.decode(
-            LightState.self,
-            from: data,
-            logger: logger,
-            context: "from MQTT topic: \(topic)"
-        )
+        do {
+            return try decoder.decode(
+                LightState.self,
+                from: data,
+                logger: logger,
+                context: "from MQTT topic: \(topic)"
+            )
+        } catch {
+            return nil
+        }
     }
 }

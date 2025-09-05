@@ -54,30 +54,26 @@ public final class CacheManager: CacheManagerProtocol, Sendable {
         setupCache()
     }
 
-    private func setupCache() {
-        memoryCache.countLimit = 50
-        memoryCache.totalCostLimit = 25 * 1024 * 1024 // 25MB
-
-        loadCriticalItemsFromDisk()
-    }
-
     public func get<T: Codable>(key: String) -> Result<T?, AppError> {
         cacheQueue.sync {
             // Try memory cache first
             if let memoryItem = memoryCache
                 .object(forKey: NSString(string: key)) {
                 if !memoryItem.isExpired {
-                    if let decoded: T = JSONDecoder().decode(
-                        T.self,
-                        from: memoryItem.data,
-                        logger: logger,
-                        context: "get Cached value"
-                    ) {
+                    do {
+                        let decoded: T = try JSONDecoder().decode(
+                            T.self,
+                            from: memoryItem.data,
+                            logger: logger,
+                            context: "get Cached value"
+                        )
                         return .success(decoded)
-                    } else {
+                    } catch let appError as AppError {
+                        return .failure(appError)
+                    } catch {
                         return .failure(AppError.deserializationError(
                             type: String(describing: T.self),
-                            details: "Failed to decode cached value"
+                            details: "Failed to decode cached value: \(error.localizedDescription)"
                         ))
                     }
                 } else {
@@ -181,15 +177,24 @@ public final class CacheManager: CacheManagerProtocol, Sendable {
             return fileManager.cacheFileExists(at: fileURL)
         }
     }
+}
 
-    private func shouldPersistToDisk(key: String) -> Bool {
+private extension CacheManager {
+    func setupCache() {
+        memoryCache.countLimit = 50
+        memoryCache.totalCostLimit = 25 * 1024 * 1024 // 25MB
+
+        loadCriticalItemsFromDisk()
+    }
+
+    func shouldPersistToDisk(key: String) -> Bool {
         // Persist important data like device lists, user preferences
         key.contains("devices") ||
             key.contains("settings") ||
             key.contains("user_profile")
     }
 
-    private func saveToDisk(key: String, item: CacheItem) {
+    func saveToDisk(key: String, item: CacheItem) {
         let fileURL = cacheDirectory.appendingPathComponent("\(key).cache")
         do {
             let cacheData = try JSONEncoder().encode(DiskCacheItem(from: item))
@@ -204,7 +209,7 @@ public final class CacheManager: CacheManagerProtocol, Sendable {
         }
     }
 
-    private func saveToDiskWithResult(
+    func saveToDiskWithResult(
         key: String,
         item: CacheItem
     ) -> Result<Void, AppError> {
@@ -223,20 +228,25 @@ public final class CacheManager: CacheManagerProtocol, Sendable {
         }
     }
 
-    private func loadFromDisk<T: Codable>(key: String) -> Result<T?, AppError> {
+    func loadFromDisk<T: Codable>(key: String) -> Result<T?, AppError> {
         let fileURL = cacheDirectory.appendingPathComponent("\(key).cache")
 
         do {
             let data = try Data(contentsOf: fileURL)
-            guard let diskItem = JSONDecoder().decode(
-                DiskCacheItem.self,
-                from: data,
-                logger: logger,
-                context: "from load from disk"
-            ) else {
+            let diskItem: DiskCacheItem
+            do {
+                diskItem = try JSONDecoder().decode(
+                    DiskCacheItem.self,
+                    from: data,
+                    logger: logger,
+                    context: "from load from disk"
+                )
+            } catch let appError as AppError {
+                return .failure(appError)
+            } catch {
                 return .failure(AppError.deserializationError(
                     type: "DiskCacheItem",
-                    details: "Failed to decode disk cache item"
+                    details: "Failed to decode disk cache item: \(error.localizedDescription)"
                 ))
             }
 
@@ -246,17 +256,21 @@ public final class CacheManager: CacheManagerProtocol, Sendable {
                 return .success(nil)
             }
 
-            if let decoded: T = JSONDecoder().decode(
-                T.self,
-                from: diskItem.data,
-                logger: logger,
-                context: "from load from disk not expired"
-            ) {
+            do {
+                let decoded: T = try JSONDecoder().decode(
+                    T.self,
+                    from: diskItem.data,
+                    logger: logger,
+                    context: "from load from disk not expired"
+                )
                 return .success(decoded)
-            } else {
+            } catch let appError as AppError {
+                return .failure(appError)
+            } catch {
+                let localizedError = error.localizedDescription
                 return .failure(AppError.deserializationError(
                     type: String(describing: T.self),
-                    details: "Failed to decode cached value from disk"
+                    details: "Failed to decode cached value from disk: \(localizedError)"
                 ))
             }
         } catch {
@@ -280,7 +294,7 @@ public final class CacheManager: CacheManagerProtocol, Sendable {
         }
     }
 
-    private func loadCriticalItemsFromDisk() {
+    func loadCriticalItemsFromDisk() {
         // Load important cached items back into memory on app startup
         let criticalKeys = ["devices", "user_settings", "device_states"]
 
@@ -290,12 +304,15 @@ public final class CacheManager: CacheManagerProtocol, Sendable {
 
             do {
                 let data = try Data(contentsOf: fileURL)
-                guard let diskItem = JSONDecoder().decode(
-                    DiskCacheItem.self,
-                    from: data,
-                    logger: logger,
-                    context: "from load cached items back into memory on startup"
-                ) else {
+                let diskItem: DiskCacheItem
+                do {
+                    diskItem = try JSONDecoder().decode(
+                        DiskCacheItem.self,
+                        from: data,
+                        logger: logger,
+                        context: "from load cached items back into memory on startup"
+                    )
+                } catch {
                     continue
                 }
 
@@ -323,7 +340,7 @@ public final class CacheManager: CacheManagerProtocol, Sendable {
     // MARK: - Error Logging
 
     /// Centralized cache error logging using AppError structured information
-    private func logCacheError(
+    func logCacheError(
         _ error: AppError,
         context: String,
         key: String? = nil
@@ -355,7 +372,7 @@ public final class CacheManager: CacheManagerProtocol, Sendable {
     }
 
     /// Build technical details string from AppError for cache operations
-    private func buildCacheTechnicalDetails(for error: AppError) -> String {
+    func buildCacheTechnicalDetails(for error: AppError) -> String {
         switch error {
         case let .fileSystemError(operation, path, underlyingError):
             let localizedError = underlyingError?.localizedDescription ?? "unknown"

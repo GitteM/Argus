@@ -1,57 +1,80 @@
+import Entities
 import Foundation
 import ServiceProtocols
 
 public extension JSONDecoder {
-    /// Decode MQTT data with proper error logging instead of fatal errors
     func decode<T: Decodable>(
         _ type: T.Type,
         from data: Data,
         logger: LoggerProtocol,
         context: String = ""
-    ) -> T? {
+    ) throws -> T {
         do {
             return try decode(T.self, from: data)
-        } catch let DecodingError.keyNotFound(key, context) {
-            let message =
+        } catch let DecodingError.keyNotFound(key, decodingContext) {
+            let details =
                 """
-                Failed to decode \(type) \(context) - missing key
-                '\(key.stringValue)': \(context.debugDescription)
+                Missing key '\(key.stringValue)': \(decodingContext
+                    .debugDescription
+                )
                 """
-            logger.log(message, level: .error)
-            return nil
-        } catch let DecodingError.typeMismatch(_, context) {
-            let message =
+            logger.log(
+                "Failed to decode \(type) \(context) - \(details)",
+                level: .error
+            )
+            throw AppError.deserializationError(
+                type: String(describing: type),
+                details: details
+            )
+        } catch let DecodingError.typeMismatch(_, decodingContext) {
+            let details =
                 """
-                "Failed to decode \(type) \(context)
-                type mismatch: \(context.debugDescription)
+                Type mismatch: \(decodingContext.debugDescription)
                 """
-            logger.log(message, level: .error)
-            return nil
-        } catch let DecodingError.valueNotFound(type, context) {
-            let message =
+            logger.log(
+                "Failed to decode \(type) \(context) - \(details)",
+                level: .error
+            )
+            throw AppError.deserializationError(
+                type: String(describing: type),
+                details: details
+            )
+        } catch let DecodingError.valueNotFound(valueType, decodingContext) {
+            let details =
                 """
-                Failed to decode \(type) \(context)
-                missing \(type)
-                value: \(context.debugDescription)
+                Missing \(valueType) value: \(decodingContext.debugDescription)
                 """
-            logger.log(message, level: .error)
-            return nil
-        } catch let DecodingError.dataCorrupted(context) {
-            let message =
+            logger.log(
+                "Failed to decode \(type) \(context) - \(details)",
+                level: .error
+            )
+            throw AppError.deserializationError(
+                type: String(describing: type),
+                details: details
+            )
+        } catch let DecodingError.dataCorrupted(decodingContext) {
+            let details =
                 """
-                Failed to decode \(type) \(context)
-                data corrupted: \(context.debugDescription)
+                Data corrupted: \(decodingContext.debugDescription)
                 """
-            logger.log(message, level: .error)
-            return nil
+            logger.log(
+                "Failed to decode \(type) \(context) - \(details)",
+                level: .error
+            )
+            throw AppError.deserializationError(
+                type: String(describing: type),
+                details: details
+            )
         } catch {
-            let message =
-                """
-                Failed to decode \(type) \(context)
-                Error: \(error.localizedDescription)
-                """
-            logger.log(message, level: .error)
-            return nil
+            let details = error.localizedDescription
+            logger.log(
+                "Failed to decode \(type) \(context) - \(details)",
+                level: .error
+            )
+            throw AppError.deserializationError(
+                type: String(describing: type),
+                details: details
+            )
         }
     }
 }
