@@ -28,3 +28,11 @@ Package.resolved
 
 # Claude Code settings
 .claude
+
+# Test Results & Coverage
+*.xcresult
+TestResults.xcresult/
+coverage.json
+coverage.txt
+coverage-*.md
+coverage-files.txt

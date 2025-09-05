@@ -57,15 +57,51 @@ jobs:
             -configuration Debug \
             build-for-testing
 
-      - name: Run unit tests
+      - name: Run unit tests with coverage
         run: |
-          xcodebuild \
-            -project Argus.xcodeproj \
+          xcodebuild test \
+            -workspace Argus.xcworkspace \
             -scheme Argus \
+            -testPlan TestPlan \
+            -enableCodeCoverage YES \
             -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
             -configuration Debug \
-            test-without-building \
-            -skip-testing:ArgusUITests
+            -resultBundlePath TestResults.xcresult
+
+      - name: Generate coverage report
+        run: |
+          xcrun xccov view TestResults.xcresult --report --json > coverage.json
+          xcrun xccov view TestResults.xcresult --report > coverage.txt
+
+      - name: Parse coverage summary
+        id: coverage
+        run: |
+          # Extract overall coverage percentage from JSON
+          COVERAGE=$(python3 -c "
+          import json
+          with open('coverage.json', 'r') as f:
+              data = json.load(f)
+              total_lines = 0
+              covered_lines = 0
+              for target in data['targets']:
+                  if not target['name'].endswith('.xctest'):
+                      total_lines += target['executableLines']
+                      covered_lines += target['coveredLines']
+              coverage = (covered_lines / total_lines) * 100 if total_lines > 0 else 0
+              print(f'{coverage:.2f}')
+          ")
+          echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
+          echo "Overall Code Coverage: $COVERAGE%"
+
+      - name: Upload coverage reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-reports
+          path: |
+            coverage.json
+            coverage.txt
+            TestResults.xcresult
+          retention-days: 7
 
       - name: Upload test results
         uses: actions/upload-artifact@v4

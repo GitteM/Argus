@@ -1,0 +1,162 @@
+name: Code Coverage
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Run daily at 2 AM UTC to keep coverage data fresh
+    - cron: '0 2 * * *'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  coverage:
+    name: Generate Coverage Report
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Select Xcode version
+        run: sudo xcode-select -s /Applications/Xcode_16.4.app/Contents/Developer
+
+      - name: Cache Swift Package Manager
+        uses: actions/cache@v4
+        with:
+          path: |
+            .build
+            ~/Library/Caches/org.swift.swiftpm
+          key: ${{ runner.os }}-xcode16-spm-${{ hashFiles('**/Package.resolved', '**/Package.swift') }}
+          restore-keys: |
+            ${{ runner.os }}-spm-
+
+      - name: Cache Xcode DerivedData
+        uses: actions/cache@v4
+        with:
+          path: ~/Library/Developer/Xcode/DerivedData
+          key: ${{ runner.os }}-xcode-deriveddata-${{ hashFiles('**/*.xcodeproj/project.pbxproj') }}
+          restore-keys: |
+            ${{ runner.os }}-xcode-deriveddata-
+
+      - name: Install dependencies
+        run: |
+          xcodebuild -resolvePackageDependencies -workspace Argus.xcworkspace
+
+      - name: Run tests with coverage
+        run: |
+          xcodebuild test \
+            -workspace Argus.xcworkspace \
+            -scheme Argus \
+            -testPlan TestPlan \
+            -enableCodeCoverage YES \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
+            -resultBundlePath TestResults.xcresult
+
+      - name: Generate coverage reports
+        run: |
+          # Generate JSON and text reports
+          xcrun xccov view TestResults.xcresult --report --json > coverage.json
+          xcrun xccov view TestResults.xcresult --report > coverage.txt
+          
+          # Generate detailed coverage per file
+          xcrun xccov view TestResults.xcresult --file-list > coverage-files.txt
+
+      - name: Parse coverage data
+        id: coverage
+        run: |
+          # Calculate overall coverage
+          OVERALL_COVERAGE=$(python3 -c "
+          import json
+          with open('coverage.json', 'r') as f:
+              data = json.load(f)
+              total_lines = 0
+              covered_lines = 0
+              for target in data['targets']:
+                  if not target['name'].endswith('.xctest') and 'Tests' not in target['name']:
+                      total_lines += target['executableLines']
+                      covered_lines += target['coveredLines']
+              coverage = (covered_lines / total_lines) * 100 if total_lines > 0 else 0
+              print(f'{coverage:.1f}')
+          ")
+          
+          # Get component coverage
+          python3 -c "
+          import json
+          with open('coverage.json', 'r') as f:
+              data = json.load(f)
+              print('| Component | Coverage |')
+              print('|-----------|----------|')
+              for target in data['targets']:
+                  if not target['name'].endswith('.xctest') and 'Tests' not in target['name']:
+                      coverage = target['lineCoverage'] * 100
+                      print(f'| {target[\"name\"]} | {coverage:.1f}% |')
+          " > coverage-table.md
+          
+          echo "overall_coverage=$OVERALL_COVERAGE" >> $GITHUB_OUTPUT
+          echo "Overall Coverage: $OVERALL_COVERAGE%"
+
+      - name: Generate coverage badge
+        uses: schneegans/dynamic-badges-action@v1.7.0
+        with:
+          auth: ${{ secrets.GITHUB_TOKEN }}
+          gistID: ${{ secrets.COVERAGE_GIST_ID || 'auto' }}
+          filename: coverage-badge.json
+          label: Coverage
+          message: ${{ steps.coverage.outputs.overall_coverage }}%
+          color: ${{ steps.coverage.outputs.overall_coverage >= 80 && 'brightgreen' || steps.coverage.outputs.overall_coverage >= 60 && 'yellow' || 'red' }}
+
+      - name: Comment coverage on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const coverageTable = fs.readFileSync('coverage-table.md', 'utf8');
+            const overallCoverage = '${{ steps.coverage.outputs.overall_coverage }}';
+            
+            const body = `## 📊 Code Coverage Report
+            
+            **Overall Coverage: ${overallCoverage}%**
+            
+            ### Component Breakdown
+            ${coverageTable}
+            
+            > Coverage report generated from TestPlan execution
+            `;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+
+      - name: Upload coverage artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report-${{ github.run_number }}
+          path: |
+            coverage.json
+            coverage.txt
+            coverage-files.txt
+            coverage-table.md
+            TestResults.xcresult
+          retention-days: 30
+
+      - name: Upload to Codecov (optional)
+        if: ${{ vars.CODECOV_TOKEN != '' }}
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: ./coverage.json
+          flags: unittests
+          name: codecov-umbrella

@@ -9,6 +9,7 @@ A modern iOS application demonstrating MQTT integration with Clean Architecture 
 ![Swift](https://img.shields.io/badge/Swift-6.1-orange.svg)
 ![iOS](https://img.shields.io/badge/iOS-17.0%2B-blue.svg)
 ![SPM](https://img.shields.io/badge/SPM-Modular-red.svg)
+![Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/GitteM/coverage-badge-gist-id/raw/coverage-badge.json)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
 ## Overview
@@ -19,9 +20,9 @@ A demonstration of basic MQTT integration for iOS featuring real-time device mon
 
 Before running the project on an iOS simulator, the MQTT test environment must be availble:
 
-Check out the companion test server repository
-Follow the setup instructions in that repository's README.md.
-Ensure the Docker container and test server is running locally to provide test data to the iOS simulator
+- Check out the companion test server repository
+- Follow the setup instructions in that repository's README.md.
+- Ensure the Docker container and test server is running locally to provide test data to the iOS simulator
 
 ### Core Functionality
 
@@ -41,7 +42,7 @@ Ensure the Docker container and test server is running locally to provide test d
 - **Dependency Injection** Composition Root with State/Store
 - **Router Pattern** for navigation
 - **Async/Await** for modern concurrency
-- **Testing Practices** TestPlan includes DeviceStore
+- **Testing Practices** TestPlan on Argus scheme
 
 ## Architecture
 
@@ -62,7 +63,7 @@ The application follows Clean Architecture principles:
 │         DI • Services • Utilites              │
 ├───────────────────────────────────────────────┤
 │                  Navigation                   │
-│         Router + Route+Extensions             │
+│           Router + Route+Extensions           │
 └───────────────────────────────────────────────┘
 ```
 
@@ -102,11 +103,15 @@ Argus/
 
 1. **Clone the repository**
 ```bash
-git clone https://github.com/yourusername/iot-device-management-ios.git
-cd iot-device-management-ios
+git clone https://github.com/GitteM/Argus.git
+cd Argus
 ```
 
 2. **Open in Xcode**
+```bash
+xed .
+```
+or
 
 Open the file Argus/Argus.xcworkspace (not the .xcodeproj).
 
@@ -164,6 +169,28 @@ chmod +x setup.sh
 - **Test Devices** Living Room Light, Kitchen Temperature Sensor
 
 See the [README.md](https://github.com/GitteM/mqtt-test-environment/blob/main/README.md) for complete documentation and troubleshooting.
+
+### Code Coverage
+
+Automated code coverage tracking is integrated into the CI/CD pipeline:
+
+- **Coverage reports** are generated automatically on every PR and push to main
+- **Coverage badges** are updated automatically and shown above
+- **Detailed coverage breakdowns** are posted as comments on PRs
+- **Coverage artifacts** are stored for 30 days for analysis
+
+Run coverage locally:
+```bash
+xcodebuild test \
+  -workspace Argus.xcworkspace \
+  -scheme Argus \
+  -testPlan TestPlan \
+  -enableCodeCoverage YES \
+  -destination 'platform=iOS Simulator,name=iPhone 16 Pro' \
+  -resultBundlePath TestResults.xcresult
+
+xcrun xccov view TestResults.xcresult --report
+```
 
 ### Limitations & Future Enhancements
 **Currently Not Implemented**
