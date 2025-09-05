@@ -9,7 +9,7 @@ A modern iOS application demonstrating MQTT integration with Clean Architecture 
 ![Swift](https://img.shields.io/badge/Swift-6.1-orange.svg)
 ![iOS](https://img.shields.io/badge/iOS-17.0%2B-blue.svg)
 ![SPM](https://img.shields.io/badge/SPM-Modular-red.svg)
-![Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/GitteM/coverage-badge-gist-id/raw/coverage-badge.json)
+![Coverage](https://github.com/GitteM/Argus/actions/workflows/coverage.yml/badge.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
 ## Overview
