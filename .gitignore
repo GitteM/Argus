@@ -25,3 +25,6 @@ Package.resolved
 
 # macOS system files
 .DS_Store
+
+# Claude Code settings
+.claude

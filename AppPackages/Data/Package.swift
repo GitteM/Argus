@@ -80,8 +80,17 @@ let package = Package(
             name: "DataSourceTests",
             dependencies: [
                 "DataSource",
+                "DataUtilities",
                 .product(name: "Domain", package: "Domain"),
             ]
+        ),
+        .testTarget(
+            name: "DataUtilitiesTests",
+            dependencies: [
+                "DataUtilities",
+                .product(name: "Domain", package: "Domain")
+            ],
+            path: "Tests/DataUtilitiesTests"
         ),
         .testTarget(
             name: "PersistenceTests",

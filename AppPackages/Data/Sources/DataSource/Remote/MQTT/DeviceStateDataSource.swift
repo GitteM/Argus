@@ -36,6 +36,11 @@ public actor DeviceStateDataSource: DeviceStateDataSourceProtocol {
                         if let deviceState = await self.parseMessage(message) {
                             await self.updateDeviceState(deviceState)
                             continuation.yield(deviceState)
+                        } else {
+                            self.logger.log(
+                                "Failed to parse message from topic: \(message.topic)",
+                                level: .info
+                            )
                         }
                     }
                 }
@@ -47,7 +52,7 @@ public actor DeviceStateDataSource: DeviceStateDataSourceProtocol {
         }
     }
 
-    public func getDeviceState(deviceId: String) -> DeviceState? {
+    public func getDeviceState(deviceId: String) async throws -> DeviceState? {
         deviceStatesCache[deviceId]
     }
 
@@ -55,13 +60,22 @@ public actor DeviceStateDataSource: DeviceStateDataSourceProtocol {
         deviceStatesCache[deviceState.deviceId] = deviceState
     }
 
-    private func parseMessage(_ message: MQTTMessage) async -> DeviceState? {
+    func parseMessage(_ message: MQTTMessage) async -> DeviceState? {
         let topicComponents = message.topic.components(separatedBy: "/")
         let payload = message.payload
 
         // Extract device ID based on topic pattern
         guard topicComponents.count >= 3,
               topicComponents[0] == "home" else {
+            let logMessage =
+                """
+                Invalid topic format: \(message.topic).
+                Expected format: home/{deviceType}/{deviceId}
+                """
+            logger.log(
+                logMessage,
+                level: .info
+            )
             return nil
         }
 
@@ -100,6 +114,8 @@ public actor DeviceStateDataSource: DeviceStateDataSourceProtocol {
         #if DEBUG
             dump(deviceState)
         #endif
+
+        updateDeviceState(deviceState)
         return deviceState
     }
 
@@ -119,12 +135,20 @@ public actor DeviceStateDataSource: DeviceStateDataSourceProtocol {
 
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .formatted(DateFormatter.iso)
-        return decoder.decode(
-            TemperatureSensor.self,
-            from: data,
-            logger: logger,
-            context: "from MQTT topic: \(topic)"
-        )
+        do {
+            return try decoder.decode(
+                TemperatureSensor.self,
+                from: data,
+                logger: logger,
+                context: "from MQTT topic: \(topic)"
+            )
+        } catch {
+            logger.log(
+                "Failed to decode TemperatureSensor from MQTT topic: \(topic). Error: \(error)",
+                level: .error
+            )
+            return nil
+        }
     }
 
     // MARK: - Light State Decoding
@@ -143,11 +167,19 @@ public actor DeviceStateDataSource: DeviceStateDataSourceProtocol {
 
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .formatted(DateFormatter.iso)
-        return decoder.decode(
-            LightState.self,
-            from: data,
-            logger: logger,
-            context: "from MQTT topic: \(topic)"
-        )
+        do {
+            return try decoder.decode(
+                LightState.self,
+                from: data,
+                logger: logger,
+                context: "from MQTT topic: \(topic)"
+            )
+        } catch {
+            logger.log(
+                "Failed to decode LightState from MQTT topic: \(topic). Error: \(error)",
+                level: .error
+            )
+            return nil
+        }
     }
 }
