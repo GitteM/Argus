@@ -115,10 +115,7 @@ struct DeviceStateDataSourceTests {
             .temperatureSensor == nil
         ) // But sensor data should be nil
 
-        // Verify error was logged
-        #expect(mockLogger.loggedMessages
-            .count >= 0
-        ) // May log errors during decoding
+        // Logger may or may not log errors during decoding - that's acceptable
     }
 
     @Test("Should handle invalid light state payload gracefully")
@@ -183,8 +180,8 @@ struct DeviceStateDataSourceTests {
             .temperatureSensor == nil
         ) // But sensor data should be nil
 
-        // Verify error was logged for malformed JSON
-        #expect(mockLogger.loggedMessages.count >= 0)
+        // Logger may or may not log errors for malformed JSON - that's
+        // acceptable
     }
 
     @Test("Should handle empty payload as offline device")
@@ -320,11 +317,17 @@ struct DeviceStateDataSourceTests {
         #expect(parsedState != nil)
 
         // Then - Retrieve from cache
-        let cachedState = try await dataSource
+        let cachedStateResult = await dataSource
             .getDeviceState(deviceId: testDeviceId)
-        #expect(cachedState != nil)
-        #expect(cachedState?.deviceId == testDeviceId)
-        #expect(cachedState?.temperatureSensor?.temperature == 25.0)
+
+        switch cachedStateResult {
+        case let .success(cachedState):
+            #expect(cachedState != nil)
+            #expect(cachedState?.deviceId == testDeviceId)
+            #expect(cachedState?.temperatureSensor?.temperature == 25.0)
+        case .failure:
+            #expect(Bool(false), "Expected success but got failure")
+        }
     }
 
     @Test("Should return nil for non-cached device")
@@ -338,11 +341,19 @@ struct DeviceStateDataSourceTests {
         )
 
         // When
-        let deviceState = try await dataSource
+        let deviceStateResult = await dataSource
             .getDeviceState(deviceId: "nonexistent_device")
 
         // Then
-        #expect(deviceState == nil)
+        switch deviceStateResult {
+        case let .success(deviceState):
+            #expect(deviceState == nil)
+        case .failure:
+            #expect(
+                Bool(false),
+                "Expected success with nil value but got failure"
+            )
+        }
     }
 
     // MARK: - AsyncStream Subscription Tests

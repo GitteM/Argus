@@ -12,8 +12,8 @@ public struct DeviceCommandRepository: DeviceCommandRepositoryProtocol {
     public func sendDeviceCommand(
         deviceId: String,
         command: Command
-    ) async throws {
-        try await deviceCommandDataSource.sendDeviceCommand(
+    ) async -> Result<Void, AppError> {
+        await deviceCommandDataSource.sendDeviceCommand(
             deviceId: deviceId,
             command: command
         )

@@ -27,11 +27,11 @@ let package = Package(
         .library(
             name: "Utilities",
             targets: ["Utilities"]
-        ),
+        )
     ],
     dependencies: [
         .package(path: "../Domain"),
-        .package(path: "../Data"),
+        .package(path: "../Data")
     ],
     targets: [
         .target(
@@ -50,7 +50,7 @@ let package = Package(
                 .product(
                     name: "Data",
                     package: "Data"
-                ),
+                )
             ],
             path: "Sources/DependencyInjection"
         ),
@@ -59,7 +59,7 @@ let package = Package(
             dependencies: [
                 "Services",
                 "DependencyInjection",
-                "Utilities",
+                "Utilities"
             ],
             path: "Sources/Infrastructure"
         ),
@@ -70,7 +70,7 @@ let package = Package(
                 .product(
                     name: "Domain",
                     package: "Domain"
-                ),
+                )
             ],
             path: "Sources/Services"
         ),
@@ -80,7 +80,7 @@ let package = Package(
                 .product(
                     name: "Domain",
                     package: "Domain"
-                ),
+                )
             ],
             path: "Sources/Utilities"
         )

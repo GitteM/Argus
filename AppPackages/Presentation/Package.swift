@@ -14,13 +14,13 @@ let package = Package(
         .library(name: "DeviceDetail", targets: ["DeviceDetail"]),
         .library(name: "Presentation", targets: ["Presentation"]),
         .library(name: "SharedUI", targets: ["SharedUI"]),
-        .library(name: "Stores", targets: ["Stores"]),
+        .library(name: "Stores", targets: ["Stores"])
     ],
     dependencies: [
         .package(path: "../Domain"),
         .package(path: "../Infrastructure"),
         .package(path: "../Data"),
-        .package(path: "../Navigation"),
+        .package(path: "../Navigation")
     ],
     targets: [
         .target(
@@ -28,7 +28,7 @@ let package = Package(
             dependencies: [
                 "Dashboard",
                 "DeviceDetail",
-                "SharedUI",
+                "SharedUI"
             ],
             path: "Sources/Presentation"
         ),
@@ -48,7 +48,7 @@ let package = Package(
                 .product(
                     name: "Infrastructure",
                     package: "Infrastructure"
-                ),
+                )
             ],
             path: "Sources/Dashboard"
         ),
@@ -64,7 +64,7 @@ let package = Package(
                 .product(
                     name: "Infrastructure",
                     package: "Infrastructure"
-                ),
+                )
             ],
             path: "Sources/DeviceDetail"
         ),
@@ -82,11 +82,11 @@ let package = Package(
                 .product(
                     name: "Data",
                     package: "Data"
-                ),
+                )
             ],
             path: "Sources/SharedUI",
             resources: [
-                .process("Resources"),
+                .process("Resources")
             ]
         ),
         .target(
@@ -100,7 +100,7 @@ let package = Package(
                 .product(
                     name: "Infrastructure",
                     package: "Infrastructure"
-                ),
+                )
             ],
             path: "Sources/Stores"
         ),
@@ -116,7 +116,7 @@ let package = Package(
                 .product(
                     name: "Infrastructure",
                     package: "Infrastructure"
-                ),
+                )
             ],
             path: "Tests/StoresTests"
         )

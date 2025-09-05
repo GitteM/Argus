@@ -6,7 +6,8 @@ import Foundation
  */
 
 public protocol DeviceConnectionRepositoryProtocol {
-    func addDevice(_ discoveredDevice: DiscoveredDevice) async throws -> Device
-    func removeDevice(deviceId: String) async throws
-    func getManagedDevices() async throws -> [Device]
+    func addDevice(_ discoveredDevice: DiscoveredDevice) async
+        -> Result<Device, AppError>
+    func removeDevice(deviceId: String) async -> Result<Void, AppError>
+    func getManagedDevices() async -> Result<[Device], AppError>
 }

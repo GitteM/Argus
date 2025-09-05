@@ -9,6 +9,12 @@ public final class GetManagedDevicesUseCase: @unchecked Sendable {
     }
 
     public func execute() async throws -> [Device] {
-        try await deviceConnectionRepository.getManagedDevices()
+        let result = await deviceConnectionRepository.getManagedDevices()
+        switch result {
+        case let .success(devices):
+            return devices
+        case let .failure(error):
+            throw error
+        }
     }
 }

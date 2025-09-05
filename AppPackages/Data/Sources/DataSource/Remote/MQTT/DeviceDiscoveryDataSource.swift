@@ -4,8 +4,9 @@ import ServiceProtocols
 
 @available(macOS 10.15, iOS 13, *)
 public protocol DeviceDiscoveryDataSourceProtocol: Sendable {
-    func subscribeToDeviceDiscovery() async -> AsyncStream<[DiscoveredDevice]>
-    func getDiscoveredDevices() async -> [DiscoveredDevice]
+    func subscribeToDeviceDiscovery() async
+        -> Result<AsyncStream<[DiscoveredDevice]>, AppError>
+    func getDiscoveredDevices() async -> Result<[DiscoveredDevice], AppError>
 }
 
 public actor DeviceDiscoveryDataSource: DeviceDiscoveryDataSourceProtocol {
@@ -26,8 +27,8 @@ public actor DeviceDiscoveryDataSource: DeviceDiscoveryDataSourceProtocol {
 
     @available(macOS 10.15, iOS 13, *)
     public func subscribeToDeviceDiscovery()
-        -> AsyncStream<[DiscoveredDevice]> {
-        AsyncStream { continuation in
+        -> Result<AsyncStream<[DiscoveredDevice]>, AppError> {
+        let stream = AsyncStream<[DiscoveredDevice]> { continuation in
             Task { [weak self] in
                 guard let self else {
                     continuation.finish()
@@ -60,9 +61,16 @@ public actor DeviceDiscoveryDataSource: DeviceDiscoveryDataSourceProtocol {
                                         await addDiscoveredDevice(
                                             discoveredDevice
                                         )
-                                        let devices =
-                                            await getDiscoveredDevices()
-                                        continuation.yield(devices)
+                                        switch await getDiscoveredDevices() {
+                                        case let .success(devices):
+                                            continuation.yield(devices)
+                                        case let .failure(error):
+                                            logger.log(
+                                                "Failed to get discovered devices: " +
+                                                    "\(error.errorDescription ?? "unknown")",
+                                                level: .error
+                                            )
+                                        }
                                     }
                                 } catch {
                                     let errorDesc = error.localizedDescription
@@ -90,13 +98,16 @@ public actor DeviceDiscoveryDataSource: DeviceDiscoveryDataSourceProtocol {
                 }
             }
         }
+
+        return .success(stream)
     }
 
-    public func getDiscoveredDevices() async -> [DiscoveredDevice] {
+    public func getDiscoveredDevices() async
+        -> Result<[DiscoveredDevice], AppError> {
         // Return real discovered devices from cache
         // Clean up expired devices (older than 5 minutes) before returning
         cleanupExpiredDevices()
-        return discoveredDevicesCache
+        return .success(discoveredDevicesCache)
     }
 
     private func addDiscoveredDevice(_ device: DiscoveredDevice) {

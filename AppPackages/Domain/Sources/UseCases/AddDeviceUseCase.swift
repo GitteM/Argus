@@ -12,6 +12,13 @@ public final class AddDeviceUseCase: @unchecked Sendable {
 
     public func execute(discoveredDevice: DiscoveredDevice) async throws
         -> Device {
-        try await deviceConnectionRepository.addDevice(discoveredDevice)
+        let result = await deviceConnectionRepository
+            .addDevice(discoveredDevice)
+        switch result {
+        case let .success(device):
+            return device
+        case let .failure(error):
+            throw error
+        }
     }
 }

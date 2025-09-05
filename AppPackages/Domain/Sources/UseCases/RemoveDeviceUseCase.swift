@@ -17,8 +17,15 @@ public final class RemoveDeviceUseCase: @unchecked Sendable {
 
     public func execute(deviceId: String) async throws {
         // Get device details before removing (to access stateTopic)
-        let devices = try await deviceConnectionRepository
-            .getManagedDevices()
+        let devicesResult = await deviceConnectionRepository.getManagedDevices()
+        let devices: [Device]
+        switch devicesResult {
+        case let .success(retrievedDevices):
+            devices = retrievedDevices
+        case let .failure(error):
+            throw error
+        }
+
         guard let device = devices.first(where: { $0.id == deviceId })
         else {
             throw AppError.deviceNotFound(deviceId: deviceId)
@@ -28,7 +35,13 @@ public final class RemoveDeviceUseCase: @unchecked Sendable {
         mqttConnectionManager.unsubscribe(from: device.stateTopic)
 
         // Remove device from persistence
-        try await deviceConnectionRepository
+        let removeResult = await deviceConnectionRepository
             .removeDevice(deviceId: deviceId)
+        switch removeResult {
+        case .success:
+            return
+        case let .failure(error):
+            throw error
+        }
     }
 }

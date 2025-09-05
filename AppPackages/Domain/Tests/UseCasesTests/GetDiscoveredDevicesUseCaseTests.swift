@@ -292,24 +292,24 @@ private final class MockDeviceDiscoveryRepository: DeviceDiscoveryRepositoryProt
     var getDiscoveredDevicesCallCount = 0
     var discoveredDevices: [DiscoveredDevice] = []
     var shouldThrowError = false
-    var errorToThrow: Error = AppError.TestFactory.repositoryError
+    var errorToThrow: AppError = .TestFactory.repositoryError
 
-    func getDiscoveredDevices() async throws -> [DiscoveredDevice] {
+    func getDiscoveredDevices() async -> Result<[DiscoveredDevice], AppError> {
         getDiscoveredDevicesCallCount += 1
 
         if shouldThrowError {
-            throw errorToThrow
+            return .failure(errorToThrow)
         }
 
-        return discoveredDevices
+        return .success(discoveredDevices)
     }
 
-    func subscribeToDiscoveredDevices() async throws
-        -> AsyncStream<[DiscoveredDevice]> {
+    func subscribeToDiscoveredDevices() async
+        -> Result<AsyncStream<[DiscoveredDevice]>, AppError> {
         // Not needed for GetDiscoveredDevicesUseCase tests
-        AsyncStream { continuation in
+        .success(AsyncStream { continuation in
             continuation.yield(discoveredDevices)
             continuation.finish()
-        }
+        })
     }
 }

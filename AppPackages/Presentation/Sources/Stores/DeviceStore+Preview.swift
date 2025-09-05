@@ -22,9 +22,9 @@ private final class MockDeviceConnectionRepository: DeviceConnectionRepositoryPr
         self.shouldNeverComplete = shouldNeverComplete
     }
 
-    func addDevice(_ discoveredDevice: DiscoveredDevice) async throws
-        -> Device {
-        Device(
+    func addDevice(_ discoveredDevice: DiscoveredDevice) async
+        -> Result<Device, AppError> {
+        let device = Device(
             id: discoveredDevice.id,
             name: discoveredDevice.name,
             type: discoveredDevice.type,
@@ -39,25 +39,29 @@ private final class MockDeviceConnectionRepository: DeviceConnectionRepositoryPr
             commandTopic: discoveredDevice.commandTopic,
             stateTopic: discoveredDevice.stateTopic
         )
+        return .success(device)
     }
 
-    func removeDevice(deviceId _: String) async throws {}
+    func removeDevice(deviceId _: String) async -> Result<Void, AppError> {
+        .success(())
+    }
 
-    func getManagedDevices() async throws -> [Device] {
+    func getManagedDevices() async -> Result<[Device], AppError> {
         if shouldNeverComplete {
             // Suspend indefinitely to simulate loading
             try? await Task.sleep(for: .seconds(3600)) // 1 hour
-            return devices // In case sleep gets cancelled
+            return .success(devices) // In case sleep gets cancelled
         }
 
         // Add a small delay to simulate real network loading
         try? await Task.sleep(for: .milliseconds(500))
 
         if shouldThrowError {
-            throw AppError
+            return .failure(
                 .mqttConnectionFailed("Failed to connect to MQTT broker")
+            )
         }
-        return devices
+        return .success(devices)
     }
 }
 
@@ -68,19 +72,20 @@ private final class MockDeviceDiscoveryRepository: DeviceDiscoveryRepositoryProt
         self.devices = devices
     }
 
-    func getDiscoveredDevices() async throws -> [DiscoveredDevice] {
+    func getDiscoveredDevices() async -> Result<[DiscoveredDevice], AppError> {
         // Add a small delay to simulate real network loading
         try? await Task.sleep(for: .milliseconds(300))
-        return devices
+        return .success(devices)
     }
 
     @available(macOS 10.15, iOS 13, *)
-    func subscribeToDiscoveredDevices() async throws
-        -> AsyncStream<[DiscoveredDevice]> {
-        AsyncStream { continuation in
+    func subscribeToDiscoveredDevices() async
+        -> Result<AsyncStream<[DiscoveredDevice]>, AppError> {
+        let stream = AsyncStream<[DiscoveredDevice]> { continuation in
             continuation.yield(devices)
             continuation.finish()
         }
+        return .success(stream)
     }
 }
 
@@ -91,19 +96,21 @@ private final class MockDeviceStateRepository: DeviceStateRepositoryProtocol {
         self.deviceState = deviceState
     }
 
-    func getDeviceState(deviceId _: String) async throws -> DeviceState? {
-        deviceState
+    func getDeviceState(deviceId _: String) async
+        -> Result<DeviceState?, AppError> {
+        .success(deviceState)
     }
 
     @available(macOS 10.15, iOS 13, *)
-    func subscribeToDeviceState(stateTopic _: String) async throws
-        -> AsyncStream<DeviceState> {
-        AsyncStream { continuation in
+    func subscribeToDeviceState(stateTopic _: String) async
+        -> Result<AsyncStream<DeviceState>, AppError> {
+        let stream = AsyncStream<DeviceState> { continuation in
             if let deviceState {
                 continuation.yield(deviceState)
             }
             continuation.finish()
         }
+        return .success(stream)
     }
 }
 
@@ -111,7 +118,9 @@ private final class MockDeviceCommandRepository: DeviceCommandRepositoryProtocol
     func sendDeviceCommand(
         deviceId _: String,
         command _: Command
-    ) async throws {}
+    ) async -> Result<Void, AppError> {
+        .success(())
+    }
 }
 
 private final class MockLogger: LoggerProtocol {

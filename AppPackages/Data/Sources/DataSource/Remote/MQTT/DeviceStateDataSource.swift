@@ -6,8 +6,9 @@ import ServiceProtocols
 @available(macOS 10.15, iOS 13, *)
 public protocol DeviceStateDataSourceProtocol: Sendable {
     func subscribeToDeviceState(stateTopic: String) async
-        -> AsyncStream<DeviceState>
-    func getDeviceState(deviceId: String) async throws -> DeviceState?
+        -> Result<AsyncStream<DeviceState>, AppError>
+    func getDeviceState(deviceId: String) async
+        -> Result<DeviceState?, AppError>
 }
 
 public actor DeviceStateDataSource: DeviceStateDataSourceProtocol {
@@ -25,8 +26,16 @@ public actor DeviceStateDataSource: DeviceStateDataSourceProtocol {
 
     @available(macOS 10.15, iOS 13, *)
     public func subscribeToDeviceState(stateTopic: String) async
-        -> AsyncStream<DeviceState> {
-        AsyncStream { continuation in
+        -> Result<AsyncStream<DeviceState>, AppError> {
+        // Validate topic
+        guard !stateTopic.isEmpty else {
+            return .failure(.validationError(
+                field: "stateTopic",
+                reason: "State topic cannot be empty"
+            ))
+        }
+
+        let stream = AsyncStream<DeviceState> { continuation in
             // Subscribe to the specific state topic
             subscriptionManager
                 .subscribe(to: stateTopic) { [weak self] message in
@@ -50,10 +59,22 @@ public actor DeviceStateDataSource: DeviceStateDataSourceProtocol {
                 // Optional: Unsubscribe from topic if needed
             }
         }
+
+        return .success(stream)
     }
 
-    public func getDeviceState(deviceId: String) async throws -> DeviceState? {
-        deviceStatesCache[deviceId]
+    public func getDeviceState(deviceId: String) async
+        -> Result<DeviceState?, AppError> {
+        // Validate device ID
+        guard !deviceId.isEmpty else {
+            return .failure(.validationError(
+                field: "deviceId",
+                reason: "Device ID cannot be empty"
+            ))
+        }
+
+        let deviceState = deviceStatesCache[deviceId]
+        return .success(deviceState)
     }
 
     private func updateDeviceState(_ deviceState: DeviceState) {

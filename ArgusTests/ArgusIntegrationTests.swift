@@ -23,9 +23,17 @@ struct ArgusIntegrationTests {
             cacheManager: failingCacheManager
         )
 
-        // When & Then
-        await #expect(throws: AppError.self) {
-            _ = try await repository.getManagedDevices()
+        // When
+        let result = await repository.getManagedDevices()
+
+        // Then
+        switch result {
+        case .success:
+            Issue.record("Expected failure but got success")
+        case let .failure(error):
+            // Verify it's specifically a cache error
+            #expect(error.category == .data)
+            #expect(error.errorDescription?.contains("cache") == true)
         }
     }
 
@@ -62,12 +70,21 @@ struct ArgusIntegrationTests {
         }
 
         // When
-        let devices = try await repository.getManagedDevices()
+        let devicesResult = await repository.getManagedDevices()
 
         // Then
-        #expect(devices.count == 2)
-        #expect(devices.contains { $0.id == Device.integrationTestLight.id })
-        #expect(devices.contains { $0.id == Device.integrationTestSensor.id })
+        switch devicesResult {
+        case let .success(devices):
+            #expect(devices.count == 2)
+            #expect(devices
+                .contains { $0.id == Device.integrationTestLight.id }
+            )
+            #expect(devices
+                .contains { $0.id == Device.integrationTestSensor.id }
+            )
+        case let .failure(error):
+            throw error
+        }
     }
 
     @Test("Device connection repository should cache retrieved devices")
@@ -84,12 +101,20 @@ struct ArgusIntegrationTests {
         try clearCache(workingCacheManager)
 
         // When - Initially should return empty array (no cached devices)
-        let initialDevices = try await repository.getManagedDevices()
+        let initialDevicesResult = await repository.getManagedDevices()
+        let initialDevices: [Device]
+        switch initialDevicesResult {
+        case let .success(devices):
+            initialDevices = devices
+        case let .failure(error):
+            throw error
+        }
 
         // Debug: Print what's actually in the cache if it's not empty
         if !initialDevices.isEmpty {
             print(
-                "DEBUG: Initial devices (expected empty): \(initialDevices.map { "\($0.id) (managed: \($0.isManaged))" })"
+                "DEBUG: Initial devices (expected empty): " +
+                    "\(initialDevices.map { "\($0.id) (managed: \($0.isManaged))" })"
             )
         }
 
@@ -100,14 +125,29 @@ struct ArgusIntegrationTests {
 
         // Add a device, which should cache it
         let discoveredDevice = DiscoveredDevice.integrationTestDevice
-        let addedDevice = try await repository.addDevice(discoveredDevice)
+        let addedDeviceResult = await repository.addDevice(discoveredDevice)
+        let addedDevice: Device
+        switch addedDeviceResult {
+        case let .success(device):
+            addedDevice = device
+        case let .failure(error):
+            throw error
+        }
 
         // Retrieve devices again - should return the cached device
-        let cachedDevices = try await repository.getManagedDevices()
+        let cachedDevicesResult = await repository.getManagedDevices()
+        let cachedDevices: [Device]
+        switch cachedDevicesResult {
+        case let .success(devices):
+            cachedDevices = devices
+        case let .failure(error):
+            throw error
+        }
 
         // Debug: Print what's actually in the cache after adding device
         print(
-            "DEBUG: Cached devices after adding: \(cachedDevices.map { "\($0.id) (managed: \($0.isManaged))" })"
+            "DEBUG: Cached devices after adding: " +
+                "\(cachedDevices.map { "\($0.id) (managed: \($0.isManaged))" })"
         )
         print(
             "DEBUG: Added device: \(addedDevice.id) (managed: \(addedDevice.isManaged))"
@@ -182,14 +222,43 @@ struct ArgusIntegrationTests {
         try clearCache(cacheManager)
 
         // When - Add a device (should persist to cache and disk)
-        let addedDevice = try await repository.addDevice(discoveredDevice)
+        let addedDeviceResult = await repository.addDevice(discoveredDevice)
+        let addedDevice: Device
+        switch addedDeviceResult {
+        case let .success(device):
+            addedDevice = device
+        case let .failure(error):
+            throw error
+        }
 
         // Verify it's in the managed devices (retrieved from cache)
-        let managedDevices = try await repository.getManagedDevices()
+        let managedDevicesResult = await repository.getManagedDevices()
+        let managedDevices: [Device]
+        switch managedDevicesResult {
+        case let .success(devices):
+            managedDevices = devices
+        case let .failure(error):
+            throw error
+        }
 
         // Test device removal
-        try await repository.removeDevice(deviceId: addedDevice.id)
-        let devicesAfterRemoval = try await repository.getManagedDevices()
+        let removeResult = await repository
+            .removeDevice(deviceId: addedDevice.id)
+        switch removeResult {
+        case .success:
+            break
+        case let .failure(error):
+            throw error
+        }
+
+        let devicesAfterRemovalResult = await repository.getManagedDevices()
+        let devicesAfterRemoval: [Device]
+        switch devicesAfterRemovalResult {
+        case let .success(devices):
+            devicesAfterRemoval = devices
+        case let .failure(error):
+            throw error
+        }
 
         // Then
         #expect(addedDevice.id == discoveredDevice.id)
