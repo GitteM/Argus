@@ -129,6 +129,10 @@ public actor DeviceStateDataSource: DeviceStateDataSourceProtocol {
                 context: "from MQTT topic: \(topic)"
             )
         } catch {
+            logger.log(
+                "Failed to decode TemperatureSensor from MQTT topic: \(topic). Error: \(error)",
+                level: .error
+            )
             return nil
         }
     }
@@ -157,6 +161,10 @@ public actor DeviceStateDataSource: DeviceStateDataSourceProtocol {
                 context: "from MQTT topic: \(topic)"
             )
         } catch {
+            logger.log(
+                "Failed to decode LightState from MQTT topic: \(topic). Error: \(error)",
+                level: .error
+            )
             return nil
         }
     }
