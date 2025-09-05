@@ -37,7 +37,7 @@ Ensure the Docker container and test server is running locally to provide test d
 - **Clean Architecture** with clear separation of concerns
 - **MV State Pattern** for reactive UI with Combine
 - **Modular Design** using Swift Package Manager
-- **Real-time Communication** via MQTT 
+- **Real-time Communication** via MQTT
 - **Dependency Injection** Composition Root with State/Store
 - **Router Pattern** for navigation
 - **Async/Await** for modern concurrency
@@ -84,7 +84,7 @@ Argus/
 ├── Packages/
 │   ├── Domain/               # Business logic (no dependencies)
 │   ├── Data/                 # Repository implementations
-│   ├── Presentation/         # UI modules 
+│   ├── Presentation/         # UI modules
 │   ├── Infrastructure/       # Core services and utilities
 │   └── Navigation/           # Routers and Route extensions
 └── README.md
@@ -120,7 +120,7 @@ Open the file Argus/Argus.xcworkspace (not the .xcodeproj).
 - Subsequent Builds: Future builds will be much faster (~5 seconds).
 
 **Run & Test**
-- To run the app: Press Cmd+R 
+- To run the app: Press Cmd+R
 - To run the tests: Press Cmd+U
 
 ## UI/UX Design
@@ -129,7 +129,7 @@ Open the file Argus/Argus.xcworkspace (not the .xcodeproj).
 
 The current interface prioritizes functionality over polish. Potential improvements for future iterations:
 - Enhanced visual design and user experience
-- Improved connection status 
+- Improved connection status
 
 ## Build Configurations
 
