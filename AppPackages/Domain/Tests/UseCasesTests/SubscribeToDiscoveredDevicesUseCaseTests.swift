@@ -212,13 +212,13 @@ struct SubscribeToDiscoveredDevicesUseCaseTests {
         // Given
         let mockRepository = MockDeviceDiscoveryRepository()
         mockRepository.shouldThrowError = true
-        mockRepository.errorToThrow = TestError.discoveryFailure
+        mockRepository.errorToThrow = AppError.TestFactory.discoveryFailure
         let sut = SubscribeToDiscoveredDevicesUseCase(
             deviceDiscoveryRepository: mockRepository
         )
 
         // When/Then
-        await #expect(throws: TestError.discoveryFailure) {
+        await #expect(throws: AppError.TestFactory.discoveryFailure) {
             try await sut.execute()
         }
         #expect(mockRepository.subscribeToDiscoveredDevicesCallCount == 1)
@@ -229,13 +229,13 @@ struct SubscribeToDiscoveredDevicesUseCaseTests {
         // Given
         let mockRepository = MockDeviceDiscoveryRepository()
         mockRepository.shouldThrowError = true
-        mockRepository.errorToThrow = TestError.mqttError
+        mockRepository.errorToThrow = AppError.TestFactory.mqttError
         let sut = SubscribeToDiscoveredDevicesUseCase(
             deviceDiscoveryRepository: mockRepository
         )
 
         // When/Then
-        await #expect(throws: TestError.mqttError) {
+        await #expect(throws: AppError.TestFactory.mqttError) {
             try await sut.execute()
         }
     }
@@ -449,7 +449,7 @@ private final class MockDeviceDiscoveryRepository: DeviceDiscoveryRepositoryProt
     var getDiscoveredDevicesCallCount = 0
     var discoveredDevices: [[DiscoveredDevice]] = []
     var shouldThrowError = false
-    var errorToThrow: Error = TestError.discoveryFailure
+    var errorToThrow: Error = AppError.TestFactory.discoveryFailure
 
     func subscribeToDiscoveredDevices() async throws
         -> AsyncStream<[DiscoveredDevice]> {

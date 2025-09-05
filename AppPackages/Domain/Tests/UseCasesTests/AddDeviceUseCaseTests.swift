@@ -54,13 +54,13 @@ struct AddDeviceUseCaseTests {
     func executeWhenRepositoryThrowsError() async {
         // Given
         let discoveredDevice = DiscoveredDevice.mockNew1
-        let expectedError = TestError.repositoryError
+        let expectedError = AppError.TestFactory.repositoryError
         let mockRepository = MockDeviceConnectionRepository()
         mockRepository.addDeviceResult = .failure(expectedError)
         let sut = AddDeviceUseCase(deviceConnectionRepository: mockRepository)
 
         // When/Then
-        await #expect(throws: TestError.repositoryError) {
+        await #expect(throws: AppError.TestFactory.repositoryError) {
             try await sut.execute(discoveredDevice: discoveredDevice)
         }
         #expect(mockRepository.addDeviceCallCount == 1)
@@ -70,13 +70,13 @@ struct AddDeviceUseCaseTests {
     func executeWhenDeviceAlreadyExists() async {
         // Given
         let discoveredDevice = DiscoveredDevice.mockNew1
-        let expectedError = TestError.deviceAlreadyExists
+        let expectedError = AppError.TestFactory.deviceAlreadyExists
         let mockRepository = MockDeviceConnectionRepository()
         mockRepository.addDeviceResult = .failure(expectedError)
         let sut = AddDeviceUseCase(deviceConnectionRepository: mockRepository)
 
         // When/Then
-        await #expect(throws: TestError.deviceAlreadyExists) {
+        await #expect(throws: AppError.TestFactory.deviceAlreadyExists) {
             try await sut.execute(discoveredDevice: discoveredDevice)
         }
     }

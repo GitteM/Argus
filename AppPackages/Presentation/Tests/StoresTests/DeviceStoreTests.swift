@@ -66,7 +66,7 @@ struct DeviceStoreTests {
         if case let .error(appError) = store.viewState {
             // The error message should contain our mock error description
             let errorMessage = appError.errorDescription ?? ""
-            #expect(errorMessage.contains("A generic test error occurred"))
+            #expect(errorMessage.contains("An unexpected error occurred"))
         } else {
             Issue.record("Expected error state, but got: \(store.viewState)")
         }
@@ -231,7 +231,7 @@ private final class MockDeviceConnectionRepository: DeviceConnectionRepositoryPr
     func addDevice(_ discoveredDevice: DiscoveredDevice) async throws
         -> Device {
         if shouldThrowError {
-            throw TestError.generic
+            throw AppError.TestFactory.generic
         }
         return Device(
             id: discoveredDevice.id,
@@ -252,13 +252,13 @@ private final class MockDeviceConnectionRepository: DeviceConnectionRepositoryPr
 
     func removeDevice(deviceId _: String) async throws {
         if shouldThrowError {
-            throw TestError.generic
+            throw AppError.TestFactory.generic
         }
     }
 
     func getManagedDevices() async throws -> [Device] {
         if shouldThrowError {
-            throw TestError.generic
+            throw AppError.TestFactory.generic
         }
         return devices
     }

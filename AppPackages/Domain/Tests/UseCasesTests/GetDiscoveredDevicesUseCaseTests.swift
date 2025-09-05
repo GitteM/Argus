@@ -132,7 +132,7 @@ struct GetDiscoveredDevicesUseCaseTests {
     @Test("Execute when repository throws error should propagate error")
     func executeWhenRepositoryThrowsError() async {
         // Given
-        let expectedError = TestError.repositoryError
+        let expectedError = AppError.TestFactory.repositoryError
         let mockRepository = MockDeviceDiscoveryRepository()
         mockRepository.shouldThrowError = true
         mockRepository.errorToThrow = expectedError
@@ -142,7 +142,7 @@ struct GetDiscoveredDevicesUseCaseTests {
             )
 
         // When/Then
-        await #expect(throws: TestError.repositoryError) {
+        await #expect(throws: AppError.TestFactory.repositoryError) {
             try await sut.execute()
         }
         #expect(mockRepository.getDiscoveredDevicesCallCount == 1)
@@ -153,7 +153,7 @@ struct GetDiscoveredDevicesUseCaseTests {
     )
     func executeWhenRepositoryThrowsDeviceNotFoundError() async {
         // Given
-        let expectedError = TestError.deviceNotFound
+        let expectedError = AppError.TestFactory.deviceNotFound
         let mockRepository = MockDeviceDiscoveryRepository()
         mockRepository.shouldThrowError = true
         mockRepository.errorToThrow = expectedError
@@ -163,7 +163,7 @@ struct GetDiscoveredDevicesUseCaseTests {
             )
 
         // When/Then
-        await #expect(throws: TestError.deviceNotFound) {
+        await #expect(throws: AppError.TestFactory.deviceNotFound) {
             try await sut.execute()
         }
     }
@@ -292,7 +292,7 @@ private final class MockDeviceDiscoveryRepository: DeviceDiscoveryRepositoryProt
     var getDiscoveredDevicesCallCount = 0
     var discoveredDevices: [DiscoveredDevice] = []
     var shouldThrowError = false
-    var errorToThrow: Error = TestError.repositoryError
+    var errorToThrow: Error = AppError.TestFactory.repositoryError
 
     func getDiscoveredDevices() async throws -> [DiscoveredDevice] {
         getDiscoveredDevicesCallCount += 1

@@ -259,185 +259,127 @@ public enum ErrorCategory: String, CaseIterable {
     case unknown
 }
 
-// MARK: - Test Error (DEBUG only)
+// MARK: - Test Helpers
 
 #if DEBUG
-    /// Unified test error for mocking failures across all test suites
-    /// This replaces the individual MockError enums in each test file
-    public enum TestError: Error, Equatable, CaseIterable {
-        // MARK: - Generic Test Errors
+    public extension AppError {
+        /// Factory methods for creating test-specific AppError instances
+        enum TestFactory {
+            // MARK: - Generic Test Errors
 
-        case generic
-        case timeout
-        case forbidden
-
-        // MARK: - Device-Specific Test Errors
-
-        case deviceNotFound
-        case deviceAlreadyExists
-        case deviceConnectionFailed
-        case deviceCommandFailure
-        case invalidDevice
-
-        // MARK: - MQTT-Specific Test Errors
-
-        case mqttError
-        case mqttConnectionFailed
-        case mqttPublishFailed
-        case mqttSubscriptionFailed
-
-        // MARK: - Data-Specific Test Errors
-
-        case persistenceError
-        case serializationError
-        case deserializationError
-        case cacheError
-        case validationError
-
-        // MARK: - Discovery-Specific Test Errors
-
-        case discoveryFailure
-        case discoveryTimeout
-        case noDevicesFound
-
-        // MARK: - Repository-Specific Test Errors
-
-        case repositoryError
-        case addDeviceFailure
-        case removeDeviceFailure
-        case getDevicesFailure
-        case subscriptionFailure
-        case commandSendFailure
-        case invalidTopic
-        case stateRetrievalError
-
-        // MARK: - Use Case-Specific Test Errors
-
-        case useCaseExecutionFailed
-        case invalidParameters
-        case preconditionFailed
-        case postconditionFailed
-
-        // MARK: - App Init Errors
-
-        case initializationError
-    }
-
-    extension TestError: LocalizedError {
-        public var errorDescription: String? {
-            switch self {
-            case .generic:
-                "A generic test error occurred"
-            case .timeout:
-                "Test operation timed out"
-            case .forbidden:
-                "Test forbidden access"
-            case .deviceNotFound:
-                "Test device not found"
-            case .deviceAlreadyExists:
-                "Test device already exists"
-            case .deviceConnectionFailed:
-                "Test device connection failed"
-            case .deviceCommandFailure:
-                "Test device command failed"
-            case .invalidDevice:
-                "Test invalid device"
-            case .mqttError:
-                "Test MQTT error"
-            case .mqttConnectionFailed:
-                "Test MQTT connection failed"
-            case .mqttPublishFailed:
-                "Test MQTT publish failed"
-            case .mqttSubscriptionFailed:
-                "Test MQTT subscription failed"
-            case .persistenceError:
-                "Test persistence error"
-            case .serializationError:
-                "Test serialization error"
-            case .deserializationError:
-                "Test deserialization error"
-            case .cacheError:
-                "Test cache error"
-            case .validationError:
-                "Test validation error"
-            case .discoveryFailure:
-                "Test discovery failure"
-            case .discoveryTimeout:
-                "Test discovery timeout"
-            case .noDevicesFound:
-                "Test no devices found"
-            case .repositoryError:
-                "Test repository error"
-            case .addDeviceFailure:
-                "Test add device failure"
-            case .removeDeviceFailure:
-                "Test remove device failure"
-            case .getDevicesFailure:
-                "Test get devices failure"
-            case .subscriptionFailure:
-                "Test subscription failure"
-            case .commandSendFailure:
-                "Test command send failure"
-            case .invalidTopic:
-                "Test invalid topic"
-            case .stateRetrievalError:
-                "Test state retrieval error"
-            case .useCaseExecutionFailed:
-                "Test use case execution failed"
-            case .invalidParameters:
-                "Test invalid parameters"
-            case .preconditionFailed:
-                "Test precondition failed"
-            case .postconditionFailed:
-                "Test postcondition failed"
-            case .initializationError:
-                "Test app initialization failed"
-            }
-        }
-    }
-
-    // MARK: - Convenience Extensions for Tests
-
-    public extension TestError {
-        /// Creates a TestError that matches the given AppError category
-        static func matching(_ category: ErrorCategory) -> TestError {
-            switch category {
-            case .device:
-                .deviceNotFound
-            case .data:
-                .persistenceError
-            case .discovery:
-                .discoveryFailure
-            case .system:
-                .timeout
-            case .unknown:
-                .generic
-            case .connectivity:
-                .mqttError
-            case .initialization:
-                .initializationError
-            }
-        }
-
-        /// Converts this TestError to the corresponding AppError
-        func asAppError() -> AppError {
-            switch self {
-            case .deviceNotFound:
-                .deviceNotFound(deviceId: "test_device")
-            case .deviceAlreadyExists:
-                .deviceAlreadyExists(deviceId: "test_device")
-            case .deviceConnectionFailed:
-                .deviceConnectionFailed(deviceId: "test_device")
-            case .mqttConnectionFailed:
-                .mqttConnectionFailed("Test MQTT connection failed")
-            case .discoveryFailure:
-                .discoveryFailed(reason: "Test discovery failed")
-            case .persistenceError:
-                .persistenceError(operation: "test_operation")
-            case .timeout:
+            public static var generic: AppError { .unknown() }
+            public static var timeout: AppError {
                 .timeout(operation: "test_operation")
-            default:
-                .unknown(underlying: self)
+            }
+
+            // MARK: - Device Test Errors
+
+            public static var deviceNotFound: AppError {
+                .deviceNotFound(deviceId: "test_device")
+            }
+
+            public static var deviceAlreadyExists: AppError {
+                .deviceAlreadyExists(deviceId: "test_device")
+            }
+
+            public static var deviceConnectionFailed: AppError {
+                .deviceConnectionFailed(deviceId: "test_device")
+            }
+
+            public static var deviceCommandFailure: AppError {
+                .deviceCommandFailed(
+                    deviceId: "test_device",
+                    command: "test_command"
+                )
+            }
+
+            // MARK: - MQTT Test Errors
+
+            public static var mqttError: AppError {
+                .mqttConnectionFailed("Test MQTT error")
+            }
+
+            public static var mqttConnectionFailed: AppError {
+                .mqttConnectionFailed("Test MQTT connection failed")
+            }
+
+            public static var mqttPublishFailed: AppError {
+                .mqttPublishFailed(topic: "test/topic")
+            }
+
+            public static var mqttSubscriptionFailed: AppError {
+                .mqttSubscriptionFailed(topic: "test/topic")
+            }
+
+            // MARK: - Data Test Errors
+
+            public static var persistenceError: AppError {
+                .persistenceError(operation: "test_operation")
+            }
+
+            public static var serializationError: AppError {
+                .serializationError(type: "TestType")
+            }
+
+            public static var deserializationError: AppError {
+                .deserializationError(type: "TestType")
+            }
+
+            public static var cacheError: AppError { .cacheError(
+                key: "test_key",
+                operation: "test_operation"
+            ) }
+            public static var validationError: AppError { .validationError(
+                field: "test_field",
+                reason: "test_reason"
+            ) }
+
+            // MARK: - Discovery Test Errors
+
+            public static var discoveryFailure: AppError {
+                .discoveryFailed(reason: "Test discovery failed")
+            }
+
+            public static var discoveryTimeout: AppError { .discoveryTimeout }
+            public static var noDevicesFound: AppError { .noDevicesDiscovered }
+
+            // MARK: - System Test Errors
+
+            public static var repositoryError: AppError {
+                .persistenceError(operation: "repository_operation")
+            }
+
+            public static var addDeviceFailure: AppError {
+                .deviceAlreadyExists(deviceId: "test_device")
+            }
+
+            public static var removeDeviceFailure: AppError {
+                .deviceNotFound(deviceId: "test_device")
+            }
+
+            public static var subscriptionFailure: AppError {
+                .mqttSubscriptionFailed(topic: "test/topic")
+            }
+
+            public static var commandSendFailure: AppError {
+                .deviceCommandFailed(
+                    deviceId: "test_device",
+                    command: "test_command"
+                )
+            }
+
+            public static var invalidTopic: AppError { .validationError(
+                field: "topic",
+                reason: "invalid format"
+            ) }
+
+            // MARK: - App Init Test Errors
+
+            public static var initializationError: AppError {
+                .initializationError(
+                    component: "test_component",
+                    reason: "test_reason"
+                )
             }
         }
     }
