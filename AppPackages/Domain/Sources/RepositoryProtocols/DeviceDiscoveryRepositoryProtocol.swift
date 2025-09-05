@@ -6,7 +6,7 @@ import Entities
  */
 @available(macOS 10.15, iOS 13, *)
 public protocol DeviceDiscoveryRepositoryProtocol {
-    func getDiscoveredDevices() async throws -> [DiscoveredDevice]
-    func subscribeToDiscoveredDevices() async throws
-        -> AsyncStream<[DiscoveredDevice]>
+    func getDiscoveredDevices() async -> Result<[DiscoveredDevice], AppError>
+    func subscribeToDiscoveredDevices() async
+        -> Result<AsyncStream<[DiscoveredDevice]>, AppError>
 }

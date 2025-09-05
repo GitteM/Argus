@@ -14,14 +14,15 @@ public struct DeviceDiscoveryRepository: DeviceDiscoveryRepositoryProtocol {
         self.deviceDiscoveryDataSource = deviceDiscoveryDataSource
     }
 
-    public func getDiscoveredDevices() async throws -> [DiscoveredDevice] {
+    public func getDiscoveredDevices() async
+        -> Result<[DiscoveredDevice], AppError> {
         // DataSource already handles caching with proper cleanup
         await deviceDiscoveryDataSource.getDiscoveredDevices()
     }
 
     @available(macOS 10.15, iOS 13, *)
-    public func subscribeToDiscoveredDevices() async throws
-        -> AsyncStream<[DiscoveredDevice]> {
+    public func subscribeToDiscoveredDevices() async
+        -> Result<AsyncStream<[DiscoveredDevice]>, AppError> {
         await deviceDiscoveryDataSource.subscribeToDeviceDiscovery()
     }
 }

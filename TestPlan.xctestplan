@@ -15,6 +15,13 @@
     {
       "target" : {
         "containerPath" : "container:AppPackages\/Data",
+        "identifier" : "PersistenceTests",
+        "name" : "PersistenceTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:AppPackages\/Data",
         "identifier" : "DataSourceTests",
         "name" : "DataSourceTests"
       }
@@ -35,13 +42,6 @@
     },
     {
       "target" : {
-        "containerPath" : "container:Argus.xcodeproj",
-        "identifier" : "EC78E3A62E4F694900262F13",
-        "name" : "ArgusTests"
-      }
-    },
-    {
-      "target" : {
         "containerPath" : "container:AppPackages\/Presentation",
         "identifier" : "StoresTests",
         "name" : "StoresTests"
@@ -49,9 +49,16 @@
     },
     {
       "target" : {
+        "containerPath" : "container:Argus.xcodeproj",
+        "identifier" : "EC78E3A62E4F694900262F13",
+        "name" : "ArgusTests"
+      }
+    },
+    {
+      "target" : {
         "containerPath" : "container:AppPackages\/Data",
-        "identifier" : "PersistenceTests",
-        "name" : "PersistenceTests"
+        "identifier" : "RepositoriesTests",
+        "name" : "RepositoriesTests"
       }
     }
   ],

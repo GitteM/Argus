@@ -9,19 +9,19 @@ let package = Package(
         .macOS(.v14)
     ],
     products: [
-        .library(name: "Navigation", targets: ["Navigation"]),
+        .library(name: "Navigation", targets: ["Navigation"])
     ],
     dependencies: [
-        .package(path: "../Presentation"),
+        .package(path: "../Presentation")
     ],
     targets: [
         .target(
             name: "Navigation",
             dependencies: [
                 .product(name: "DeviceDetail", package: "Presentation"),
-                .product(name: "SharedUI", package: "Presentation"),
+                .product(name: "SharedUI", package: "Presentation")
             ],
             path: "Sources/Navigation"
-        ),
+        )
     ]
 )

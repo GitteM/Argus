@@ -192,10 +192,8 @@ struct CacheManagerTests {
 
         // Then - Check that errors were logged
         // Note: The actual logging happens inside the JSONDecoder extension
-        // This test verifies the integration
-        #expect(mockLogger.loggedMessages
-            .count >= 0
-        ) // May or may not log depending on implementation
+        // This test verifies the integration - logging behavior is
+        // implementation dependent
     }
 
     @Test("Cache directory creation should succeed or handle failure gracefully"

@@ -367,31 +367,33 @@ private final class MockDeviceConnectionRepository: DeviceConnectionRepositoryPr
     var managedDevices: [Device] = []
     var shouldThrowErrorOnGet = false
     var shouldThrowErrorOnRemove = false
-    var errorToThrow: Error = AppError.TestFactory.repositoryError
+    var errorToThrow: AppError = .TestFactory.repositoryError
     var lastRemovedDeviceId: String?
 
-    func getManagedDevices() async throws -> [Device] {
+    func getManagedDevices() async -> Result<[Device], AppError> {
         getManagedDevicesCallCount += 1
 
         if shouldThrowErrorOnGet {
-            throw errorToThrow
+            return .failure(errorToThrow)
         }
 
-        return managedDevices
+        return .success(managedDevices)
     }
 
-    func removeDevice(deviceId: String) async throws {
+    func removeDevice(deviceId: String) async -> Result<Void, AppError> {
         removeDeviceCallCount += 1
         lastRemovedDeviceId = deviceId
 
         if shouldThrowErrorOnRemove {
-            throw errorToThrow
+            return .failure(errorToThrow)
         }
+
+        return .success(())
     }
 
-    func addDevice(_: DiscoveredDevice) async throws -> Device {
+    func addDevice(_: DiscoveredDevice) async -> Result<Device, AppError> {
         // Not needed for RemoveDeviceUseCase tests
-        Device.mockLight
+        .success(Device.mockLight)
     }
 }
 

@@ -15,7 +15,7 @@ let package = Package(
                 "Entities",
                 "RepositoryProtocols",
                 "ServiceProtocols",
-                "UseCases",
+                "UseCases"
             ]
         ),
         .library(
@@ -33,10 +33,10 @@ let package = Package(
         .library(
             name: "UseCases",
             targets: ["UseCases"]
-        ),
+        )
     ],
     dependencies: [
-        .package(url: "https://github.com/emqx/CocoaMQTT.git", from: "2.1.0"),
+        .package(url: "https://github.com/emqx/CocoaMQTT.git", from: "2.1.0")
     ],
     targets: [
         .target(
@@ -49,7 +49,7 @@ let package = Package(
             name: "RepositoryProtocols",
             dependencies: [
                 "Entities",
-                "ServiceProtocols",
+                "ServiceProtocols"
             ],
             path: "Sources/RepositoryProtocols"
         ),
@@ -57,7 +57,7 @@ let package = Package(
             name: "ServiceProtocols",
             dependencies: [
                 "Entities",
-                "CocoaMQTT",
+                "CocoaMQTT"
             ],
             path: "Sources/ServiceProtocols"
         ),
@@ -66,7 +66,7 @@ let package = Package(
             dependencies: [
                 "Entities",
                 "RepositoryProtocols",
-                "ServiceProtocols",
+                "ServiceProtocols"
             ],
             path: "Sources/UseCases"
         ),
@@ -76,7 +76,7 @@ let package = Package(
                 "UseCases",
                 "Entities",
                 "RepositoryProtocols",
-                "ServiceProtocols",
+                "ServiceProtocols"
             ],
             path: "Tests/UseCasesTests"
         )

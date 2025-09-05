@@ -143,27 +143,22 @@ struct AddDeviceUseCaseTests {
 private final class MockDeviceConnectionRepository: DeviceConnectionRepositoryProtocol {
     var addDeviceCallCount = 0
     var lastDiscoveredDevice: DiscoveredDevice?
-    var addDeviceResult: Result<Device, Error> = .success(Device.mockLight)
+    var addDeviceResult: Result<Device, AppError> = .success(Device.mockLight)
 
-    func addDevice(_ discoveredDevice: DiscoveredDevice) async throws
-        -> Device {
+    func addDevice(_ discoveredDevice: DiscoveredDevice) async
+        -> Result<Device, AppError> {
         addDeviceCallCount += 1
         lastDiscoveredDevice = discoveredDevice
-
-        switch addDeviceResult {
-        case let .success(device):
-            return device
-        case let .failure(error):
-            throw error
-        }
+        return addDeviceResult
     }
 
-    func removeDevice(deviceId _: String) async throws {
+    func removeDevice(deviceId _: String) async -> Result<Void, AppError> {
         // Not needed for AddDeviceUseCase tests
+        .success(())
     }
 
-    func getManagedDevices() async throws -> [Device] {
+    func getManagedDevices() async -> Result<[Device], AppError> {
         // Not needed for AddDeviceUseCase tests
-        []
+        .success([])
     }
 }

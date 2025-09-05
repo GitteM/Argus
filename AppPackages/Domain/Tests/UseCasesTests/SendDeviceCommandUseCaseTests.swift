@@ -379,23 +379,28 @@ private actor MockDeviceCommandRepository: DeviceCommandRepositoryProtocol {
     var lastDeviceId: String?
     var lastCommand: Command?
     var shouldThrowError = false
-    var errorToThrow: Error = AppError.TestFactory.commandSendFailure
+    var errorToThrow: AppError = .TestFactory.commandSendFailure
 
-    func sendDeviceCommand(deviceId: String, command: Command) async throws {
+    func sendDeviceCommand(
+        deviceId: String,
+        command: Command
+    ) async -> Result<Void, AppError> {
         sendDeviceCommandCallCount += 1
         lastDeviceId = deviceId
         lastCommand = command
 
         if shouldThrowError {
-            throw errorToThrow
+            return .failure(errorToThrow)
         }
+
+        return .success(())
     }
 
     func setShouldThrowError(_ value: Bool) {
         shouldThrowError = value
     }
 
-    func setErrorToThrow(_ error: Error) {
+    func setErrorToThrow(_ error: AppError) {
         errorToThrow = error
     }
 }

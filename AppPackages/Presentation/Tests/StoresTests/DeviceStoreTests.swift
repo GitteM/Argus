@@ -171,7 +171,7 @@ struct DeviceStoreTests {
 
 // MARK: - Test Helpers
 
-// TODO: Attempt to reuse DeviceStore+Preview
+// Note: Consider extracting this helper to DeviceStore+Preview for reuse
 
 @MainActor
 private func createDeviceStore(
@@ -228,12 +228,12 @@ private final class MockDeviceConnectionRepository: DeviceConnectionRepositoryPr
         self.shouldThrowError = shouldThrowError
     }
 
-    func addDevice(_ discoveredDevice: DiscoveredDevice) async throws
-        -> Device {
+    func addDevice(_ discoveredDevice: DiscoveredDevice) async
+        -> Result<Device, AppError> {
         if shouldThrowError {
-            throw AppError.TestFactory.generic
+            return .failure(AppError.TestFactory.generic)
         }
-        return Device(
+        let device = Device(
             id: discoveredDevice.id,
             name: discoveredDevice.name,
             type: discoveredDevice.type,
@@ -248,19 +248,21 @@ private final class MockDeviceConnectionRepository: DeviceConnectionRepositoryPr
             commandTopic: discoveredDevice.commandTopic,
             stateTopic: discoveredDevice.stateTopic
         )
+        return .success(device)
     }
 
-    func removeDevice(deviceId _: String) async throws {
+    func removeDevice(deviceId _: String) async -> Result<Void, AppError> {
         if shouldThrowError {
-            throw AppError.TestFactory.generic
+            return .failure(AppError.TestFactory.generic)
         }
+        return .success(())
     }
 
-    func getManagedDevices() async throws -> [Device] {
+    func getManagedDevices() async -> Result<[Device], AppError> {
         if shouldThrowError {
-            throw AppError.TestFactory.generic
+            return .failure(AppError.TestFactory.generic)
         }
-        return devices
+        return .success(devices)
     }
 }
 
@@ -271,31 +273,34 @@ private final class MockDeviceDiscoveryRepository: DeviceDiscoveryRepositoryProt
         self.devices = devices
     }
 
-    func getDiscoveredDevices() async throws -> [DiscoveredDevice] {
-        devices
+    func getDiscoveredDevices() async -> Result<[DiscoveredDevice], AppError> {
+        .success(devices)
     }
 
     @available(macOS 10.15, iOS 13, *)
-    func subscribeToDiscoveredDevices() async throws
-        -> AsyncStream<[DiscoveredDevice]> {
-        AsyncStream { continuation in
+    func subscribeToDiscoveredDevices() async
+        -> Result<AsyncStream<[DiscoveredDevice]>, AppError> {
+        let stream = AsyncStream<[DiscoveredDevice]> { continuation in
             continuation.yield(devices)
             continuation.finish()
         }
+        return .success(stream)
     }
 }
 
 private final class MockDeviceStateRepository: DeviceStateRepositoryProtocol {
-    func getDeviceState(deviceId _: String) async throws -> DeviceState? {
-        nil
+    func getDeviceState(deviceId _: String) async
+        -> Result<DeviceState?, AppError> {
+        .success(nil)
     }
 
     @available(macOS 10.15, iOS 13, *)
-    func subscribeToDeviceState(stateTopic _: String) async throws
-        -> AsyncStream<DeviceState> {
-        AsyncStream { continuation in
+    func subscribeToDeviceState(stateTopic _: String) async
+        -> Result<AsyncStream<DeviceState>, AppError> {
+        let stream = AsyncStream<DeviceState> { continuation in
             continuation.finish()
         }
+        return .success(stream)
     }
 }
 
@@ -303,7 +308,9 @@ private final class MockDeviceCommandRepository: DeviceCommandRepositoryProtocol
     func sendDeviceCommand(
         deviceId _: String,
         command _: Command
-    ) async throws {}
+    ) async -> Result<Void, AppError> {
+        .success(())
+    }
 }
 
 private final class MockMQTTConnectionManager: MQTTConnectionManagerProtocol {

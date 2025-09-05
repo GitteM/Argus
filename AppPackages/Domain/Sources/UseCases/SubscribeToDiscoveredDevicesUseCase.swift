@@ -11,6 +11,13 @@ public final class SubscribeToDiscoveredDevicesUseCase: @unchecked Sendable {
 
     @available(macOS 10.15, iOS 13, *)
     public func execute() async throws -> AsyncStream<[DiscoveredDevice]> {
-        try await deviceDiscoveryRepository.subscribeToDiscoveredDevices()
+        let result = await deviceDiscoveryRepository
+            .subscribeToDiscoveredDevices()
+        switch result {
+        case let .success(stream):
+            return stream
+        case let .failure(error):
+            throw error
+        }
     }
 }

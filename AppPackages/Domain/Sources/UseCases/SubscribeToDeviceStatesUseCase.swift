@@ -12,7 +12,13 @@ public final class SubscribeToDeviceStatesUseCase: @unchecked Sendable {
     @available(macOS 10.15, iOS 13, *)
     public func execute(stateTopic: String) async throws
         -> AsyncStream<DeviceState> {
-        try await deviceStateRepository
+        let result = await deviceStateRepository
             .subscribeToDeviceState(stateTopic: stateTopic)
+        switch result {
+        case let .success(stream):
+            return stream
+        case let .failure(error):
+            throw error
+        }
     }
 }

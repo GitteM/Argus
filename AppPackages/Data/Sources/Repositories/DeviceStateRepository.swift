@@ -12,13 +12,14 @@ public class DeviceStateRepository: DeviceStateRepositoryProtocol {
         self.deviceStateDataSource = deviceStateDataSource
     }
 
-    public func getDeviceState(deviceId: String) async throws -> DeviceState? {
-        try await deviceStateDataSource.getDeviceState(deviceId: deviceId)
+    public func getDeviceState(deviceId: String) async
+        -> Result<DeviceState?, AppError> {
+        await deviceStateDataSource.getDeviceState(deviceId: deviceId)
     }
 
     @available(macOS 10.15, iOS 13, *)
-    public func subscribeToDeviceState(stateTopic: String) async throws
-        -> AsyncStream<DeviceState> {
+    public func subscribeToDeviceState(stateTopic: String) async
+        -> Result<AsyncStream<DeviceState>, AppError> {
         await deviceStateDataSource
             .subscribeToDeviceState(stateTopic: stateTopic)
     }

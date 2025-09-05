@@ -418,28 +418,29 @@ private final class MockDeviceStateRepository: DeviceStateRepositoryProtocol {
     var lastStateTopic: String?
     var deviceStates: [DeviceState] = []
     var shouldThrowError = false
-    var errorToThrow: Error = AppError.TestFactory.subscriptionFailure
+    var errorToThrow: AppError = .TestFactory.subscriptionFailure
 
-    func subscribeToDeviceState(stateTopic: String) async throws
-        -> AsyncStream<DeviceState> {
+    func subscribeToDeviceState(stateTopic: String) async
+        -> Result<AsyncStream<DeviceState>, AppError> {
         subscribeToDeviceStateCallCount += 1
         lastStateTopic = stateTopic
 
         if shouldThrowError {
-            throw errorToThrow
+            return .failure(errorToThrow)
         }
 
-        return AsyncStream { continuation in
+        return .success(AsyncStream { continuation in
             for state in deviceStates {
                 continuation.yield(state)
             }
             continuation.finish()
-        }
+        })
     }
 
-    func getDeviceState(deviceId: String) async throws -> DeviceState? {
+    func getDeviceState(deviceId: String) async
+        -> Result<DeviceState?, AppError> {
         getDeviceStateCallCount += 1
         // Not needed for SubscribeToDeviceStatesUseCase tests
-        return deviceStates.first { $0.deviceId == deviceId }
+        return .success(deviceStates.first { $0.deviceId == deviceId })
     }
 }

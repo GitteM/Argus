@@ -31,7 +31,7 @@ let package = Package(
 
         // MARK: - MQTT (For IoT real-time communication)
 
-        .package(url: "https://github.com/emqx/CocoaMQTT.git", from: "2.1.0"),
+        .package(url: "https://github.com/emqx/CocoaMQTT.git", from: "2.1.0")
     ],
     targets: [
         .target(
@@ -39,7 +39,7 @@ let package = Package(
             dependencies: [
                 "Repositories",
                 "Persistence",
-                "DataSource",
+                "DataSource"
             ],
             path: "Sources/Core"
         ),
@@ -48,7 +48,7 @@ let package = Package(
             dependencies: [
                 .product(name: "Domain", package: "Domain"),
                 "CocoaMQTT",
-                "DataUtilities",
+                "DataUtilities"
             ],
             path: "Sources/DataSource"
         ),
@@ -56,7 +56,7 @@ let package = Package(
             name: "Persistence",
             dependencies: [
                 .product(name: "Domain", package: "Domain"),
-                "DataUtilities",
+                "DataUtilities"
             ],
             path: "Sources/Persistence"
         ),
@@ -65,14 +65,14 @@ let package = Package(
             dependencies: [
                 .product(name: "Domain", package: "Domain"),
                 "Persistence",
-                "DataSource",
+                "DataSource"
             ],
             path: "Sources/Repositories"
         ),
         .target(
             name: "DataUtilities",
             dependencies: [
-                .product(name: "ServiceProtocols", package: "Domain"),
+                .product(name: "ServiceProtocols", package: "Domain")
             ],
             path: "Sources/Utilities"
         ),
@@ -81,7 +81,7 @@ let package = Package(
             dependencies: [
                 "DataSource",
                 "DataUtilities",
-                .product(name: "Domain", package: "Domain"),
+                .product(name: "Domain", package: "Domain")
             ]
         ),
         .testTarget(
@@ -97,7 +97,7 @@ let package = Package(
             dependencies: [
                 "Persistence",
                 "DataUtilities",
-                .product(name: "Domain", package: "Domain"),
+                .product(name: "Domain", package: "Domain")
             ],
             path: "Tests/PersistenceTests"
         ),
@@ -105,6 +105,6 @@ let package = Package(
             name: "RepositoriesTests",
             dependencies: ["Repositories"],
             path: "Tests/RepositoriesTests"
-        ),
+        )
     ]
 )

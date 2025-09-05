@@ -6,7 +6,8 @@ import Entities
  */
 @available(macOS 10.15, iOS 13, *)
 public protocol DeviceStateRepositoryProtocol {
-    func getDeviceState(deviceId: String) async throws -> DeviceState?
-    func subscribeToDeviceState(stateTopic: String) async throws
-        -> AsyncStream<DeviceState>
+    func getDeviceState(deviceId: String) async
+        -> Result<DeviceState?, AppError>
+    func subscribeToDeviceState(stateTopic: String) async
+        -> Result<AsyncStream<DeviceState>, AppError>
 }
